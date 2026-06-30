@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart - Taiva India</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="announcement-container">
+      <span class="slider-text"> 100% Natural Ayurvedic Formulations  Shop Now</span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <div class="menu-btn header-actions">
+        <button><i class="fa-solid fa-bars"></i></button>
+      </div>
+      <a href="index.html" class="logo">
+        <img src="images/taiva-logo-white.png" alt="Taiva" height="32">
+      </a>
+      <nav>
+        <ul>
+          <li><a href="diacurex-powder.html">Sugar Pro Max</a></li>
+          <li><a href="digestive-health.html">Digestive Health</a></li>
+          <li><a href="joint-care.html">Joint Care</a></li>
+          <li><a href="#"><i class="fa-regular fa-user"></i> Account</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <a href="cart.html" class="cart-icon" id="cartOpen">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="cart-count">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+  <div class="mobile-nav-drawer">
+    <div class="mobile-nav-header">
+      <img src="images/taiva-logo-white.png" alt="Taiva" style="height:32px;background:#000;padding:4px 10px;border-radius:6px;">
+      <button class="mobile-nav-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="diacurex-powder.html">Sugar Pro Max</a></li>
+      <li><a href="digestive-health.html">Digestive Health</a></li>
+      <li><a href="joint-care.html">Joint Care</a></li>
+      <li><a href="cart.html">View Cart</a></li>
+      <li><a href="#"><i class="fa-regular fa-user"></i> Account</a></li>
+    </ul>
+  </div>
+
+  <!-- Cart Page Section -->
+  <section class="cart-page">
+    <div class="cart-page-container">
+      <div class="cart-table-container">
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 20px; color: var(--primary-dark);">Shopping Cart</h2>
+        <div id="cart-items-list"></div>
+      </div>
+      <div class="cart-summary-box" style="display: none;">
+        <h3>Order Summary</h3>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem;">
+          <span>Subtotal</span>
+          <span id="cart-subtotal-price">₹0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted);">
+          <span>Shipping</span>
+          <span>Free</span>
+        </div>
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 12px 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.1rem; font-weight: 700;">
+          <span>Total</span>
+          <span id="cart-total-price">₹0.00</span>
+        </div>
+        <button class="btn btn-full" onclick="alert('Proceed to checkout')" style="margin-bottom: 8px;">Proceed to Checkout</button>
+        <a href="index.html" style="display: block; text-align: center; font-size: 0.9rem; color: var(--primary-color); text-decoration: underline;">Continue Shopping</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Authenticity</a></li>
+          <li><a href="#">Refund Policy</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Cancellation Policy</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p><strong>Taiva India</strong></p>
+        <p>PLOT NO. 275, PILLAR NO. 168, Sector-81 Noida, Gautam Buddha Nagar, Uttar Pradesh - 201302</p>
+        <p class="footer-contact-item"><i class="fa-solid fa-phone"></i> +91-9582908080</p>
+        <p class="footer-contact-item"><i class="fa-solid fa-envelope"></i> info@taiva.in</p>
+        <p><strong>Hours:</strong> Monday - Saturday, 10:00 AM - 07:00 PM</p>
+        <div class="footer-socials">
+          <a href="https://www.facebook.com/profile.php?id=61590565554083" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/taivanatural/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.youtube.com/@TaivaNatural" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-col footer-map-col">
+        <h4>Our Location</h4>
+        <div class="footer-map">
+          <iframe src="https://www.google.com/maps?q=Plot+No+275+Pillar+No+168+Sector+81+Noida+Uttar+Pradesh+201302&output=embed" 
+            width="100%" height="180" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Taiva India. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Overlay -->
+  <div class="overlay"></div>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay">
+    <button class="search-close"><i class="fa-solid fa-xmark"></i></button>
+    <form class="search-container">
+      <input type="text" placeholder="Search for products (e.g. Sugar, Pachan, Pain)..." required>
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

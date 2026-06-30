@@ -1,0 +1,10 @@
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# IDE
+.vscode/settings.json
+
+# Large video
+images/11.mp4

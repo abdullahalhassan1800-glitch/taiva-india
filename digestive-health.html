@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paachan Pro - Ayurvedic Digestive Powder | Taiva</title>
+  <meta name="description" content="Shop Paachan Pro at Taiva. An Ayurvedic digestive powder with Triphala, Isabgol, Saunf & Ajwain to relieve gas, bloating & indigestion naturally.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="announcement-container">
+      <span class="slider-text"> 100% Natural Ayurvedic Formulations  Shop Now</span>
+      <span class="slider-text"> Free Shipping Across India on Orders Above 499!</span>
+      <span class="slider-text"> Clinically Tested & Science-Backed Wellness</span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="menu-btn header-actions">
+        <button><i class="fa-solid fa-bars"></i></button>
+      </div>
+      <div class="logo">
+        <a href="index.html">
+      <img src="images/taiva-logo-white.png" alt="Taiva Logo" style="height:32px;background:#000;padding:4px 10px;border-radius:6px;">
+        </a>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="diacurex-powder.html">Sugar Pro Max</a></li>
+          <li><a href="digestive-health.html" style="color: var(--primary-color);">Digestive Health</a></li>
+          <li><a href="joint-care.html">Joint Care</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <a href="#" class="cart-btn">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="cart-count">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+  <div class="mobile-nav-drawer">
+    <div class="mobile-nav-header">
+      <img src="images/taiva-logo-white.png" alt="Taiva Logo" style="height:32px;background:#000;padding:4px 10px;border-radius:6px;">
+      <button class="mobile-nav-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="diacurex-powder.html">Sugar Pro Max</a></li>
+      <li><a href="digestive-health.html">Digestive Health</a></li>
+      <li><a href="joint-care.html">Joint Care</a></li>
+      <li><a href="cart.html">View Cart</a></li>
+    </ul>
+  </div>
+
+  <!-- Product Detail Section -->
+  <section class="product-detail">
+    <div class="product-detail-container">
+      
+      <!-- Gallery (Left) -->
+      <div class="product-gallery">
+        <div class="main-image">
+          <img id="galleryMain" src="images/pachan-pro-main.png" alt="Paachan Pro" class="gallery-main-img">
+          <button class="gallery-arrow gallery-arrow-left" onclick="changeGallery(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="gallery-arrow gallery-arrow-right" onclick="changeGallery(1)"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="gallery-thumbs">
+          <img src="images/pachan-pro-main.png" alt="Main" class="gallery-thumb active" data-index="0" onclick="setGallery(0)">
+          <img src="images/pachan-pro-ingredients.png" alt="Ingredients" class="gallery-thumb" data-index="1" onclick="setGallery(1)">
+          <img src="images/pachan-pro-benefits.png" alt="Benefits" class="gallery-thumb" data-index="2" onclick="setGallery(2)">
+          <img src="images/pachan-pro-how-to-use.png" alt="How to Use" class="gallery-thumb" data-index="3" onclick="setGallery(3)">
+          <img src="images/pachan-pro-comparison.png" alt="Comparison" class="gallery-thumb" data-index="4" onclick="setGallery(4)">
+        </div>
+      </div>
+
+      <!-- Info (Right) -->
+      <div class="product-detail-info">
+        <div class="product-detail-meta">
+          <div class="product-stars">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star-half-alt"></i>
+            <span>4.6 (312 reviews)</span>
+          </div>
+        </div>
+        <h1>Paachan Pro</h1>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Ayurvedic Digestive Powder for Gas & Indigestion Relief</p>
+        
+        <div class="product-detail-price">
+          <span class="price-current" style="color: var(--primary-color); font-weight: 700;" data-base-price="1090">₹1,090.00</span>
+          <span class="price-original" style="text-decoration: line-through; color: var(--text-muted);">₹1,499.00</span>
+          <span class="product-tag" style="position: static; background-color: #2e7d32;">27% OFF</span>
+          <span style="color: #2e7d32; font-size: 14px; margin-left: 8px;">You save ₹409.00</span>
+        </div>
+
+        <p style="margin-bottom: 24px; color: var(--text-muted);">
+          Get relief from digestive discomfort with Paachan Pro. Made with trusted Ayurvedic herbs, this formula naturally relieves bloating, gas, and indigestion while supporting healthy digestion.
+        </p>
+
+        <div class="pd-benefit-icons">
+          <div class="pd-benefit-icon-item">
+            <svg viewBox="0 0 48 48" fill="none" width="36" height="36"><circle cx="24" cy="24" r="22" stroke="#2e7d32" stroke-width="1.5" fill="#e8f5e9"/><path d="M16 26l5 5 11-11" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Relieves Gas & Bloating</span>
+          </div>
+          <div class="pd-benefit-icon-item">
+            <svg viewBox="0 0 48 48" fill="none" width="36" height="36"><circle cx="24" cy="24" r="22" stroke="#2e7d32" stroke-width="1.5" fill="#e8f5e9"/><path d="M16 24h16M24 16v16" stroke="#2e7d32" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>Supports Healthy Digestion</span>
+          </div>
+          <div class="pd-benefit-icon-item">
+            <svg viewBox="0 0 48 48" fill="none" width="36" height="36"><circle cx="24" cy="24" r="22" stroke="#2e7d32" stroke-width="1.5" fill="#e8f5e9"/><path d="M18 28c2-4 10-4 12 0M15 24c4-6 14-6 18 0" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"/><path d="M24 32h.01" stroke="#2e7d32" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>Reduces Acidity</span>
+          </div>
+          <div class="pd-benefit-icon-item">
+            <svg viewBox="0 0 48 48" fill="none" width="36" height="36"><circle cx="24" cy="24" r="22" stroke="#2e7d32" stroke-width="1.5" fill="#e8f5e9"/><path d="M16 24c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"/><path d="M20 24l4 4 4-4" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Promotes Gut Health</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="product-detail-actions">
+          <div class="qty-control">
+            <button class="qty-btn minus"><i class="fa-solid fa-minus"></i></button>
+            <span class="qty-val">1</span>
+            <button class="qty-btn plus"><i class="fa-solid fa-plus"></i></button>
+          </div>
+          <button class="btn btn-full add-to-cart-action" data-product-id="pachan-pro" style="flex-grow: 1;">Add to Cart</button>
+        </div>
+
+        <button class="btn btn-accent btn-full" onclick="var q=parseInt(document.querySelector('.qty-val').textContent);addToCart('pachan-pro',q,q>=2?980:undefined);setTimeout(openCartDrawer,100);" style="margin-bottom: 16px; padding: 16px;">Buy Now</button>
+
+        <!-- Trust Bullet Points -->
+        <div class="trust-bullets">
+          <div><i class="fa-solid fa-leaf" style="color: var(--primary-color); margin-right: 8px;"></i> 100% Vegan & Herbal</div>
+          <div><i class="fa-solid fa-wheat-awn" style="color: var(--primary-color); margin-right: 8px;"></i> Gluten-Free & Non-GMO</div>
+          <div><i class="fa-solid fa-ban" style="color: var(--primary-color); margin-right: 8px;"></i> No Added Sugars</div>
+          <div><i class="fa-solid fa-flask" style="color: var(--primary-color); margin-right: 8px;"></i> Lab Tested for Heavy Metals</div>
+        </div>
+
+        <div class="product-highlights">
+          <div class="highlight-item"><i class="fa-regular fa-clock"></i> <span>60-Day Supply</span></div>
+          <div class="highlight-item"><i class="fa-solid fa-microscope"></i> <span>Lab Tested</span></div>
+          <div class="highlight-item"><i class="fa-solid fa-truck-fast"></i> <span>Free Shipping</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What's Inside Section -->
+  <section class="section ingredients-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2>What's Inside</h2>
+        <p>Honest, Transparent, and 100% Natural Ingredients</p>
+      </div>
+      <div class="ingredient-grid">
+        <div class="ingredient-card">
+          <img src="images/ingredients-fennel-seeds.png" alt="Fennel Seeds" loading="lazy">
+          <h3>Fennel Seeds (Saunf)</h3>
+          <p>Relieves bloating and gas while soothing the digestive tract naturally</p>
+        </div>
+        <div class="ingredient-card">
+          <img src="images/ingredients-dry-ginger.png" alt="Dry Ginger" loading="lazy">
+          <h3>Dry Ginger (Sonth)</h3>
+          <p>Soothes digestive discomfort and supports healthy digestion after meals</p>
+        </div>
+        <div class="ingredient-card">
+          <img src="images/ingredients-triphala.png" alt="Triphala" loading="lazy">
+          <h3>Triphala</h3>
+          <p>Promotes healthy bowel movement and supports complete gut detoxification</p>
+        </div>
+        <div class="ingredient-card">
+          <img src="images/ingredients-isabgol.png" alt="Isabgol" loading="lazy">
+          <h3>Isabgol</h3>
+          <p>Supports gut health and regularity with natural fiber for smooth digestion</p>
+        </div>
+        <div class="ingredient-card">
+          <img src="images/ingredients-podina.png" alt="Podina" loading="lazy">
+          <h3>Podina (Mint)</h3>
+          <p>Cools and freshens digestion while relieving stomach discomfort naturally</p>
+        </div>
+        <div class="ingredient-card">
+          <img src="images/ingredients-ajwain.png" alt="Ajwain" loading="lazy">
+          <h3>Ajwain (Bishopweed)</h3>
+          <p>Reduces gas and indigestion with powerful carminative and digestive properties</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Section -->
+  <section class="section why-choose-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2>Why Choose Paachan Pro?</h2>
+        <p>Because your gut health deserves the best</p>
+      </div>
+      <div class="why-choose-layout">
+        <div class="why-choose-list">
+          <ul>
+            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> Ayurvedic Formula &mdash; Natural digestive blend made with trusted herbs like Triphala, Isabgol and Saunf</li>
+            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> 100% Natural &mdash; No artificial chemicals, preservatives or additives. Pure plant-based ingredients</li>
+            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> Targets Root Cause &mdash; Supports digestion at the root level, not just the symptoms</li>
+            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> Supports Daily Gut Health &mdash; Long-term relief from bloating, gas and indigestion with daily use</li>
+            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> Quality Assured &mdash; Manufactured with strict quality and safety standards</li>
+          </ul>
+        </div>
+        <div class="why-choose-image">
+          <img src="images/why-choose-paachan-pro.png" alt="Why Choose Paachan Pro?" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How To Consume Section -->
+  <section class="howtouse-section">
+    <div class="section-container">
+      <h2 class="howto-title">How To Consume This Powder</h2>
+      <div class="howto-steps">
+        <div class="howto-step">
+          <div class="howto-step-img">
+            <img src="images/pachan-pro-measure.png" alt="Measure" loading="lazy">
+          </div>
+          <div class="howto-step-no">1</div>
+          <p>Take 1 scoop (2-3g) of powder</p>
+        </div>
+        <div class="howto-step">
+          <div class="howto-step-img">
+            <img src="images/pachan-pro-mix.png" alt="Mix" loading="lazy">
+          </div>
+          <div class="howto-step-no">2</div>
+          <p>Mix in lukewarm water and stir well</p>
+        </div>
+        <div class="howto-step">
+          <div class="howto-step-img">
+            <img src="images/pachan-pro-consume.png" alt="Consume" loading="lazy">
+          </div>
+          <div class="howto-step-no">3</div>
+          <p>Drink 15-20 minutes before meals</p>
+        </div>
+        <div class="howto-step">
+          <div class="howto-step-img">
+            <img src="images/pachan-pro-repeat-daily.png" alt="Repeat Daily" loading="lazy">
+          </div>
+          <div class="howto-step-no">4</div>
+          <p>Use 1-2 times daily for best results</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="section testimonials-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2>What Our Customers Say</h2>
+        <p>Real results from real people who trusted Paachan Pro.</p>
+      </div>
+      <div class="reviews-carousel">
+        <button class="review-arrow review-arrow-left"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="reviews-track">
+          <div class="review-card">
+            <div class="review-card-header">
+              <img src="images/client1.png" alt="Vikram Singh" class="review-avatar-img">
+              <div>
+                <h4 class="review-author">Vikram Singh</h4>
+                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
+              </div>
+            </div>
+            <div class="review-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="review-text">"Bahut gas aur bloating rehti thi. Paachan Pro liya to 4-5 din mein hi farak dikh gaya. Ab pet bilkul light rehta hai."</p>
+          </div>
+          <div class="review-card">
+            <div class="review-card-header">
+              <img src="images/client2.png" alt="Sunita Devi" class="review-avatar-img">
+              <div>
+                <h4 class="review-author">Sunita Devi</h4>
+                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
+              </div>
+            </div>
+            <div class="review-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="review-text">"Subah uthte hi pet bhari bhari lagta tha. Paachan Pro se ab digestion smooth ho gayi hai aur din fresh start hota hai."</p>
+          </div>
+          <div class="review-card">
+            <div class="review-card-header">
+              <img src="images/client3.png" alt="Rajesh Kumar" class="review-avatar-img">
+              <div>
+                <h4 class="review-author">Rajesh Kumar</h4>
+                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
+              </div>
+            </div>
+            <div class="review-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="review-text">"Maine bahut digestive products try kiye but chemical wale nuksaan karte the. Paachan Pro Ayurvedic hai, koi side effect nahi hua. Best hai."</p>
+          </div>
+          <div class="review-card">
+            <div class="review-card-header">
+              <img src="images/client4.png" alt="Pooja Sharma" class="review-avatar-img">
+              <div>
+                <h4 class="review-author">Pooja Sharma</h4>
+                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
+              </div>
+            </div>
+            <div class="review-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="review-text">"Khana khane ke baad acidity aur discomfort bahut hota tha. Ab Paachan Pro se kaafi improvement aaya hai. Highly recommend karti hoon."</p>
+          </div>
+          <div class="review-card">
+            <div class="review-card-header">
+              <img src="images/client5.png" alt="Amit Yadav" class="review-avatar-img">
+              <div>
+                <h4 class="review-author">Amit Yadav</h4>
+                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
+              </div>
+            </div>
+            <div class="review-stars">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="review-text">"Taking Paachan Pro every morning keeps my stomach healthy. Easy to use and I can clearly feel the results. Highly recommended."</p>
+          </div>
+        </div>
+        <button class="review-arrow review-arrow-right"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="reviews-dots"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="section faq-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about Paachan Pro.</p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item active">
+          <div class="faq-header">
+            <h4>What is Paachan Pro?</h4>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-content">
+            <p>Paachan Pro is an Ayurvedic herbal powder that naturally supports digestion. It contains Triphala, Isabgol, Saunf, Ajwain and other natural herbs that help relieve gas, bloating and indigestion.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-header">
+            <h4>Who can use Paachan Pro?</h4>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-content">
+            <p>Paachan Pro is suitable for adults who are troubled by bloating, gas, indigestion, or irregular bowel movements. Made with natural Ayurvedic ingredients, it is generally safe for daily use.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-header">
+            <h4>How does Paachan Pro work?</h4>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-content">
+            <p>Its Ayurvedic ingredients support digestive enzymes, improve gut movement, and naturally reduce gas and bloating. Triphala and Isabgol maintain bowel regularity while Saunf and Ajwain provide immediate relief.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-header">
+            <h4>How should I take Paachan Pro?</h4>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-content">
+            <p>Mix 1 scoop (2-3g) of powder in lukewarm water and drink it 15-20 minutes before meals. For best results, use 1-2 times a day. Regular use will provide long-term relief.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-header">
+            <h4>How long does it take to see results?</h4>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-content">
+            <p>Results vary from person to person. With regular use and a healthy diet, you may start noticing a difference within 2-4 weeks. Consistent use leads to long-term gut health improvement.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-header">
+            <h4>Is Paachan Pro safe for daily use?</h4>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-content">
+            <p>Yes, Paachan Pro is made with natural Ayurvedic ingredients and is safe for daily use. If you have any underlying health condition, please consult your doctor. Consult a doctor during pregnancy and breastfeeding.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Science Behind Section -->
+  <section class="section science-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2>Science Behind Paachan Pro Ingredients</h2>
+      </div>
+      <div class="science-grid">
+        <div class="science-card">
+          <span class="science-tag">Published Study</span>
+          <h3>Triphala Gut Health Research</h3>
+          <span class="science-year">2010 Research</span>
+          <p>Research published in the Journal of Ethnopharmacology showed Triphala extract effectively supports gut motility and promotes healthy digestive function.</p>
+        </div>
+        <div class="science-card">
+          <span class="science-tag">Clinical Trial</span>
+          <h3>Fennel & Ginger Study</h3>
+          <span class="science-year">2016 Research</span>
+          <p>International Journal of Ayurveda Research confirmed that fennel seed and dry ginger combination demonstrated significant relief in bloating and functional indigestion symptoms.</p>
+        </div>
+        <div class="science-card">
+          <span class="science-tag">Latest Findings</span>
+          <h3>Isabgol Clinical Evidence</h3>
+          <span class="science-year">2019 Research</span>
+          <p>Phytotherapy Research Journal published findings showing Isabgol (Psyllium) husk improves bowel regularity and supports a healthy gut microbiome.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Warning Banner -->
+  <section class="section warning-section">
+    <div class="section-container">
+      <div class="warning-banner">
+        <img src="images/pachan-pro-fake-products.png" alt="Beware of Fake Products - Choose Original Taiva" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- Certificate Section -->
+  <section class="section certificate-section">
+    <div class="section-container">
+      <div class="section-header">
+        <h2>Certificate of Natural Goodness</h2>
+      </div>
+      <div class="certificate-grid">
+        <div class="certificate-item"><img src="images/Certificate1.svg" alt="AYUSH Premium" loading="lazy"></div>
+        <div class="certificate-item"><img src="images/Certificate2.svg" alt="FSSAI Certified" loading="lazy"></div>
+        <div class="certificate-item"><img src="images/Certificate3.svg" alt="High Quality Ingredients" loading="lazy"></div>
+        <div class="certificate-item"><img src="images/Certificate4.svg" alt="Expert Formulations" loading="lazy"></div>
+        <div class="certificate-item"><img src="images/Certificate5.svg" alt="Expert Formulations" loading="lazy"></div>
+        <div class="certificate-item"><img src="images/Certificate6.svg" alt="100% Pure & Vegan" loading="lazy"></div>
+        <div class="certificate-item"><img src="images/Certificate7.svg" alt="No Added Sugar" loading="lazy"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Products -->
+  <section class="section" style="background-color: var(--bg-light); border-top: 1px solid var(--border-color);">
+    <div class="section-container">
+      <div class="section-header" style="margin-bottom: 32px;">
+        <h2>You May Also Like</h2>
+      </div>
+      <div class="product-grid">
+        <div class="product-card">
+          <span class="product-tag">27% OFF</span>
+          <div class="product-image-container">
+            <a href="diacurex-powder.html">
+              <img src="images/sugar-pro-max-1.jpg" alt="Sugar Pro Max">
+            </a>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title"><a href="diacurex-powder.html">Sugar Pro Max - Natural Blood Sugar Support</a></h3>
+            <div class="product-price">
+              <span class="price-current">1,090.00</span>
+              <span class="price-original">1,499.00</span>
+            </div>
+            <div class="product-action">
+              <button class="btn btn-full" onclick="addToCart('sugar-pro-max')">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <span class="product-tag">9% OFF</span>
+          <div class="product-image-container">
+            <a href="joint-care.html">
+              <img src="images/joint-care-main.png" alt="Painopill">
+            </a>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title"><a href="joint-care.html">Painopill Tablets - Ayurvedic Joint Care</a></h3>
+            <div class="product-price">
+              <span class="price-current">1,040.00</span>
+              <span class="price-original">1,140.00</span>
+            </div>
+            <div class="product-action">
+              <button class="btn btn-full" onclick="addToCart('painopill')">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Authenticity</a></li>
+          <li><a href="#">Refund Policy</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Cancellation Policy</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p><strong>Taiva India</strong></p>
+        <p>PLOT NO. 275, PILLAR NO. 168, Sector-81 Noida, Gautam Buddha Nagar, Uttar Pradesh - 201302</p>
+        <p class="footer-contact-item"><i class="fa-solid fa-phone"></i> +91-9582908080</p>
+        <p class="footer-contact-item"><i class="fa-solid fa-envelope"></i> info@taiva.in</p>
+        <p><strong>Hours:</strong> Monday - Saturday, 10:00 AM - 07:00 PM</p>
+        <div class="footer-socials">
+          <a href="https://www.facebook.com/profile.php?id=61590565554083" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/taivanatural/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.youtube.com/@TaivaNatural" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-col footer-map-col">
+        <h4>Our Location</h4>
+        <div class="footer-map">
+          <iframe src="https://www.google.com/maps?q=Plot+No+275+Pillar+No+168+Sector+81+Noida+Uttar+Pradesh+201302&output=embed" 
+            width="100%" height="180" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Taiva India. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Drawer Elements & Overlays -->
+  <div class="overlay"></div>
+
+  <!-- Cart Drawer -->
+  <div class="cart-drawer">
+    <div class="cart-drawer-header">
+      <h3>Shopping Cart</h3>
+      <button class="cart-drawer-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="cart-drawer-items">
+      <!-- Dynamic render via JS -->
+    </div>
+    <div class="cart-drawer-footer">
+      <div class="cart-subtotal">
+        <span>Subtotal:</span>
+        <span class="cart-subtotal-val">0.00</span>
+      </div>
+      <a href="cart.html" class="btn btn-full" style="margin-bottom: 12px;">View Shopping Cart</a>
+      <button class="btn btn-accent btn-full" onclick="openCheckout()">Checkout Now</button>
+    </div>
+  </div>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay">
+    <button class="search-close"><i class="fa-solid fa-xmark"></i></button>
+    <form class="search-container">
+      <input type="text" placeholder="Search for products (e.g. Sugar, Pachan, Pain)..." required>
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    var galleryImages = [
+      "images/pachan-pro-main.png",
+      "images/pachan-pro-ingredients.png",
+      "images/pachan-pro-benefits.png",
+      "images/pachan-pro-how-to-use.png",
+      "images/pachan-pro-comparison.png"
+    ];
+    var currentGalleryIndex = 0;
+    function setGallery(idx) {
+      currentGalleryIndex = idx;
+      document.getElementById('galleryMain').src = galleryImages[idx];
+      document.querySelectorAll('.gallery-thumb').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelector('.gallery-thumb[data-index="'+idx+'"]').classList.add('active');
+    }
+    function changeGallery(dir) {
+      var n = currentGalleryIndex + dir;
+      if (n < 0) n = galleryImages.length - 1;
+      if (n >= galleryImages.length) n = 0;
+      setGallery(n);
+    }
+  </script>
+</body>
+</html>

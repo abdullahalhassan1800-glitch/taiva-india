@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taiva India – Premium Ayurvedic Wellness</title>
+  <meta name="description" content="Taiva India - Premium Ayurvedic supplements for diabetes, digestive health, joint care and piles relief. 100% natural ingredients.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🌿</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <img src="images/taiva-logo-white.png" alt="Taiva India">
+      </a>
+
+      <button class="mobile-menu-btn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+
+      <nav class="desktop-nav">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="diacurex-powder.html">Sugar Pro Max</a></li>
+          <li><a href="digestive-health.html">Digestive Health</a></li>
+          <li><a href="joint-care.html">Joint Care</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-search">
+        <form action="/search" method="get" role="search">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" name="q" placeholder="Search products..." aria-label="Search">
+        </form>
+      </div>
+
+      <div class="header-actions">
+        <a href="#" aria-label="Account"><i class="fa-regular fa-user"></i></a>
+        <button class="cart-btn" id="cartOpen" aria-label="Cart">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu-overlay"></div>
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+      <img src="images/taiva-logo-white.png" alt="Taiva Logo" style="height:32px;background:#000;padding:4px 10px;border-radius:6px;">
+      <button class="mobile-menu-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <ul class="mobile-nav">
+      <li><a href="/">Home</a></li>
+      <li><a href="diacurex-powder.html">Sugar Pro Max</a></li>
+      <li><a href="digestive-health.html">Digestive Health</a></li>
+      <li><a href="joint-care.html">Joint Care</a></li>
+      <li><a href="#"><i class="fa-regular fa-user"></i> Account</a></li>
+    </ul>
+  </div>
+
+  <!-- CART DRAWER -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+      <h3>Shopping Cart</h3>
+      <button class="cart-drawer-close" id="cartClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="cart-drawer-body" id="cartBody">
+      <div class="cart-empty" id="cartEmpty">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <p>Your cart is empty</p>
+      </div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="fbt-section" id="fbtSection">
+        <div class="fbt-header">
+          <h4><i class="fa-solid fa-cart-plus"></i> Often Bought Together</h4>
+        </div>
+        <div class="fbt-products" id="fbtProducts">
+          <div class="fbt-item" data-product="sugar-pro-max" data-name="Sugar Pro Max" data-price="1090" data-image="images/sugar-pro-max-1.jpg">
+            <img src="images/sugar-pro-max-1.jpg" alt="Sugar Pro Max" loading="lazy">
+            <div class="fbt-info">
+              <span class="fbt-name">Sugar Pro Max</span>
+              <span class="fbt-price">Rs. 1,090</span>
+            </div>
+            <button class="fbt-add-btn">Add</button>
+          </div>
+          <div class="fbt-item" data-product="digestive-health" data-name="Digestive Health" data-price="1090" data-image="images/pachan-pro-main.png">
+            <img src="images/pachan-pro-main.png" alt="Digestive Health" loading="lazy">
+            <div class="fbt-info">
+              <span class="fbt-name">Digestive Health</span>
+              <span class="fbt-price">Rs. 1,090</span>
+            </div>
+            <button class="fbt-add-btn">Add</button>
+          </div>
+          <div class="fbt-item" data-product="joint-care" data-name="Joint Care" data-price="1040" data-image="images/joint-care-main.png">
+            <img src="images/joint-care-main.png" alt="Joint Care" loading="lazy">
+            <div class="fbt-info">
+              <span class="fbt-name">Joint Care</span>
+              <span class="fbt-price">Rs. 1,040</span>
+            </div>
+            <button class="fbt-add-btn">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cart-drawer-footer">
+      <div class="cart-total">
+        <span>Total</span>
+        <span class="cart-total-amount" id="cartTotal">Rs. 0</span>
+      </div>
+      <button class="cart-checkout-btn" onclick="alert('Checkout feature coming soon!');">Checkout</button>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- HERO SLIDER -->
+    <section class="hero-section">
+      <div class="swiper heroSwiper">
+        <div class="swiper-wrapper">
+
+          <!-- SLIDE 1: Video -->
+          <div class="swiper-slide">
+            <div class="hero-slide">
+              <video class="hero-media hero-video" autoplay muted loop playsinline poster="images/1.jpeg" id="heroVideo">
+                <source src="images/11.mp4" type="video/mp4">
+              </video>
+              <div class="hero-overlay"></div>
+              <button class="hero-sound-toggle" id="soundToggle" aria-label="Toggle sound">
+                <i class="fa-solid fa-volume-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- SLIDE 2: Sugar Pro Max -->
+          <div class="swiper-slide">
+            <div class="hero-slide">
+              <img src="images/1.jpeg" alt="Sugar Pro Max" class="hero-media hero-image" loading="lazy">
+              <div class="hero-overlay"></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 3: Digestive Health -->
+          <div class="swiper-slide">
+            <div class="hero-slide">
+              <img src="images/2.jpeg" alt="Digestive Health" class="hero-media hero-image" loading="lazy">
+              <div class="hero-overlay"></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 4: Joint Care -->
+          <div class="swiper-slide">
+            <div class="hero-slide">
+              <img src="images/3.jpeg" alt="Joint Care" class="hero-media hero-image" loading="lazy">
+              <div class="hero-overlay"></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+      </div>
+    </section>
+
+    <!-- CERTIFICATE SECTION -->
+    <section class="certificate-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Certified Care</span>
+          <h2>Certificate of Natural Goodness</h2>
+        </div>
+        <div class="certificate-icons">
+          <div class="cert-icon"><img src="images/certificates/Certificate1.svg" alt="AYUSH Premium" loading="lazy"><span>AYUSH Premium</span></div>
+          <div class="cert-icon"><img src="images/certificates/Certificate2.svg" alt="FSSAI Certified" loading="lazy"><span>FSSAI Certified</span></div>
+          <div class="cert-icon"><img src="images/certificates/Certificate3.svg" alt="High Quality Ingredients" loading="lazy"><span>High Quality Ingredients</span></div>
+          <div class="cert-icon"><img src="images/certificates/Certificate4.svg" alt="Expert Formulations" loading="lazy"><span>Expert Formulations</span></div>
+          <div class="cert-icon"><img src="images/certificates/Certificate6.svg" alt="100% Pure & Vegan" loading="lazy"><span>100% Pure & Vegan</span></div>
+          <div class="cert-icon"><img src="images/certificates/Certificate7.svg" alt="No Added Sugar" loading="lazy"><span>No Added Sugar</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHOP NOW SECTION -->
+    <section class="shop-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Premium Collection</span>
+          <h2>Shop Now</h2>
+        </div>
+        <div class="products-grid" id="productsGrid">
+
+          <div class="product-card">
+            <div class="product-image">
+              <a href="diacurex-powder.html">
+                <div class="product-img-wrap">
+                  <img src="images/sugar-pro-max-1.jpg" alt="Sugar Pro Max - Natural Blood Sugar Balance Formula" loading="lazy" class="product-img-default">
+                  <img src="images/sugar-pro-max-2.jpg" alt="Sugar Pro Max" loading="lazy" class="product-img-hover">
+                </div>
+              </a>
+              <span class="discount-badge">-27%</span>
+            </div>
+            <div class="product-info">
+              <h3><a href="diacurex-powder.html">Sugar Pro Max | Natural Blood Sugar Support</a></h3>
+              <div class="product-price">
+                <span class="current-price">Rs. 1,090.00</span>
+                <span class="original-price">Rs. 1,499.00</span>
+              </div>
+              <div class="product-actions">
+                <button class="add-to-cart">Add to Cart</button>
+                <a href="diacurex-powder.html" class="view-btn">View</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="product-image">
+              <a href="digestive-health.html">
+                <div class="product-img-wrap">
+                  <img src="images/pachan-pro-main.png" alt="Paachan Pro - Natural Solution for Gas & Indigestion" loading="lazy" class="product-img-default">
+                  <img src="images/pachan-pro-benefits.png" alt="Paachan Pro - Digestive Health" loading="lazy" class="product-img-hover">
+                </div>
+              </a>
+              <span class="discount-badge">-22%</span>
+            </div>
+            <div class="product-info">
+              <h3><a href="digestive-health.html">Digestive Health | Complete Gut Wellness</a></h3>
+              <div class="product-price">
+                <span class="current-price">Rs. 1,090.00</span>
+                <span class="original-price">Rs. 1,399.00</span>
+              </div>
+              <div class="product-actions">
+                <button class="add-to-cart">Add to Cart</button>
+                <a href="digestive-health.html" class="view-btn">View</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <div class="product-image">
+              <a href="joint-care.html">
+                <div class="product-img-wrap">
+                  <img src="images/joint-care-main.png" alt="Painopill Tablets - Natural Relief for Arthritis, Joint Pain & Stiffness" loading="lazy" class="product-img-default">
+                  <img src="images/joint-care-benefits.png" alt="Joint Care - Arthritis Relief" loading="lazy" class="product-img-hover">
+                </div>
+              </a>
+              <span class="discount-badge">-9%</span>
+            </div>
+            <div class="product-info">
+              <h3><a href="joint-care.html">Joint Care | Natural Joint & Mobility Support</a></h3>
+              <div class="product-price">
+                <span class="current-price">Rs. 1,040.00</span>
+                <span class="original-price">Rs. 1,140.00</span>
+              </div>
+              <div class="product-actions">
+                <button class="add-to-cart">Add to Cart</button>
+                <a href="joint-care.html" class="view-btn">View</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS SECTION -->
+    <section class="testimonials-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Customer Reviews</span>
+          <h2>What Our Clients Say</h2>
+        </div>
+        <div class="swiper testimonialSwiper">
+          <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+              <div class="testimonial-card">
+                <div class="testimonial-avatar-wrap">
+                  <img src="images/client1.png" alt="Rahul Sharma" class="testimonial-avatar" loading="lazy">
+                </div>
+                <div class="stars">★★★★★</div>
+                <h4>Natural & Effective</h4>
+                <p>DiaCurex feels premium from packaging to results. A perfect Ayurvedic addition to my routine.</p>
+                <div class="testimonial-author">
+                  <span class="name">Rahul Sharma</span>
+                  <span class="badge">VERIFIED CUSTOMER</span>
+                </div>
+                <div class="testimonial-quote">"</div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="testimonial-card">
+                <div class="testimonial-avatar-wrap">
+                  <img src="images/client2.png" alt="Priya Mehta" class="testimonial-avatar" loading="lazy">
+                </div>
+                <div class="stars">★★★★★</div>
+                <h4>Great Results</h4>
+                <p>Paachan Pro solved my digestion issues within weeks. Highly recommend for anyone with gas issues.</p>
+                <div class="testimonial-author">
+                  <span class="name">Priya Mehta</span>
+                  <span class="badge">VERIFIED CUSTOMER</span>
+                </div>
+                <div class="testimonial-quote">"</div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="testimonial-card">
+                <div class="testimonial-avatar-wrap">
+                  <img src="images/client3.png" alt="Aman Verma" class="testimonial-avatar" loading="lazy">
+                </div>
+                <div class="stars">★★★★★</div>
+                <h4>Trusted Ayurveda</h4>
+                <p>Amazing blend of herbs crafted for natural daily balance. Taiva products are truly premium.</p>
+                <div class="testimonial-author">
+                  <span class="name">Aman Verma</span>
+                  <span class="badge">VERIFIED CUSTOMER</span>
+                </div>
+                <div class="testimonial-quote">"</div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="testimonial-card">
+                <div class="testimonial-avatar-wrap">
+                  <img src="images/client4.png" alt="Anjali Kapoor" class="testimonial-avatar" loading="lazy">
+                </div>
+                <div class="stars">★★★★★</div>
+                <h4>Joint Relief</h4>
+                <p>ArthoCalm Kit has made a huge difference in my joint mobility. Feeling much better every day.</p>
+                <div class="testimonial-author">
+                  <span class="name">Anjali Kapoor</span>
+                  <span class="badge">VERIFIED CUSTOMER</span>
+                </div>
+                <div class="testimonial-quote">"</div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="testimonial-card">
+                <div class="testimonial-avatar-wrap">
+                  <img src="images/client1.png" alt="Aman Damani" class="testimonial-avatar" loading="lazy">
+                </div>
+                <div class="stars">★★★★★</div>
+                <h4>Piles Relief</h4>
+                <p>PilesCurex Kit worked wonders for me. Natural solution that actually delivers results.</p>
+                <div class="testimonial-author">
+                  <span class="name">Aman Damani</span>
+                  <span class="badge">VERIFIED CUSTOMER</span>
+                </div>
+                <div class="testimonial-quote">"</div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="testimonial-card">
+                <div class="testimonial-avatar-wrap">
+                  <img src="images/client2.png" alt="Anand Gautam" class="testimonial-avatar" loading="lazy">
+                </div>
+                <div class="stars">★★★★★</div>
+                <h4>Premium Quality</h4>
+                <p>Everything from delivery to packaging feels premium. Truly a high-quality Ayurvedic product.</p>
+                <div class="testimonial-author">
+                  <span class="name">Anand Gautam</span>
+                  <span class="badge">VERIFIED CUSTOMER</span>
+                </div>
+                <div class="testimonial-quote">"</div>
+              </div>
+            </div>
+
+          </div>
+          <div class="swiper-pagination"></div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OUR STORY SECTION -->
+    <section class="story-section">
+      <div class="container">
+        <div class="story-layout">
+          <div class="story-text">
+            <span class="section-label">Our Mission</span>
+            <h2>Empowering Your Wellness Journey</h2>
+            <p>At Taiva, our mission is to make better health accessible to everyone. Inspired by the age-old wisdom of Ayurveda, we combine nature's finest ingredients with modern science to create supplements you can trust.</p>
+            <p>Every product is crafted with care, ensuring the highest standards of quality. For us, it's not just about supplements—it's about building a connection based on honesty, care, and your well-being.</p>
+            <div class="story-values">
+              <div class="value-item">
+                <i class="fa-solid fa-leaf"></i>
+                <h4>AYURVEDIC WISDOM</h4>
+                <p>Traditional herbs known for wellness management</p>
+              </div>
+              <div class="value-item">
+                <i class="fa-solid fa-flask"></i>
+                <h4>SCIENCE BACKED</h4>
+                <p>Modern research meets ancient Ayurvedic knowledge</p>
+              </div>
+              <div class="value-item">
+                <i class="fa-solid fa-droplet"></i>
+                <h4>PURE & NATURAL</h4>
+                <p>No harmful chemicals or additives</p>
+              </div>
+              <div class="value-item">
+                <i class="fa-solid fa-bullseye"></i>
+                <h4>YOUR WELL-BEING</h4>
+                <p>Crafted to support healthy balance naturally</p>
+              </div>
+            </div>
+          </div>
+          <div class="story-image">
+            <img src="images/1.jpeg" alt="Taiva Mission">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS KNOW MORE -->
+    <section class="goals-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Our Range</span>
+          <h2>Shop By Health Goals</h2>
+        </div>
+        <div class="goals-grid">
+
+          <div class="goal-card">
+            <a href="diacurex-powder.html">
+              <div class="goal-img">
+                <img src="images/sugar-pro-max-1.jpg" alt="Sugar Pro Max" loading="lazy" style="width:100%;height:100%;object-fit:contain;padding:8px;">
+              </div>
+            </a>
+            <div class="goal-body">
+              <h3>Sugar Pro Max</h3>
+              <p>Natural blood sugar support with Ayurvedic herbs</p>
+              <a href="diacurex-powder.html" class="goal-link">Know More <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+
+          <div class="goal-card">
+            <a href="digestive-health.html">
+              <div class="goal-img">
+                <img src="images/pachan-pro-main.png" alt="Digestive Health" loading="lazy" style="width:100%;height:100%;object-fit:contain;padding:8px;">
+              </div>
+            </a>
+            <div class="goal-body">
+              <h3>Digestive Health</h3>
+              <p>Complete gut wellness for healthy digestion</p>
+              <a href="digestive-health.html" class="goal-link">Know More <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+
+          <div class="goal-card">
+            <a href="joint-care.html">
+              <div class="goal-img">
+                <img src="images/joint-care-main.png" alt="Joint Care" loading="lazy" style="width:100%;height:100%;object-fit:contain;padding:8px;">
+              </div>
+            </a>
+            <div class="goal-body">
+              <h3>Joint Care</h3>
+              <p>Natural joint & mobility support supplement</p>
+              <a href="joint-care.html" class="goal-link">Know More <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWSLETTER SECTION -->
+    <section class="newsletter-section">
+      <div class="container">
+        <div class="newsletter-content">
+          <h2>Join Our Wellness Community</h2>
+          <p>Get exclusive offers, natural care tips and wellness updates.</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Enter your email" required>
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Authenticity</a></li>
+            <li><a href="#">Refund Policy</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Shipping Policy</a></li>
+            <li><a href="#">Cancellation Policy</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <p><strong>Taiva India</strong></p>
+          <p>PLOT NO. 275, PILLAR NO. 168, Sector-81 Noida, Gautam Buddha Nagar, Uttar Pradesh - 201302</p>
+          <p class="footer-contact-item"><i class="fa-solid fa-phone"></i> +91-9582908080</p>
+          <p class="footer-contact-item"><i class="fa-solid fa-envelope"></i> info@taiva.in</p>
+          <p><strong>Hours:</strong> Monday - Saturday, 10:00 AM - 07:00 PM</p>
+          <div class="footer-social">
+            <a href="https://www.facebook.com/profile.php?id=61590565554083" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/taivanatural/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.youtube.com/@TaivaNatural" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col footer-col-map">
+          <h4>Find Us</h4>
+          <div class="footer-map">
+            <iframe src="https://www.google.com/maps?q=Plot+No+275+Pillar+No+168+Sector+81+Noida+Uttar+Pradesh+201302&output=embed" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Taiva India Location"></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Taiva India. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
