@@ -20,7 +20,7 @@ function requireAuth() {
   }
 }
 function login(username, password) {
-  if (username === 'admin' && password === 'admin123') {
+  if (username === 'Admin' && password === 'Taiva@2026FB') {
     sessionStorage.setItem('taiva_admin', JSON.stringify({ user: username, name: 'Admin' }));
     return true;
   }
