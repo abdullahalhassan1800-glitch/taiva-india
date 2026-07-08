@@ -681,6 +681,61 @@ function initCityAutocomplete(inputId, stateId, pincodeId) {
   input.addEventListener('focus', function () {
     if (results.length > 0) dropdown.classList.add('active');
   });
+
+  // Pincode API auto-fill
+  if (pincodeId) {
+    var pincodeField = document.getElementById(pincodeId);
+    if (pincodeField) {
+      var _timer;
+      pincodeField.addEventListener('input', function () {
+        clearTimeout(_timer);
+        var val = this.value.trim();
+        if (/^\d{6}$/.test(val)) {
+          _timer = setTimeout(function () {
+            lookupPincode(val, function (err, postOffices) {
+              if (err || !postOffices || postOffices.length === 0) return;
+              var seen = {}, options = [];
+              postOffices.forEach(function (po) {
+                var city = (po.District || '').trim();
+                var state = (po.State || '').trim();
+                if (!city || !state) return;
+                var key = city + '|' + state;
+                if (!seen[key]) { seen[key] = true; options.push({ city: city, state: state, pincode: val }); }
+              });
+              if (options.length === 0) return;
+              if (options.length === 1) {
+                document.getElementById(inputId).value = options[0].city;
+                if (stateId) { var sf = document.getElementById(stateId); if (sf) sf.value = options[0].state; }
+                pincodeField.value = options[0].pincode;
+              } else {
+                results = options; selectedIndex = 0; renderDropdown();
+              }
+            });
+          }, 300);
+        }
+      });
+    }
+  }
+}
+
+// ---- PINCODE API LOOKUP ----
+function lookupPincode(pincode, callback) {
+  if (!/^\d{6}$/.test(pincode)) { callback(null, null); return; }
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'https://api.postalpincode.in/pincode/' + encodeURIComponent(pincode));
+  xhr.onload = function() {
+    if (xhr.status !== 200) { callback('Network error', null); return; }
+    try {
+      var resp = JSON.parse(xhr.responseText);
+      if (resp && resp[0] && resp[0].Status === 'Success' && resp[0].PostOffice) {
+        callback(null, resp[0].PostOffice);
+      } else {
+        callback(resp && resp[0] ? resp[0].Message : 'No data', null);
+      }
+    } catch(e) { callback('Parse error', null); }
+  };
+  xhr.onerror = function() { callback('Network error', null); };
+  xhr.send();
 }
 
 // ---- ROLE-BASED SIDEBAR ----
