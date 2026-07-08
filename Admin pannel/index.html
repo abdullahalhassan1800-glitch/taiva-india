@@ -24,11 +24,15 @@
   </div>
   <script src="app.js"></script>
   <script>
-    function handleLogin() {
+    async function handleLogin() {
       var username = document.getElementById('username').value;
       var password = document.getElementById('password').value;
       var errorEl = document.getElementById('loginError');
       if (login(username, password)) {
+        errorEl.textContent = 'Syncing data...';
+        errorEl.style.display = 'block';
+        errorEl.style.color = 'var(--accent)';
+        await autoRestoreFromMilesweb();
         window.location.href = 'dashboard.html';
       } else {
         errorEl.style.display = 'block';

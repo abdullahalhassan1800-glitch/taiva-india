@@ -553,6 +553,18 @@ async function milesRestoreAll() {
   }
   return {success:true, restored:restored};
 }
+async function autoRestoreFromMilesweb() {
+  var mc = getMilesConfig();
+  if (!mc || !mc.url || !mc.token) return;
+  try {
+    var res = await milesRestoreAll();
+    if (res.success && res.restored > 0) {
+      showToast('Data synced from server! (' + res.restored + ' datasets)', 'success');
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
 // ---- CITY AUTOCOMPLETE ----
 function initCityAutocomplete(inputId, stateId, pincodeId) {
   var input = document.getElementById(inputId);
