@@ -440,6 +440,7 @@ var start = (currentPage - 1) * perPage;
 var end = start + perPage;
 var pageOrders = filteredOrders.slice(start, end);
 
+var cur = getCurrentUser();
 var tbody = document.getElementById('ordersBody');
 if (pageOrders.length === 0) {
 tbody.innerHTML = '<tr><td colspan="8" class="text-muted text-center" style="padding:24px;">No orders found</td></tr>';
@@ -453,7 +454,7 @@ return '<tr><td><span style="color:var(--accent);font-weight:500;">' + o.id + '<
 '<td>' + (o.paymentMethod === 'cod' ? 'COD' : o.paymentMethod === 'upi' ? 'UPI' : 'Card') + '</td>' +
 '<td><span class="badge badge-' + o.status + '">' + o.status + '</span></td>' +
 '<td>' + formatDateTime(o.createdAt) + '</td>' +
-'<td><div class="order-actions"><button class="btn btn-sm" onclick="viewOrder(\'' + o.id + '\')"><i class="fa-solid fa-eye"></i></button><button class="btn btn-sm btn-danger" onclick="openDeleteModal(\'' + o.id + '\')"><i class="fa-solid fa-trash"></i></button></div></td></tr>';
+'<td><div class="order-actions"><button class="btn btn-sm" onclick="viewOrder(\'' + o.id + '\')"><i class="fa-solid fa-eye"></i></button>' + (cur && cur.role !== 'viewer' ? '<button class="btn btn-sm btn-danger" onclick="openDeleteModal(\'' + o.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '') + '</div></td></tr>';
 }).join('');
 }
 renderPagination(totalPages);
@@ -510,6 +511,8 @@ openModal('deleteModal');
 }
 
 function confirmDeleteOrder() {
+var cur = getCurrentUser();
+if (cur && cur.role === 'viewer') { showToast('You do not have permission to delete orders', 'error'); closeModal('deleteModal'); return; }
 var id = document.getElementById('deleteTargetId').value;
 var orders = getData('orders');
 var idx = orders.findIndex(function(o) { return o.id === id; });
