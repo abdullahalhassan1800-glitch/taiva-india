@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drafts — Taiva Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+<style>
+.order-item-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.order-item-row select { flex: 2; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card-bg); color: var(--text); }
+.order-item-row input[type="number"] { flex: 0 0 60px; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card-bg); color: var(--text); }
+.order-item-row .coPrice { flex: 0 0 80px; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--page-bg); color: var(--text); }
+.draft-actions { display: flex; gap: 4px; }
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+<span class="logo-text">Taiva</span>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-section">Main</div>
+<a href="dashboard.html" class="nav-item">
+<span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+<span class="nav-label">Home</span>
+</a>
+<a href="#" class="nav-item has-submenu">
+<span class="nav-icon"><i class="fa-solid fa-box"></i></span>
+<span class="nav-label">Orders</span>
+<span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span>
+<span class="nav-badge">31</span>
+</a>
+<div class="nav-sub open">
+<a href="orders.html" class="nav-item">All orders</a>
+<a href="orders-draft.html" class="nav-item active">Drafts</a>
+<a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a>
+</div>
+<a href="#" class="nav-item has-submenu">
+<span class="nav-icon"><i class="fa-solid fa-tag"></i></span>
+<span class="nav-label">Products</span>
+<span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+</a>
+<div class="nav-sub">
+<a href="products.html" class="nav-item">All products</a>
+<a href="products-collections.html" class="nav-item">Collections</a>
+<a href="products-inventory.html" class="nav-item">Inventory</a>
+<a href="products-purchase-orders.html" class="nav-item">Purchase orders</a>
+<a href="products-transfers.html" class="nav-item">Transfers</a>
+<a href="products-gift-cards.html" class="nav-item">Gift cards</a>
+</div>
+<a href="#" class="nav-item has-submenu">
+<span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+<span class="nav-label">Customers</span>
+<span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+</a>
+<div class="nav-sub">
+<a href="customers.html" class="nav-item">All customers</a>
+<a href="customers-segments.html" class="nav-item">Segments</a>
+<a href="customers-companies.html" class="nav-item">Companies</a>
+</div>
+<a href="#" class="nav-item has-submenu">
+<span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span>
+<span class="nav-label">Growth</span>
+<span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+</a>
+<div class="nav-sub">
+<a href="growth-attribution.html" class="nav-item">Attribution</a>
+<a href="growth-campaigns.html" class="nav-item">Campaigns</a>
+</div>
+<a href="#" class="nav-item has-submenu">
+<span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span>
+<span class="nav-label">Content</span>
+<span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+</a>
+<div class="nav-sub">
+<a href="content-metaobjects.html" class="nav-item">Metaobjects</a>
+<a href="content-files.html" class="nav-item">Files</a>
+<a href="content-menus.html" class="nav-item">Menus</a>
+<a href="content-blog.html" class="nav-item">Blog posts</a>
+</div>
+<a href="#" class="nav-item has-submenu">
+<span class="nav-icon"><i class="fa-solid fa-globe"></i></span>
+<span class="nav-label">Markets</span>
+<span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+</a>
+<div class="nav-sub">
+<a href="markets-catalogs.html" class="nav-item">Catalogs</a>
+<a href="markets-rollouts.html" class="nav-item">Rollouts</a>
+</div>
+<a href="#" class="nav-item has-submenu">
+<span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+<span class="nav-label">Analytics</span>
+<span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+</a>
+<div class="nav-sub">
+<a href="analytics-reports.html" class="nav-item">Reports</a>
+<a href="analytics-liveview.html" class="nav-item">Live View</a>
+</div>
+<div class="nav-section">Settings</div>
+<a href="settings.html" class="nav-item">
+<span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+<span class="nav-label">Settings</span>
+</a>
+<a href="#" class="nav-item" onclick="logout()">
+<span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+<span class="nav-label">Logout</span>
+</a>
+</nav>
+</div>
+
+<div class="main-content">
+<header class="topbar">
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+<button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+<div class="topbar-search">
+<i class="fa-solid fa-search"></i>
+<input type="text" placeholder="Search..." id="globalSearch">
+</div>
+<div class="topbar-actions">
+<button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+<button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+<div class="admin-avatar">A</div>
+</div>
+</header>
+
+<div class="page-content">
+<div class="page-header">
+<div>
+<h1>Drafts</h1>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openCreateDraftModal()"><i class="fa-solid fa-plus"></i> Create draft</button>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">
+<div class="filter-bar" style="margin-bottom:0;width:100%;">
+<input type="text" id="searchInput" placeholder="Search drafts..." style="width:200px;">
+<span class="filter-count" id="draftCount">0 drafts</span>
+</div>
+</div>
+<div class="card-body" style="padding:0;">
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Draft ID</th>
+<th>Customer</th>
+<th>Items</th>
+<th>Total</th>
+<th>Created</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="draftsBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal" id="createDraftModal">
+<div class="modal-header">
+<h2>Create Draft</h2>
+<button class="modal-close" onclick="closeModal('createDraftModal')">&times;</button>
+</div>
+<div class="modal-body">
+<div class="form-row">
+<div class="form-group">
+<label>Customer Name <span style="color:var(--danger)">*</span></label>
+<input type="text" id="cdName" placeholder="Full name">
+</div>
+<div class="form-group">
+<label>Phone <span style="color:var(--danger)">*</span></label>
+<input type="text" id="cdPhone" placeholder="Phone number">
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Email</label>
+<input type="email" id="cdEmail" placeholder="Email address">
+</div>
+<div class="form-group">
+<label>City <span style="color:var(--danger)">*</span></label>
+<input type="text" id="cdCity" placeholder="City">
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>State</label>
+<input type="text" id="cdState" placeholder="State">
+</div>
+<div class="form-group">
+<label>Pincode</label>
+<input type="text" id="cdPincode" placeholder="Pincode">
+</div>
+</div>
+<div class="form-group">
+<label>Address <span style="color:var(--danger)">*</span></label>
+<textarea id="cdAddress" placeholder="Delivery address"></textarea>
+</div>
+<div class="form-group">
+<label>Order Items</label>
+<div id="draftItemsContainer"></div>
+<button class="btn btn-sm" onclick="addDraftItem()" style="margin-top:4px;"><i class="fa-solid fa-plus"></i> Add item</button>
+</div>
+<div class="form-group">
+<label>Payment Method</label>
+<div style="display:flex;gap:16px;margin-top:4px;">
+<label style="display:flex;align-items:center;gap:4px;"><input type="radio" name="cdPayment" value="cod" checked> COD</label>
+<label style="display:flex;align-items:center;gap:4px;"><input type="radio" name="cdPayment" value="upi"> UPI</label>
+<label style="display:flex;align-items:center;gap:4px;"><input type="radio" name="cdPayment" value="card"> Card</label>
+</div>
+</div>
+<div class="form-group" style="border-top:1px solid var(--border);padding-top:12px;margin-top:12px;">
+<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:600;">
+<span>Total:</span>
+<span id="cdTotal">Rs. 0</span>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('createDraftModal')">Cancel</button>
+<button class="btn btn-accent" onclick="submitDraft()"><i class="fa-solid fa-check"></i> Save Draft</button>
+</div>
+</div>
+
+<div class="modal" id="deleteDraftModal">
+<div class="modal-header">
+<h2>Delete Draft</h2>
+<button class="modal-close" onclick="closeModal('deleteDraftModal')">&times;</button>
+</div>
+<div class="modal-body">
+<p>Are you sure you want to delete this draft? This action cannot be undone.</p>
+<input type="hidden" id="deleteDraftTargetId">
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('deleteDraftModal')">Cancel</button>
+<button class="btn btn-danger" onclick="confirmDeleteDraft()"><i class="fa-solid fa-trash"></i> Delete</button>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<script src="app.js"></script>
+<script>
+document.getElementById('themeToggle')?.addEventListener('click', function() {
+var html = document.documentElement;
+var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+html.setAttribute('data-theme', theme);
+localStorage.setItem('taiva_theme', theme);
+this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+});
+var savedTheme = localStorage.getItem('taiva_theme');
+if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
+
+function populateProductDropdown(sel) {
+var products = getData('products');
+sel.innerHTML = '<option value="">Select product</option>';
+products.forEach(function(p) {
+sel.innerHTML += '<option value="' + p.id + '" data-price="' + p.price + '" data-name="' + p.name.replace(/"/g,'&quot;') + '" data-sku="' + (p.sku || 'NA') + '">' + p.name + ' — ' + formatCurrency(p.price) + '</option>';
+});
+}
+
+function addDraftItem() {
+var container = document.getElementById('draftItemsContainer');
+var row = document.createElement('div');
+row.className = 'order-item-row';
+row.innerHTML = '<select class="coProduct"></select><input type="number" class="coQty" value="1" min="1"><input type="text" class="coPrice" readonly><button class="btn btn-sm btn-danger" onclick="removeDraftItem(this)"><i class="fa-solid fa-times"></i></button>';
+container.appendChild(row);
+var sel = row.querySelector('.coProduct');
+populateProductDropdown(sel);
+sel.addEventListener('change', function() { updateDraftPrice(this); });
+row.querySelector('.coQty').addEventListener('input', calcDraftTotal);
+updateDraftPrice(sel);
+}
+
+function removeDraftItem(btn) {
+var row = btn.closest('.order-item-row');
+row.parentNode.removeChild(row);
+calcDraftTotal();
+}
+
+function updateDraftPrice(sel) {
+var row = sel.closest('.order-item-row');
+var priceInput = row.querySelector('.coPrice');
+var opt = sel.options[sel.selectedIndex];
+priceInput.value = opt && opt.value ? (opt.getAttribute('data-price') || '0') : '0';
+calcDraftTotal();
+}
+
+function calcDraftTotal() {
+var total = 0;
+document.querySelectorAll('#draftItemsContainer .order-item-row').forEach(function(row) {
+var qty = parseInt(row.querySelector('.coQty').value) || 1;
+var price = parseFloat(row.querySelector('.coPrice').value) || 0;
+total += qty * price;
+});
+document.getElementById('cdTotal').textContent = formatCurrency(total);
+}
+
+function openCreateDraftModal() {
+document.getElementById('draftItemsContainer').innerHTML = '';
+addDraftItem();
+document.getElementById('cdName').value = '';
+document.getElementById('cdPhone').value = '';
+document.getElementById('cdEmail').value = '';
+document.getElementById('cdAddress').value = '';
+document.getElementById('cdCity').value = '';
+document.getElementById('cdState').value = '';
+document.getElementById('cdPincode').value = '';
+document.querySelector('input[name="cdPayment"][value="cod"]').checked = true;
+calcDraftTotal();
+openModal('createDraftModal');
+}
+
+function submitDraft() {
+var name = document.getElementById('cdName').value.trim();
+var phone = document.getElementById('cdPhone').value.trim();
+var email = document.getElementById('cdEmail').value.trim();
+var address = document.getElementById('cdAddress').value.trim();
+var city = document.getElementById('cdCity').value.trim();
+var state = document.getElementById('cdState').value.trim();
+var pincode = document.getElementById('cdPincode').value.trim();
+if (!name || !phone || !address || !city) { showToast('Please fill in required fields', 'error'); return; }
+
+var items = [];
+document.querySelectorAll('#draftItemsContainer .order-item-row').forEach(function(row) {
+var sel = row.querySelector('.coProduct');
+var opt = sel.options[sel.selectedIndex];
+if (opt && opt.value) {
+items.push({ name: opt.getAttribute('data-name'), price: parseFloat(opt.getAttribute('data-price')), qty: parseInt(row.querySelector('.coQty').value) || 1, sku: opt.getAttribute('data-sku') || 'NA', productId: opt.value });
+}
+});
+if (items.length === 0) { showToast('Please add at least one item', 'error'); return; }
+
+var paymentMethod = document.querySelector('input[name="cdPayment"]:checked').value;
+var total = items.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
+
+var draft = {
+id: generateId(), customerName: name, phone: phone, email: email, address: address, city: city, state: state, pincode: pincode,
+items: items, total: total, paymentMethod: paymentMethod, createdAt: new Date().toISOString()
+};
+
+var drafts = getData('drafts');
+drafts.unshift(draft);
+setData('drafts', drafts);
+closeModal('createDraftModal');
+showToast('Draft saved', 'success');
+renderDrafts();
+}
+
+function renderDrafts() {
+var drafts = getData('drafts');
+var search = (document.getElementById('searchInput').value || '').toLowerCase();
+var filtered = drafts.filter(function(d) {
+if (!search) return true;
+return d.customerName.toLowerCase().indexOf(search) !== -1 || d.id.toLowerCase().indexOf(search) !== -1;
+});
+filtered.sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+
+document.getElementById('draftCount').textContent = filtered.length + ' drafts';
+
+var tbody = document.getElementById('draftsBody');
+if (filtered.length === 0) {
+tbody.innerHTML = '<tr><td colspan="6" class="text-muted text-center" style="padding:24px;">No drafts found</td></tr>';
+} else {
+tbody.innerHTML = filtered.map(function(d) {
+var itemsCount = d.items ? d.items.length : 0;
+return '<tr><td><span style="color:var(--accent);font-weight:500;">' + d.id + '</span></td>' +
+'<td><div class="customer-cell"><div class="avatar">' + d.customerName.charAt(0) + '</div><div>' + d.customerName + '<br><span class="text-muted" style="font-size:11px;">' + d.phone + '</span></div></div></td>' +
+'<td>' + itemsCount + ' item' + (itemsCount !== 1 ? 's' : '') + '</td>' +
+'<td>' + formatCurrency(d.total) + '</td>' +
+'<td>' + formatDate(d.createdAt) + '</td>' +
+'<td><div class="draft-actions"><button class="btn btn-sm btn-accent" onclick="convertDraft(\'' + d.id + '\')"><i class="fa-solid fa-arrow-right"></i> Convert</button><button class="btn btn-sm btn-danger" onclick="openDeleteDraftModal(\'' + d.id + '\')"><i class="fa-solid fa-trash"></i></button></div></td></tr>';
+}).join('');
+}
+}
+
+function openDeleteDraftModal(id) {
+document.getElementById('deleteDraftTargetId').value = id;
+openModal('deleteDraftModal');
+}
+
+function confirmDeleteDraft() {
+var id = document.getElementById('deleteDraftTargetId').value;
+var drafts = getData('drafts');
+var idx = drafts.findIndex(function(d) { return d.id === id; });
+if (idx !== -1) { drafts.splice(idx, 1); setData('drafts', drafts); }
+closeModal('deleteDraftModal');
+showToast('Draft deleted', 'success');
+renderDrafts();
+}
+
+async function convertDraft(id) {
+var drafts = getData('drafts');
+var idx = drafts.findIndex(function(d) { return d.id === id; });
+if (idx === -1) return;
+var draft = drafts[idx];
+
+var orderData = {
+id: generateId(), customerName: draft.customerName, phone: draft.phone, email: draft.email || '', address: draft.address,
+city: draft.city, state: draft.state || '', pincode: draft.pincode || '', items: draft.items, total: draft.total,
+paymentMethod: draft.paymentMethod || 'cod', status: 'pending', createdAt: new Date().toISOString(), shiprocketId: null
+};
+
+var orders = getData('orders');
+orders.unshift(orderData);
+setData('orders', orders);
+
+drafts.splice(idx, 1);
+setData('drafts', drafts);
+
+showToast('Draft converted to order: ' + orderData.id, 'success');
+renderDrafts();
+
+showToast('Creating order in Shiprocket...', 'info');
+var result = await createShiprocketOrder(orderData);
+if (result.success) {
+orderData.shiprocketId = result.shiprocket_order_id;
+orderData.status = 'processing';
+orders = getData('orders');
+var oi = orders.findIndex(function(o) { return o.id === orderData.id; });
+if (oi !== -1) { orders[oi] = orderData; setData('orders', orders); }
+showToast('Shiprocket order created! ID: ' + result.shiprocket_order_id, 'success');
+} else {
+showToast('Order saved. Shiprocket: ' + result.error, 'error');
+}
+}
+
+initPage = function() {
+document.getElementById('searchInput').addEventListener('input', function() { renderDrafts(); });
+renderDrafts();
+};
+</script>
+</body>
+</html>

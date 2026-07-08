@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping Cart - Taiva India</title>
-  <meta name="description" content="View and manage your shopping cart at Taiva India.">
+  <title>About Us - Taiva India</title>
+  <meta name="description" content="Learn about Taiva India's mission to bring premium Ayurvedic wellness products.">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,21 +61,25 @@
   <section class="info-page">
     <div class="container">
       <div class="page-header">
-        <h1>Shopping Cart</h1>
+        <h1>About Taiva India</h1>
+        <p>Bringing the Wisdom of Ayurveda to Modern Life</p>
       </div>
-      <div class="cart-layout">
-        <div class="cart-items-list" id="cartItemsList">
-          <div class="empty-state" id="cartEmptyState">
-            <p>Your cart is empty</p>
-            <a href="index.html" class="btn btn-primary" style="margin-top:12px;">Continue Shopping</a>
-          </div>
-        </div>
-        <div class="cart-summary">
-          <h3>Order Summary</h3>
-          <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">Rs. 0</span></div>
-          <div class="summary-row"><span>Shipping</span><span>Free</span></div>
-          <div class="summary-row total"><span>Total</span><span id="cartTotalPage">Rs. 0</span></div>
-          <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+      <div class="info-content">
+        <p>At Taiva India, we believe that true wellness begins with nature. Our journey started with a simple vision — to make the ancient wisdom of Ayurveda accessible to everyone in its purest, most effective form.</p>
+        <h2>Our Mission</h2>
+        <p>Our mission is to empower individuals to take charge of their health naturally. We combine time-tested Ayurvedic herbs with modern quality standards to create supplements that are safe, effective, and trustworthy.</p>
+        <h2>Why Taiva?</h2>
+        <ul>
+          <li><strong>100% Natural</strong> - Every ingredient is sourced from nature, free from harmful chemicals and additives</li>
+          <li><strong>Science-Backed</strong> - Our formulations are rooted in Ayurvedic texts and supported by modern research</li>
+          <li><strong>Quality Assured</strong> - GMP-certified facilities, lab tested for purity</li>
+          <li><strong>Customer First</strong> - Your health and satisfaction are at the heart of everything we do</li>
+        </ul>
+        <h2>Our Story</h2>
+        <p>Founded with a deep respect for India's Ayurvedic heritage, Taiva India bridges the gap between traditional wellness knowledge and modern lifestyles. We work closely with Ayurvedic practitioners and researchers to develop formulations that address today's most common health concerns — from blood sugar management to digestive wellness and joint care.</p>
+        <p>Every product reflects our commitment to purity, transparency, and efficacy. From sourcing raw ingredients to final packaging, every step is carefully monitored to ensure you receive nothing but the best.</p>
+        <div class="highlight-box">
+          <p>Every product is crafted with care, ensuring the highest standards of quality. For us, it's not just about supplements—it's about building a connection based on honesty, care, and your well-being.</p>
         </div>
       </div>
     </div>
@@ -132,53 +136,5 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
   <script src="app.js"></script>
-  <script>
-    function renderCartPage() {
-      var list = document.getElementById('cartItemsList');
-      var empty = document.getElementById('cartEmptyState');
-      var subtotalEl = document.getElementById('cartSubtotal');
-      var totalEl = document.getElementById('cartTotalPage');
-      var items = typeof cartItems !== 'undefined' ? cartItems : [];
-      if (items.length === 0) {
-        if (empty) empty.style.display = 'block';
-        if (subtotalEl) subtotalEl.textContent = 'Rs. 0';
-        if (totalEl) totalEl.textContent = 'Rs. 0';
-        return;
-      }
-      if (empty) empty.style.display = 'none';
-      var html = '';
-      var total = 0;
-      items.forEach(function (item, idx) {
-        total += item.price;
-        html += '<div class="cart-item-card">' +
-          '<img src="' + item.image + '" alt="' + item.name + '" loading="lazy">' +
-          '<div class="item-info">' +
-            '<h4>' + item.name + '</h4>' +
-            '<div class="item-price">Rs. ' + item.price.toLocaleString('en-IN') + '</div>' +
-            '<div class="item-actions">' +
-              '<button class="remove-btn" onclick="removeFromCart(' + idx + ')"><i class="fa-solid fa-trash-can"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      });
-      list.innerHTML = html;
-      if (subtotalEl) subtotalEl.textContent = 'Rs. ' + total.toLocaleString('en-IN');
-      if (totalEl) totalEl.textContent = 'Rs. ' + total.toLocaleString('en-IN');
-    }
-    function removeFromCart(idx) {
-      if (typeof cartItems !== 'undefined') {
-        cartItems.splice(idx, 1);
-        renderCartPage();
-      }
-    }
-    function checkout() {
-      if (typeof openCheckout === 'function') {
-        openCheckout();
-      } else {
-        alert('Checkout is not available right now.');
-      }
-    }
-    document.addEventListener('DOMContentLoaded', renderCartPage);
-  </script>
 </body>
 </html>

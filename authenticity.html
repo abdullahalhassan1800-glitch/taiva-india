@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping Cart - Taiva India</title>
-  <meta name="description" content="View and manage your shopping cart at Taiva India.">
+  <title>Authenticity & Quality - Taiva India</title>
+  <meta name="description" content="Verify the authenticity of Taiva India products. Learn about our quality certifications and how to identify genuine products.">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,21 +61,41 @@
   <section class="info-page">
     <div class="container">
       <div class="page-header">
-        <h1>Shopping Cart</h1>
+        <h1>Authenticity & Quality</h1>
+        <p>How to Identify Genuine Taiva India Products</p>
       </div>
-      <div class="cart-layout">
-        <div class="cart-items-list" id="cartItemsList">
-          <div class="empty-state" id="cartEmptyState">
-            <p>Your cart is empty</p>
-            <a href="index.html" class="btn btn-primary" style="margin-top:12px;">Continue Shopping</a>
-          </div>
+      <div class="info-content">
+        <p>At Taiva India, we are committed to providing you with 100% genuine Ayurvedic products. Unfortunately, counterfeit products exist in the market. Here's how you can ensure you're buying authentic Taiva products.</p>
+
+        <div class="highlight-box">
+          <p>Every product is manufactured in GMP-certified facilities and lab-tested for purity and potency before dispatch.</p>
         </div>
-        <div class="cart-summary">
-          <h3>Order Summary</h3>
-          <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">Rs. 0</span></div>
-          <div class="summary-row"><span>Shipping</span><span>Free</span></div>
-          <div class="summary-row total"><span>Total</span><span id="cartTotalPage">Rs. 0</span></div>
-          <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+
+        <h2>Buy Only from Authorized Channels</h2>
+        <p>To guarantee authenticity, always purchase from:</p>
+        <ul>
+          <li>Our official website: <strong>taiva.in</strong></li>
+          <li>Authorized retail partners listed on our website</li>
+        </ul>
+
+        <h2>How to Spot a Genuine Taiva Product</h2>
+        <ul>
+          <li><strong>Packaging:</strong> Genuine products feature high-quality printing, consistent colors, and proper sealing</li>
+          <li><strong>Labels:</strong> Each product has a detailed label with ingredients, manufacturing date, expiry date, and batch number</li>
+          <li><strong>FSSAI License:</strong> Our products display our FSSAI license number on the packaging</li>
+          <li><strong>MRP:</strong> Genuine products always have the Maximum Retail Price clearly printed</li>
+        </ul>
+
+        <h2>What We Do to Protect You</h2>
+        <ul>
+          <li>All products are manufactured in GMP-certified facilities</li>
+          <li>Every batch is tested for quality and purity before dispatch</li>
+          <li>We regularly monitor the market for counterfeit products</li>
+          <li>Legal action is taken against sellers of fake Taiva products</li>
+        </ul>
+
+        <div class="highlight-box">
+          <p><strong>Report a Suspicious Product:</strong> If you suspect you've received a counterfeit product, contact us immediately at info@taiva.in or +91-9582908080 with your order number and photos for verification.</p>
         </div>
       </div>
     </div>
@@ -132,53 +152,5 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
   <script src="app.js"></script>
-  <script>
-    function renderCartPage() {
-      var list = document.getElementById('cartItemsList');
-      var empty = document.getElementById('cartEmptyState');
-      var subtotalEl = document.getElementById('cartSubtotal');
-      var totalEl = document.getElementById('cartTotalPage');
-      var items = typeof cartItems !== 'undefined' ? cartItems : [];
-      if (items.length === 0) {
-        if (empty) empty.style.display = 'block';
-        if (subtotalEl) subtotalEl.textContent = 'Rs. 0';
-        if (totalEl) totalEl.textContent = 'Rs. 0';
-        return;
-      }
-      if (empty) empty.style.display = 'none';
-      var html = '';
-      var total = 0;
-      items.forEach(function (item, idx) {
-        total += item.price;
-        html += '<div class="cart-item-card">' +
-          '<img src="' + item.image + '" alt="' + item.name + '" loading="lazy">' +
-          '<div class="item-info">' +
-            '<h4>' + item.name + '</h4>' +
-            '<div class="item-price">Rs. ' + item.price.toLocaleString('en-IN') + '</div>' +
-            '<div class="item-actions">' +
-              '<button class="remove-btn" onclick="removeFromCart(' + idx + ')"><i class="fa-solid fa-trash-can"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      });
-      list.innerHTML = html;
-      if (subtotalEl) subtotalEl.textContent = 'Rs. ' + total.toLocaleString('en-IN');
-      if (totalEl) totalEl.textContent = 'Rs. ' + total.toLocaleString('en-IN');
-    }
-    function removeFromCart(idx) {
-      if (typeof cartItems !== 'undefined') {
-        cartItems.splice(idx, 1);
-        renderCartPage();
-      }
-    }
-    function checkout() {
-      if (typeof openCheckout === 'function') {
-        openCheckout();
-      } else {
-        alert('Checkout is not available right now.');
-      }
-    }
-    document.addEventListener('DOMContentLoaded', renderCartPage);
-  </script>
 </body>
 </html>

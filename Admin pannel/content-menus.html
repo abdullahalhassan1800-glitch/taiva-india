@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menus — Taiva Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+<style>
+.menu-item-row { display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:6px; }
+.menu-item-row .drag-handle { cursor:grab; color:var(--text-muted); font-size:14px; }
+.menu-item-row .item-label { flex:1; font-weight:500; }
+.menu-item-row .item-url { color:var(--text-muted); font-size:12px; }
+.menu-item-row .item-actions { display:flex; gap:4px; flex-shrink:0; }
+.menu-item-row.indent-1 { margin-left:24px; }
+.menu-item-row.indent-2 { margin-left:48px; }
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+<span class="logo-text">Taiva</span>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-section">Main</div>
+<a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+<div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="products.html" class="nav-item">All products</a><a href="products-collections.html" class="nav-item">Collections</a><a href="products-inventory.html" class="nav-item">Inventory</a><a href="products-purchase-orders.html" class="nav-item">Purchase orders</a><a href="products-transfers.html" class="nav-item">Transfers</a><a href="products-gift-cards.html" class="nav-item">Gift cards</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+<a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub open">
+<a href="content-metaobjects.html" class="nav-item">Metaobjects</a>
+<a href="content-files.html" class="nav-item">Files</a>
+<a href="content-menus.html" class="nav-item active">Menus</a>
+<a href="content-blog.html" class="nav-item">Blog posts</a>
+</div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section">Settings</div>
+<a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+<a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+</nav>
+</div>
+
+<div class="main-content">
+<header class="topbar">
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+<button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+<div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+<div class="topbar-actions">
+<button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+<button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+<div class="admin-avatar">A</div>
+</div>
+</header>
+
+<div class="page-content">
+<div class="page-header">
+<div>
+<h1>Menus</h1>
+<div class="page-subtitle">Navigation menus for your store</div>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openCreateMenuModal()"><i class="fa-solid fa-plus"></i> Create menu</button>
+</div>
+</div>
+
+<div id="menuListView">
+<div class="table-container">
+<table>
+<thead><tr><th>Name</th><th>Location</th><th>Items</th><th>Created</th><th>Actions</th></tr></thead>
+<tbody id="menuTableBody"></tbody>
+</table>
+</div>
+</div>
+
+<div id="menuEditorView" style="display:none;">
+<div class="page-header">
+<div>
+<button class="btn btn-sm" onclick="backToMenuList()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+<h2 id="editorMenuName" style="margin-top:8px;"></h2>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openAddItemModal()"><i class="fa-solid fa-plus"></i> Add item</button>
+</div>
+</div>
+<div id="menuItemsContainer"></div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<div class="modal" id="createMenuModal">
+<div class="modal-header"><h2 id="menuModalTitle">Create menu</h2><button class="modal-close" onclick="closeModal('createMenuModal')">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="editMenuId">
+<div class="form-group"><label>Menu name <span style="color:var(--danger)">*</span></label><input type="text" id="menuName" placeholder="e.g. Main Navigation"></div>
+<div class="form-group"><label>Location</label><select id="menuLocation"><option value="header">Header</option><option value="footer">Footer</option></select></div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('createMenuModal')">Cancel</button>
+<button class="btn btn-accent" onclick="saveMenu()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+</div>
+</div>
+
+<div class="modal" id="addItemModal">
+<div class="modal-header"><h2 id="itemModalTitle">Add menu item</h2><button class="modal-close" onclick="closeModal('addItemModal')">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="editItemId">
+<div class="form-group"><label>Label <span style="color:var(--danger)">*</span></label><input type="text" id="itemLabel" placeholder="e.g. Home"></div>
+<div class="form-group"><label>URL <span style="color:var(--danger)">*</span></label><input type="text" id="itemUrl" placeholder="e.g. /home"></div>
+<div class="form-group"><label>Parent item (optional)</label><select id="itemParent"><option value="">None (top level)</option></select></div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('addItemModal')">Cancel</button>
+<button class="btn btn-accent" onclick="saveItem()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+</div>
+</div>
+
+<div class="modal" id="deleteMenuModal">
+<div class="modal-header"><h2>Delete menu</h2><button class="modal-close" onclick="closeModal('deleteMenuModal')">&times;</button></div>
+<div class="modal-body">
+<p>Are you sure you want to delete <strong id="deleteMenuName"></strong>?</p>
+<input type="hidden" id="deleteMenuId">
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('deleteMenuModal')">Cancel</button>
+<button class="btn btn-danger" onclick="confirmDeleteMenu()"><i class="fa-solid fa-trash"></i> Delete</button>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var tt = document.getElementById('themeToggle');
+  if (tt) {
+    tt.addEventListener('click', function () {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      tt.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var saved = localStorage.getItem('taiva_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      tt.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    }
+  }
+});
+
+var currentMenuId = null;
+
+function initPage() {
+  renderMenus();
+}
+
+function getMenus() {
+  return getData('menus');
+}
+
+function saveMenus(data) {
+  setData('menus', data);
+}
+
+function renderMenus() {
+  var menus = getMenus();
+  var tbody = document.getElementById('menuTableBody');
+  if (menus.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding:24px;">No menus yet. Create your first one.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = menus.map(function (m) {
+    var count = flattenItems(m.items || []).length;
+    return '<tr><td><a href="#" onclick="openMenuEditor(\'' + m.id + '\');return false;" style="font-weight:500;color:var(--accent);">' + m.name + '</a></td><td><span class="badge badge-active">' + m.location + '</span></td><td>' + count + ' item' + (count !== 1 ? 's' : '') + '</td><td>' + formatDate(m.createdAt) + '</td><td><button class="btn btn-sm" onclick="editMenu(\'' + m.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteMenu(\'' + m.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+  }).join('');
+}
+
+function flattenItems(items) {
+  var result = [];
+  items.forEach(function (item) {
+    result.push(item);
+    if (item.children && item.children.length) result = result.concat(flattenItems(item.children));
+  });
+  return result;
+}
+
+function openCreateMenuModal() {
+  document.getElementById('menuModalTitle').textContent = 'Create menu';
+  document.getElementById('editMenuId').value = '';
+  document.getElementById('menuName').value = '';
+  document.getElementById('menuLocation').value = 'header';
+  openModal('createMenuModal');
+}
+
+function saveMenu() {
+  var id = document.getElementById('editMenuId').value;
+  var name = document.getElementById('menuName').value.trim();
+  var location = document.getElementById('menuLocation').value;
+  if (!name) { showToast('Menu name is required', 'error'); return; }
+  var menus = getMenus();
+  if (id) {
+    var m = menus.find(function (x) { return x.id === id; });
+    if (m) { m.name = name; m.location = location; }
+    showToast('Menu updated', 'success');
+  } else {
+    menus.push({ id: generateId(), name: name, location: location, items: [], createdAt: new Date().toISOString() });
+    showToast('Menu created', 'success');
+  }
+  saveMenus(menus);
+  closeModal('createMenuModal');
+  renderMenus();
+}
+
+function editMenu(id) {
+  var m = getMenus().find(function (x) { return x.id === id; });
+  if (!m) return;
+  document.getElementById('menuModalTitle').textContent = 'Edit menu';
+  document.getElementById('editMenuId').value = m.id;
+  document.getElementById('menuName').value = m.name;
+  document.getElementById('menuLocation').value = m.location;
+  openModal('createMenuModal');
+}
+
+function deleteMenu(id) {
+  var m = getMenus().find(function (x) { return x.id === id; });
+  if (!m) return;
+  document.getElementById('deleteMenuId').value = id;
+  document.getElementById('deleteMenuName').textContent = m.name;
+  openModal('deleteMenuModal');
+}
+
+function confirmDeleteMenu() {
+  var id = document.getElementById('deleteMenuId').value;
+  saveMenus(getMenus().filter(function (x) { return x.id !== id; }));
+  closeModal('deleteMenuModal');
+  if (currentMenuId === id) backToMenuList();
+  renderMenus();
+  showToast('Menu deleted', 'success');
+}
+
+function openMenuEditor(id) {
+  currentMenuId = id;
+  var menu = getMenus().find(function (x) { return x.id === id; });
+  if (!menu) return;
+  document.getElementById('menuListView').style.display = 'none';
+  document.getElementById('menuEditorView').style.display = 'block';
+  document.getElementById('editorMenuName').textContent = menu.name;
+  renderMenuItems();
+}
+
+function backToMenuList() {
+  currentMenuId = null;
+  document.getElementById('menuListView').style.display = 'block';
+  document.getElementById('menuEditorView').style.display = 'none';
+  renderMenus();
+}
+
+function renderMenuItems() {
+  var menu = getMenus().find(function (x) { return x.id === currentMenuId; });
+  if (!menu) return;
+  var container = document.getElementById('menuItemsContainer');
+  var items = menu.items || [];
+  if (items.length === 0) {
+    container.innerHTML = '<div class="text-muted" style="text-align:center;padding:24px;">No items yet. Add your first menu item.</div>';
+    return;
+  }
+  container.innerHTML = renderItemList(items, 0);
+}
+
+function renderItemList(items, depth) {
+  var html = '';
+  items.forEach(function (item, idx) {
+    var indentClass = depth > 0 ? ' indent-' + depth : '';
+    html += '<div class="menu-item-row' + indentClass + '"><span class="drag-handle"><i class="fa-solid fa-grip-vertical"></i></span><span class="item-label">' + item.label + '</span><span class="item-url">' + item.url + '</span><div class="item-actions"><button class="btn btn-sm" onclick="editItem(\'' + item.id + '\')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm" onclick="moveItemUp(\'' + item.id + '\')" title="Move up"><i class="fa-solid fa-chevron-up"></i></button><button class="btn btn-sm" onclick="moveItemDown(\'' + item.id + '\')" title="Move down"><i class="fa-solid fa-chevron-down"></i></button><button class="btn btn-sm btn-danger" onclick="removeItem(\'' + item.id + '\')"><i class="fa-solid fa-times"></i></button></div></div>';
+    if (item.children && item.children.length) {
+      html += renderItemList(item.children, depth + 1);
+    }
+  });
+  return html;
+}
+
+function openAddItemModal() {
+  document.getElementById('itemModalTitle').textContent = 'Add menu item';
+  document.getElementById('editItemId').value = '';
+  document.getElementById('itemLabel').value = '';
+  document.getElementById('itemUrl').value = '';
+  populateParentSelect();
+  openModal('addItemModal');
+}
+
+function populateParentSelect() {
+  var menu = getMenus().find(function (x) { return x.id === currentMenuId; });
+  var select = document.getElementById('itemParent');
+  var currentEdit = document.getElementById('editItemId').value;
+  select.innerHTML = '<option value="">None (top level)</option>';
+  if (!menu) return;
+  function addOptions(items, depth) {
+    items.forEach(function (item) {
+      if (item.id !== currentEdit) {
+        var opt = document.createElement('option');
+        opt.value = item.id;
+        opt.textContent = (depth > 0 ? '— '.repeat(depth) : '') + item.label;
+        select.appendChild(opt);
+      }
+      if (item.children && item.children.length) addOptions(item.children, depth + 1);
+    });
+  }
+  addOptions(menu.items || [], 0);
+}
+
+function saveItem() {
+  var editId = document.getElementById('editItemId').value;
+  var label = document.getElementById('itemLabel').value.trim();
+  var url = document.getElementById('itemUrl').value.trim();
+  var parentId = document.getElementById('itemParent').value;
+  if (!label || !url) { showToast('Label and URL are required', 'error'); return; }
+  var menus = getMenus();
+  var menu = menus.find(function (x) { return x.id === currentMenuId; });
+  if (!menu) return;
+  if (editId) {
+    var allItems = flattenItems(menu.items || []);
+    var item = allItems.find(function (x) { return x.id === editId; });
+    if (item) { item.label = label; item.url = url; }
+  } else {
+    var newItem = { id: generateId(), label: label, url: url, children: [] };
+    if (parentId) {
+      var parent = findItemById(menu.items, parentId);
+      if (parent) {
+        if (!parent.children) parent.children = [];
+        parent.children.push(newItem);
+      } else {
+        menu.items.push(newItem);
+      }
+    } else {
+      menu.items.push(newItem);
+    }
+  }
+  saveMenus(menus);
+  closeModal('addItemModal');
+  renderMenuItems();
+  showToast(editId ? 'Item updated' : 'Item added', 'success');
+}
+
+function findItemById(items, id) {
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].id === id) return items[i];
+    if (items[i].children && items[i].children.length) {
+      var found = findItemById(items[i].children, id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function editItem(id) {
+  var menu = getMenus().find(function (x) { return x.id === currentMenuId; });
+  if (!menu) return;
+  var allItems = flattenItems(menu.items || []);
+  var item = allItems.find(function (x) { return x.id === id; });
+  if (!item) return;
+  document.getElementById('itemModalTitle').textContent = 'Edit menu item';
+  document.getElementById('editItemId').value = id;
+  document.getElementById('itemLabel').value = item.label || '';
+  document.getElementById('itemUrl').value = item.url || '';
+  populateParentSelect();
+  openModal('addItemModal');
+}
+
+function removeItem(id) {
+  if (!confirm('Remove this menu item?')) return;
+  var menus = getMenus();
+  var menu = menus.find(function (x) { return x.id === currentMenuId; });
+  if (!menu) return;
+  function removeFrom(items) {
+    for (var i = items.length - 1; i >= 0; i--) {
+      if (items[i].id === id) { items.splice(i, 1); return true; }
+      if (items[i].children && items[i].children.length) { if (removeFrom(items[i].children)) return true; }
+    }
+    return false;
+  }
+  removeFrom(menu.items);
+  saveMenus(menus);
+  renderMenuItems();
+  showToast('Item removed', 'success');
+}
+
+function moveItemUp(id) {
+  var menus = getMenus();
+  var menu = menus.find(function (x) { return x.id === currentMenuId; });
+  if (!menu) return;
+  function moveUp(items) {
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].id === id) {
+        if (i > 0) { var tmp = items[i - 1]; items[i - 1] = items[i]; items[i] = tmp; return true; }
+        return false;
+      }
+      if (items[i].children && items[i].children.length) { if (moveUp(items[i].children)) return true; }
+    }
+    return false;
+  }
+  if (moveUp(menu.items)) { saveMenus(menus); renderMenuItems(); }
+}
+
+function moveItemDown(id) {
+  var menus = getMenus();
+  var menu = menus.find(function (x) { return x.id === currentMenuId; });
+  if (!menu) return;
+  function moveDown(items) {
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].id === id) {
+        if (i < items.length - 1) { var tmp = items[i + 1]; items[i + 1] = items[i]; items[i] = tmp; return true; }
+        return false;
+      }
+      if (items[i].children && items[i].children.length) { if (moveDown(items[i].children)) return true; }
+    }
+    return false;
+  }
+  if (moveDown(menu.items)) { saveMenus(menus); renderMenuItems(); }
+}
+
+document.addEventListener('click', function (e) {
+  if (e.target.classList.contains('modal-overlay')) closeAllModals();
+});
+</script>
+<script src="app.js"></script>
+</body>
+</html>

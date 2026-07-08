@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaigns — Taiva Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+<style>
+.copy-btn { cursor: pointer; background: none; border: none; color: var(--accent); font-size: 14px; padding: 0 4px; }
+.status-toggle { cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+<span class="logo-text">Taiva</span>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-section">Main</div>
+<a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+<div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="products.html" class="nav-item">All products</a><a href="products-collections.html" class="nav-item">Collections</a><a href="products-inventory.html" class="nav-item">Inventory</a><a href="products-purchase-orders.html" class="nav-item">Purchase orders</a><a href="products-transfers.html" class="nav-item">Transfers</a><a href="products-gift-cards.html" class="nav-item">Gift cards</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+<a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub open">
+<a href="growth-attribution.html" class="nav-item">Attribution</a>
+<a href="growth-campaigns.html" class="nav-item active">Campaigns</a>
+</div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="content-metaobjects.html" class="nav-item">Metaobjects</a><a href="content-files.html" class="nav-item">Files</a><a href="content-menus.html" class="nav-item">Menus</a><a href="content-blog.html" class="nav-item">Blog posts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section">Settings</div>
+<a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+<a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+</nav>
+</div>
+
+<div class="main-content">
+<header class="topbar">
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+<button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+<div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+<div class="topbar-actions">
+<button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+<button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+<div class="admin-avatar">A</div>
+</div>
+</header>
+
+<div class="page-content">
+<div class="page-header">
+<div>
+<h1>Campaigns</h1>
+<div class="page-subtitle">Discount codes & promotional campaigns</div>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openCreateCampaignModal()"><i class="fa-solid fa-plus"></i> Create campaign</button>
+</div>
+</div>
+
+<div class="card">
+<div class="card-body" style="padding:0;">
+<div class="table-container">
+<table>
+<thead><tr><th>Name</th><th>Code</th><th>Discount</th><th>Min Amount</th><th>Used / Limit</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody id="campaignsBody"></tbody>
+</table>
+</div>
+<div id="noCampaigns" class="empty-state" style="display:none;">
+<i class="fa-solid fa-tags"></i><h3>No campaigns yet</h3><p>Create your first campaign.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<div class="modal" id="campaignModal">
+<div class="modal-header"><h2 id="campaignModalTitle">Create campaign</h2><button class="modal-close" onclick="closeModal('campaignModal')">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="editCampaignId">
+<div class="form-group"><label>Campaign name <span style="color:var(--danger)">*</span></label><input type="text" id="campName" placeholder="e.g. Summer Sale"></div>
+<div class="form-row">
+<div class="form-group">
+<label>Discount code</label>
+<div style="display:flex;gap:6px;">
+<input type="text" id="campCode" placeholder="SUMMER10" style="flex:1;">
+<button class="btn btn-sm" onclick="generateCode()"><i class="fa-solid fa-rotate"></i> Generate</button>
+</div>
+<div class="form-hint">Leave empty to auto-generate</div>
+</div>
+<div class="form-group">
+<label>Discount type</label>
+<select id="campType"><option value="percentage">Percentage (%)</option><option value="fixed">Fixed (Rs.)</option></select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Value <span style="color:var(--danger)">*</span></label><input type="number" id="campValue" placeholder="10"></div>
+<div class="form-group"><label>Min amount (Rs.)</label><input type="number" id="campMinAmount" placeholder="0"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Usage limit</label><input type="number" id="campUsageLimit" placeholder="100"></div>
+<div class="form-group"><label>Expiry date</label><input type="date" id="campExpires"></div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('campaignModal')">Cancel</button>
+<button class="btn btn-primary" onclick="saveCampaign()">Save campaign</button>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var tt = document.getElementById('themeToggle');
+  if (tt) {
+    tt.addEventListener('click', function () {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      tt.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var saved = localStorage.getItem('taiva_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      tt.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    }
+  }
+});
+
+function initPage() {
+  renderCampaigns();
+}
+
+function getCampaigns() {
+  return getData('campaigns');
+}
+
+function saveCampaigns(data) {
+  setData('campaigns', data);
+}
+
+function renderCampaigns() {
+  var camps = getCampaigns();
+  var tbody = document.getElementById('campaignsBody');
+  var empty = document.getElementById('noCampaigns');
+  if (camps.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = camps.map(function (c) {
+    var discountText = c.type === 'percentage' ? c.value + '%' : formatCurrency(c.value);
+    var statusClass = c.status === 'active' ? 'badge-active' : (c.status === 'expired' ? 'badge-expired' : 'badge-draft');
+    var expiresText = c.expiresAt ? formatDate(c.expiresAt) : '—';
+    return '<tr>' +
+      '<td><div style="font-weight:500;">' + c.name + '</div></td>' +
+      '<td><code style="background:var(--page-bg);padding:2px 8px;border-radius:4px;font-size:13px;">' + (c.code || '—') + '</code>' +
+      (c.code ? '<button class="copy-btn" onclick="copyCode(\'' + c.code + '\')" title="Copy code"><i class="fa-regular fa-copy"></i></button>' : '') + '</td>' +
+      '<td>' + discountText + '</td>' +
+      '<td>' + formatCurrency(c.minAmount || 0) + '</td>' +
+      '<td>' + (c.usedCount || 0) + ' / ' + (c.usageLimit || '∞') + '</td>' +
+      '<td>' + expiresText + '</td>' +
+      '<td><span class="badge ' + statusClass + ' status-toggle" onclick="toggleCampaignStatus(\'' + c.id + '\')">' + c.status + '</span></td>' +
+      '<td><div class="order-actions">' +
+      '<button class="btn btn-sm" onclick="editCampaign(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+      '<button class="btn btn-sm btn-danger" onclick="deleteCampaign(\'' + c.id + '\')"><i class="fa-solid fa-trash"></i></button>' +
+      '</div></td></tr>';
+  }).join('');
+}
+
+function generateCode() {
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  var code = '';
+  for (var i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+  document.getElementById('campCode').value = code;
+}
+
+function openCreateCampaignModal() {
+  document.getElementById('campaignModalTitle').textContent = 'Create campaign';
+  document.getElementById('editCampaignId').value = '';
+  document.getElementById('campName').value = '';
+  document.getElementById('campCode').value = '';
+  document.getElementById('campType').value = 'percentage';
+  document.getElementById('campValue').value = '';
+  document.getElementById('campMinAmount').value = '';
+  document.getElementById('campUsageLimit').value = '';
+  document.getElementById('campExpires').value = '';
+  openModal('campaignModal');
+}
+
+function saveCampaign() {
+  var name = document.getElementById('campName').value.trim();
+  var value = document.getElementById('campValue').value;
+  if (!name || !value) { showToast('Fill required fields', 'error'); return; }
+  var code = document.getElementById('campCode').value.trim();
+  if (!code) code = generateCode();
+  var camps = getCampaigns();
+  var editId = document.getElementById('editCampaignId').value;
+  var obj = {
+    name: name,
+    code: code.toUpperCase(),
+    type: document.getElementById('campType').value,
+    value: Number(value),
+    minAmount: Number(document.getElementById('campMinAmount').value) || 0,
+    usageLimit: Number(document.getElementById('campUsageLimit').value) || 0,
+    usedCount: 0,
+    expiresAt: document.getElementById('campExpires').value || null,
+    status: 'active'
+  };
+  if (editId) {
+    var existing = camps.find(function (c) { return c.id === editId; });
+    if (existing) {
+      obj.usedCount = existing.usedCount || 0;
+      Object.assign(existing, obj);
+    }
+  } else {
+    obj.id = 'CMPGN' + Date.now().toString(36).toUpperCase();
+    obj.createdAt = new Date().toISOString();
+    camps.push(obj);
+  }
+  saveCampaigns(camps);
+  renderCampaigns();
+  closeModal('campaignModal');
+  showToast(editId ? 'Campaign updated' : 'Campaign created', 'success');
+}
+
+function editCampaign(id) {
+  var camps = getCampaigns();
+  var c = camps.find(function (x) { return x.id === id; });
+  if (!c) return;
+  document.getElementById('campaignModalTitle').textContent = 'Edit campaign';
+  document.getElementById('editCampaignId').value = c.id;
+  document.getElementById('campName').value = c.name || '';
+  document.getElementById('campCode').value = c.code || '';
+  document.getElementById('campType').value = c.type || 'percentage';
+  document.getElementById('campValue').value = c.value || '';
+  document.getElementById('campMinAmount').value = c.minAmount || '';
+  document.getElementById('campUsageLimit').value = c.usageLimit || '';
+  document.getElementById('campExpires').value = c.expiresAt ? c.expiresAt.split('T')[0] : '';
+  openModal('campaignModal');
+}
+
+function deleteCampaign(id) {
+  if (!confirm('Delete this campaign?')) return;
+  saveCampaigns(getCampaigns().filter(function (c) { return c.id !== id; }));
+  renderCampaigns();
+  showToast('Campaign deleted', 'success');
+}
+
+function toggleCampaignStatus(id) {
+  var camps = getCampaigns();
+  var c = camps.find(function (x) { return x.id === id; });
+  if (!c) return;
+  c.status = c.status === 'active' ? 'expired' : 'active';
+  saveCampaigns(camps);
+  renderCampaigns();
+  showToast('Status changed to ' + c.status, 'info');
+}
+
+function copyCode(code) {
+  navigator.clipboard.writeText(code).then(function () {
+    showToast('Code copied: ' + code, 'success');
+  }).catch(function () {
+    // fallback
+    var ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    showToast('Code copied: ' + code, 'success');
+  });
+}
+</script>
+<script src="app.js"></script>
+</body>
+</html>

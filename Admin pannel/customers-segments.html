@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Segments — Taiva Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+<style>
+.rule-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.rule-row select, .rule-row input { padding: 6px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; background: var(--card-bg); color: var(--text); outline: none; }
+.rule-row select { flex: 1; }
+.rule-row input { flex: 1; }
+.rule-row .btn-icon { flex-shrink: 0; }
+.rules-summary { font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+<span class="logo-text">Taiva</span>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-section">Main</div>
+<a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+<div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="products.html" class="nav-item">All products</a><a href="products-collections.html" class="nav-item">Collections</a><a href="products-inventory.html" class="nav-item">Inventory</a><a href="products-purchase-orders.html" class="nav-item">Purchase orders</a><a href="products-transfers.html" class="nav-item">Transfers</a><a href="products-gift-cards.html" class="nav-item">Gift cards</a></div>
+<a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub open">
+<a href="customers.html" class="nav-item">All customers</a>
+<a href="customers-segments.html" class="nav-item active">Segments</a>
+<a href="customers-companies.html" class="nav-item">Companies</a>
+</div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="content-metaobjects.html" class="nav-item">Metaobjects</a><a href="content-files.html" class="nav-item">Files</a><a href="content-menus.html" class="nav-item">Menus</a><a href="content-blog.html" class="nav-item">Blog posts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section">Settings</div>
+<a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+<a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+</nav>
+</div>
+
+<div class="main-content">
+<header class="topbar">
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+<button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+<div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+<div class="topbar-actions">
+<button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+<button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+<div class="admin-avatar">A</div>
+</div>
+</header>
+
+<div class="page-content">
+<div class="page-header">
+<div>
+<h1>Segments</h1>
+<div class="page-subtitle">Group customers by rules</div>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openCreateSegmentModal()"><i class="fa-solid fa-plus"></i> Create segment</button>
+</div>
+</div>
+
+<div class="card">
+<div class="card-body" style="padding:0;">
+<div class="table-container">
+<table>
+<thead><tr><th>Name</th><th>Rules</th><th>Customers</th><th>Created</th><th>Actions</th></tr></thead>
+<tbody id="segmentsBody"></tbody>
+</table>
+</div>
+<div id="noSegments" class="empty-state" style="display:none;">
+<i class="fa-solid fa-layer-group"></i><h3>No segments yet</h3><p>Create your first segment.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<div class="modal" id="segmentModal">
+<div class="modal-header"><h2 id="segmentModalTitle">Create segment</h2><button class="modal-close" onclick="closeModal('segmentModal')">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="editSegmentId">
+<div class="form-group"><label>Segment name</label><input type="text" id="segName" placeholder="e.g. VIP Customers"></div>
+<div class="form-group">
+<label>Rules</label>
+<div id="rulesContainer"></div>
+<button class="btn btn-sm" onclick="addRule()"><i class="fa-solid fa-plus"></i> Add rule</button>
+<button class="btn btn-sm" onclick="applySegmentRules()" style="margin-left:8px;background:var(--accent);color:#fff;border-color:var(--accent);"><i class="fa-solid fa-calculator"></i> Apply → count</button>
+</div>
+<div class="form-group"><label>Matching customers</label><div style="font-size:24px;font-weight:700;" id="segCountPreview">0</div></div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('segmentModal')">Cancel</button>
+<button class="btn btn-primary" onclick="saveSegment()">Save segment</button>
+</div>
+</div>
+
+<script>
+var ruleFields = [
+  { value: 'ordersCount', label: 'Orders count' },
+  { value: 'totalSpent', label: 'Total spent' },
+  { value: 'lastOrder', label: 'Last order (days ago)' }
+];
+var ruleOperators = [
+  { value: '>=', label: '>=' },
+  { value: '>', label: '>' },
+  { value: '<=', label: '<=' },
+  { value: '<', label: '<' },
+  { value: '==', label: '=' }
+];
+
+document.addEventListener('DOMContentLoaded', function () {
+  var tt = document.getElementById('themeToggle');
+  if (tt) {
+    tt.addEventListener('click', function () {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      tt.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var saved = localStorage.getItem('taiva_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      tt.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    }
+  }
+});
+
+var ruleIdCounter = 0;
+
+function initPage() {
+  renderSegments();
+}
+
+function getSegments() {
+  return getData('segments');
+}
+
+function saveSegments(data) {
+  setData('segments', data);
+}
+
+function renderSegments() {
+  var segs = getSegments();
+  var tbody = document.getElementById('segmentsBody');
+  var empty = document.getElementById('noSegments');
+  if (segs.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = segs.map(function (s) {
+    var rulesText = (s.rules || []).map(function (r) {
+      var f = ruleFields.find(function (x) { return x.value === r.field; });
+      return (f ? f.label : r.field) + ' ' + r.operator + ' ' + r.value;
+    }).join(', ') || '—';
+    return '<tr>' +
+      '<td><div style="font-weight:500;">' + s.name + '</div></td>' +
+      '<td><span class="rules-summary">' + rulesText + '</span></td>' +
+      '<td>' + (s.customerCount || 0) + '</td>' +
+      '<td>' + formatDate(s.createdAt) + '</td>' +
+      '<td><div class="order-actions">' +
+      '<button class="btn btn-sm" onclick="editSegment(\'' + s.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+      '<button class="btn btn-sm btn-danger" onclick="deleteSegment(\'' + s.id + '\')"><i class="fa-solid fa-trash"></i></button>' +
+      '</div></td></tr>';
+  }).join('');
+}
+
+function openCreateSegmentModal() {
+  document.getElementById('segmentModalTitle').textContent = 'Create segment';
+  document.getElementById('editSegmentId').value = '';
+  document.getElementById('segName').value = '';
+  document.getElementById('segCountPreview').textContent = '0';
+  document.getElementById('rulesContainer').innerHTML = '';
+  addRule();
+  openModal('segmentModal');
+}
+
+function addRule(field, operator, value) {
+  var c = document.getElementById('rulesContainer');
+  var id = 'rule_' + (ruleIdCounter++);
+  var div = document.createElement('div');
+  div.className = 'rule-row';
+  div.id = id;
+  div.innerHTML = '<select onchange="updateSegmentCount()">' + ruleFields.map(function (f) {
+    return '<option value="' + f.value + '"' + (f.value === field ? ' selected' : '') + '>' + f.label + '</option>';
+  }).join('') + '</select>' +
+    '<select onchange="updateSegmentCount()">' + ruleOperators.map(function (o) {
+      return '<option value="' + o.value + '"' + (o.value === operator ? ' selected' : '') + '>' + o.label + '</option>';
+    }).join('') + '</select>' +
+    '<input type="text" placeholder="Value" value="' + (value || '') + '" oninput="updateSegmentCount()">' +
+    '<button class="btn btn-sm btn-icon" onclick="this.parentElement.remove();updateSegmentCount();"><i class="fa-solid fa-times"></i></button>';
+  c.appendChild(div);
+}
+
+function getRulesFromUI() {
+  var rules = [];
+  document.querySelectorAll('#rulesContainer .rule-row').forEach(function (row) {
+    var selects = row.querySelectorAll('select');
+    var input = row.querySelector('input');
+    if (selects.length === 2 && input) {
+      var val = input.value.trim();
+      if (val !== '') {
+        rules.push({ field: selects[0].value, operator: selects[1].value, value: val });
+      }
+    }
+  });
+  return rules;
+}
+
+function applySegmentRules() {
+  var rules = getRulesFromUI();
+  var orders = getData('orders');
+  var customers = {};
+  orders.forEach(function (o) {
+    var key = o.phone || 'unknown';
+    if (!customers[key]) {
+      customers[key] = { phone: o.phone || '', totalSpent: 0, ordersCount: 0, lastOrder: null };
+    }
+    customers[key].totalSpent += Number(o.total) || 0;
+    customers[key].ordersCount++;
+    if (!customers[key].lastOrder || new Date(o.createdAt) > new Date(customers[key].lastOrder)) {
+      customers[key].lastOrder = o.createdAt;
+    }
+  });
+  var count = 0;
+  for (var k in customers) {
+    var c = customers[k];
+    var match = true;
+    for (var i = 0; i < rules.length; i++) {
+      var r = rules[i];
+      var cv;
+      if (r.field === 'ordersCount') cv = c.ordersCount;
+      else if (r.field === 'totalSpent') cv = c.totalSpent;
+      else if (r.field === 'lastOrder') cv = c.lastOrder ? Math.floor((Date.now() - new Date(c.lastOrder).getTime()) / 86400000) : 9999;
+      var rv = Number(r.value);
+      switch (r.operator) {
+        case '>=': if (!(cv >= rv)) match = false; break;
+        case '>': if (!(cv > rv)) match = false; break;
+        case '<=': if (!(cv <= rv)) match = false; break;
+        case '<': if (!(cv < rv)) match = false; break;
+        case '==': if (!(cv == rv)) match = false; break;
+      }
+      if (!match) break;
+    }
+    if (match) count++;
+  }
+  document.getElementById('segCountPreview').textContent = count;
+  showToast('Calculated: ' + count + ' matching customer' + (count !== 1 ? 's' : ''), 'info');
+}
+
+function updateSegmentCount() {
+  // preview updates on "Apply" click only
+}
+
+function saveSegment() {
+  var name = document.getElementById('segName').value.trim();
+  if (!name) { showToast('Enter a segment name', 'error'); return; }
+  var rules = getRulesFromUI();
+  if (rules.length === 0) { showToast('Add at least one rule', 'error'); return; }
+  var segs = getSegments();
+  var editId = document.getElementById('editSegmentId').value;
+  var count = parseInt(document.getElementById('segCountPreview').textContent) || 0;
+  if (editId) {
+    var seg = segs.find(function (s) { return s.id === editId; });
+    if (seg) { seg.name = name; seg.rules = rules; seg.customerCount = count; }
+  } else {
+    segs.push({ id: 'SEG' + Date.now().toString(36).toUpperCase(), name: name, rules: rules, customerCount: count, createdAt: new Date().toISOString() });
+  }
+  saveSegments(segs);
+  renderSegments();
+  closeModal('segmentModal');
+  showToast('Segment saved', 'success');
+}
+
+function editSegment(id) {
+  var segs = getSegments();
+  var seg = segs.find(function (s) { return s.id === id; });
+  if (!seg) return;
+  document.getElementById('segmentModalTitle').textContent = 'Edit segment';
+  document.getElementById('editSegmentId').value = seg.id;
+  document.getElementById('segName').value = seg.name;
+  document.getElementById('rulesContainer').innerHTML = '';
+  (seg.rules || []).forEach(function (r) { addRule(r.field, r.operator, r.value); });
+  applySegmentRules();
+  openModal('segmentModal');
+}
+
+function deleteSegment(id) {
+  if (!confirm('Delete this segment?')) return;
+  var segs = getSegments().filter(function (s) { return s.id !== id; });
+  saveSegments(segs);
+  renderSegments();
+  showToast('Segment deleted', 'success');
+}
+</script>
+<script src="app.js"></script>
+</body>
+</html>

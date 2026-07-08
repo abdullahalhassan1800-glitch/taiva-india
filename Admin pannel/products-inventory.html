@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory — Taiva Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .low-stock-row td { background: rgba(255,193,7,0.08); }
+    [data-theme="dark"] .low-stock-row td { background: rgba(255,193,7,0.12); }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+      <span class="logo-text">Taiva</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+      <div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+      <a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub open">
+        <a href="products.html" class="nav-item">All products</a>
+        <a href="products-collections.html" class="nav-item">Collections</a>
+        <a href="products-inventory.html" class="nav-item active">Inventory</a>
+        <a href="products-purchase-orders.html" class="nav-item">Purchase orders</a>
+        <a href="products-transfers.html" class="nav-item">Transfers</a>
+        <a href="products-gift-cards.html" class="nav-item">Gift cards</a>
+      </div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="content-metaobjects.html" class="nav-item">Metaobjects</a><a href="content-files.html" class="nav-item">Files</a><a href="content-menus.html" class="nav-item">Menus</a><a href="content-blog.html" class="nav-item">Blog posts</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+      <div class="nav-section">Settings</div>
+      <a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+      <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+      <button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+      <div class="topbar-actions">
+        <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+        <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>Inventory</h1>
+          <div class="page-subtitle">Monitor and adjust stock levels</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-accent" onclick="openModal('adjustStockModal')"><i class="fa-solid fa-pen"></i> Adjust stock</button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="invSearch" placeholder="Search by name..." style="min-width:200px;">
+        <select id="invCategoryFilter"><option value="">All categories</option></select>
+        <span class="filter-count" id="invCount"></span>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Product Name</th><th>SKU</th><th>Category</th><th>Current Stock</th><th>Low Stock Threshold</th><th>Status</th></tr></thead>
+          <tbody id="inventoryTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+  <div class="modal" id="adjustStockModal">
+    <div class="modal-header"><h2>Adjust stock</h2><button class="modal-close" onclick="closeModal('adjustStockModal')">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Product</label><select id="adjProduct"></select></div>
+      <div class="form-group"><label>Current stock</label><div id="adjCurrentStock" class="text-muted">0</div></div>
+      <div class="form-group"><label>New quantity</label><input type="number" id="adjQuantity" placeholder="Enter new stock quantity"></div>
+      <div class="form-group"><label>Reason</label><select id="adjReason"><option value="manual adjustment">Manual adjustment</option><option value="restock">Restock</option><option value="return">Return</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('adjustStockModal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveAdjustStock()"><i class="fa-solid fa-floppy-disk"></i> Update stock</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('themeToggle')?.addEventListener('click', function() {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var savedTheme = localStorage.getItem('taiva_theme');
+    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
+  </script>
+  <script src="app.js"></script>
+  <script>
+  function initPage() {
+    loadCategoryFilter();
+    loadProductSelect();
+    loadInventory();
+    document.getElementById('invSearch').addEventListener('input', loadInventory);
+    document.getElementById('invCategoryFilter').addEventListener('change', loadInventory);
+    document.getElementById('adjProduct').addEventListener('change', updateAdjCurrentStock);
+  }
+
+  function loadCategoryFilter() {
+    var products = getData('products');
+    var cats = {};
+    products.forEach(function(p) { if (p.category) cats[p.category] = 1; });
+    var sel = document.getElementById('invCategoryFilter');
+    sel.innerHTML = '<option value="">All categories</option>';
+    Object.keys(cats).sort().forEach(function(c) {
+      sel.innerHTML += '<option value="' + c + '">' + c + '</option>';
+    });
+  }
+
+  function loadProductSelect() {
+    var products = getData('products');
+    var sel = document.getElementById('adjProduct');
+    sel.innerHTML = '<option value="">Select a product</option>';
+    products.forEach(function(p) {
+      sel.innerHTML += '<option value="' + p.id + '">' + p.name + ' (' + p.sku + ')</option>';
+    });
+  }
+
+  function updateAdjCurrentStock() {
+    var id = document.getElementById('adjProduct').value;
+    var products = getData('products');
+    var p = products.find(function(x) { return x.id === id; });
+    document.getElementById('adjCurrentStock').textContent = p ? p.stock : '0';
+    if (p) document.getElementById('adjQuantity').value = p.stock;
+  }
+
+  function loadInventory() {
+    var products = getData('products');
+    var search = (document.getElementById('invSearch').value || '').toLowerCase();
+    var cat = document.getElementById('invCategoryFilter').value;
+    var filtered = products.filter(function(p) {
+      if (search && p.name.toLowerCase().indexOf(search) === -1) return false;
+      if (cat && p.category !== cat) return false;
+      return true;
+    });
+    document.getElementById('invCount').textContent = filtered.length + ' product' + (filtered.length !== 1 ? 's' : '');
+    var tbody = document.getElementById('inventoryTableBody');
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:24px;">No products found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map(function(p) {
+      var threshold = 5;
+      var statusClass = 'badge-ok';
+      var statusText = 'OK';
+      var rowClass = '';
+      if (p.stock <= 0) { statusClass = 'badge-cancelled'; statusText = 'Out'; rowClass = 'low-stock-row'; }
+      else if (p.stock <= threshold) { statusClass = 'badge-low'; statusText = 'Low'; rowClass = 'low-stock-row'; }
+      return '<tr class="' + rowClass + '"><td><strong>' + p.name + '</strong></td><td>' + p.sku + '</td><td>' + (p.category || '-') + '</td><td>' + p.stock + '</td><td>' + threshold + '</td><td><span class="badge ' + statusClass + '">' + statusText + '</span></td></tr>';
+    }).join('');
+  }
+
+  function saveAdjustStock() {
+    var id = document.getElementById('adjProduct').value;
+    var qty = parseInt(document.getElementById('adjQuantity').value);
+    var reason = document.getElementById('adjReason').value;
+
+    if (!id) { showToast('Please select a product', 'error'); return; }
+    if (isNaN(qty) || qty < 0) { showToast('Please enter a valid quantity', 'error'); return; }
+
+    var products = getData('products');
+    var idx = products.findIndex(function(p) { return p.id === id; });
+    if (idx !== -1) {
+      products[idx].stock = qty;
+      setData('products', products);
+      showToast('Stock updated to ' + qty + ' (' + reason + ')', 'success');
+      closeModal('adjustStockModal');
+      loadInventory();
+      loadProductSelect();
+    } else {
+      showToast('Product not found', 'error');
+    }
+  }
+
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) { closeAllModals(); }
+  });
+  </script>
+</body>
+</html>

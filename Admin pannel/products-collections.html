@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collections — Taiva Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+      <span class="logo-text">Taiva</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+      <div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+      <a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub open">
+        <a href="products.html" class="nav-item">All products</a>
+        <a href="products-collections.html" class="nav-item active">Collections</a>
+        <a href="products-inventory.html" class="nav-item">Inventory</a>
+        <a href="products-purchase-orders.html" class="nav-item">Purchase orders</a>
+        <a href="products-transfers.html" class="nav-item">Transfers</a>
+        <a href="products-gift-cards.html" class="nav-item">Gift cards</a>
+      </div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="content-metaobjects.html" class="nav-item">Metaobjects</a><a href="content-files.html" class="nav-item">Files</a><a href="content-menus.html" class="nav-item">Menus</a><a href="content-blog.html" class="nav-item">Blog posts</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+      <div class="nav-section">Settings</div>
+      <a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+      <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+      <button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+      <div class="topbar-actions">
+        <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+        <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>Collections</h1>
+          <div class="page-subtitle">Organize products into collections</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-accent" onclick="openModal('addCollectionModal')"><i class="fa-solid fa-plus"></i> Create collection</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Name</th><th>Description</th><th>Products</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="collectionsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+  <div class="modal" id="addCollectionModal">
+    <div class="modal-header"><h2 id="collectionModalTitle">Create collection</h2><button class="modal-close" onclick="closeModal('addCollectionModal')">&times;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editCollectionId">
+      <div class="form-group"><label>Collection name</label><input type="text" id="colName" placeholder="e.g. Summer Sale"></div>
+      <div class="form-group"><label>Description</label><textarea id="colDescription" placeholder="Describe this collection"></textarea></div>
+      <div class="form-group"><label>Status</label><select id="colStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+      <div class="form-group"><label>Select products</label><div id="colProductList" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);padding:8px;"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('addCollectionModal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveCollection()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    </div>
+  </div>
+
+  <div class="modal" id="deleteCollectionModal">
+    <div class="modal-header"><h2>Delete collection</h2><button class="modal-close" onclick="closeModal('deleteCollectionModal')">&times;</button></div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete <strong id="deleteColName"></strong>?</p>
+      <input type="hidden" id="deleteColId">
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('deleteCollectionModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDeleteCollection()"><i class="fa-solid fa-trash"></i> Delete</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('themeToggle')?.addEventListener('click', function() {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var savedTheme = localStorage.getItem('taiva_theme');
+    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
+  </script>
+  <script src="app.js"></script>
+  <script>
+  function initPage() {
+    loadCollections();
+  }
+
+  function loadCollections() {
+    var collections = getData('collections');
+    var tbody = document.getElementById('collectionsTableBody');
+    if (collections.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding:24px;">No collections yet. Create your first collection.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = collections.map(function(c) {
+      var count = (c.productIds || []).length;
+      return '<tr><td><strong>' + c.name + '</strong></td><td>' + (c.description || '-') + '</td><td>' + count + ' product' + (count !== 1 ? 's' : '') + '</td><td><span class="badge ' + (c.status === 'active' ? 'badge-active' : 'badge-expired') + '">' + c.status + '</span></td><td><button class="btn btn-sm" onclick="editCollection(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i> Edit</button> <button class="btn btn-sm btn-danger" onclick="deleteCollection(\'' + c.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+    }).join('');
+  }
+
+  function loadProductCheckboxes() {
+    var products = getData('products');
+    var container = document.getElementById('colProductList');
+    var selected = document.getElementById('editCollectionId').value ? (getData('collections').find(function(c) { return c.id === document.getElementById('editCollectionId').value; }) || {}).productIds || [] : [];
+    if (products.length === 0) {
+      container.innerHTML = '<div class="text-muted" style="padding:8px;">No products available</div>';
+      return;
+    }
+    container.innerHTML = products.map(function(p) {
+      var checked = selected.indexOf(p.id) !== -1 ? 'checked' : '';
+      return '<label style="display:flex;align-items:center;gap:8px;padding:4px 8px;cursor:pointer;font-size:13px;"><input type="checkbox" value="' + p.id + '" ' + checked + '> ' + p.name + ' <span class="text-muted">(' + (p.sku || '-') + ')</span></label>';
+    }).join('');
+  }
+
+  function saveCollection() {
+    var id = document.getElementById('editCollectionId').value;
+    var name = document.getElementById('colName').value.trim();
+    var description = document.getElementById('colDescription').value.trim();
+    var status = document.getElementById('colStatus').value;
+    var checkboxes = document.querySelectorAll('#colProductList input[type=checkbox]:checked');
+    var productIds = [];
+    checkboxes.forEach(function(cb) { productIds.push(cb.value); });
+
+    if (!name) { showToast('Collection name is required', 'error'); return; }
+
+    var collections = getData('collections');
+    if (id) {
+      var idx = collections.findIndex(function(c) { return c.id === id; });
+      if (idx !== -1) {
+        collections[idx].name = name;
+        collections[idx].description = description;
+        collections[idx].productIds = productIds;
+        collections[idx].status = status;
+      }
+      showToast('Collection updated', 'success');
+    } else {
+      collections.push({ id: 'COL' + Date.now().toString(36).toUpperCase(), name: name, description: description, productIds: productIds, status: status, createdAt: new Date().toISOString() });
+      showToast('Collection created', 'success');
+    }
+    setData('collections', collections);
+    closeModal('addCollectionModal');
+    loadCollections();
+  }
+
+  function editCollection(id) {
+    var collections = getData('collections');
+    var c = collections.find(function(x) { return x.id === id; });
+    if (!c) return;
+    document.getElementById('collectionModalTitle').textContent = 'Edit collection';
+    document.getElementById('editCollectionId').value = c.id;
+    document.getElementById('colName').value = c.name || '';
+    document.getElementById('colDescription').value = c.description || '';
+    document.getElementById('colStatus').value = c.status || 'active';
+    loadProductCheckboxes();
+    openModal('addCollectionModal');
+  }
+
+  function resetCollectionForm() {
+    document.getElementById('collectionModalTitle').textContent = 'Create collection';
+    document.getElementById('editCollectionId').value = '';
+    document.getElementById('colName').value = '';
+    document.getElementById('colDescription').value = '';
+    document.getElementById('colStatus').value = 'active';
+    loadProductCheckboxes();
+  }
+
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) { closeAllModals(); }
+  });
+
+  var origOpenModal = window.openModal;
+  window.openModal = function(id) {
+    if (id === 'addCollectionModal') resetCollectionForm();
+    origOpenModal(id);
+  };
+
+  function deleteCollection(id) {
+    var collections = getData('collections');
+    var c = collections.find(function(x) { return x.id === id; });
+    if (!c) return;
+    document.getElementById('deleteColId').value = id;
+    document.getElementById('deleteColName').textContent = c.name;
+    openModal('deleteCollectionModal');
+  }
+
+  function confirmDeleteCollection() {
+    var id = document.getElementById('deleteColId').value;
+    var collections = getData('collections');
+    var idx = collections.findIndex(function(c) { return c.id === id; });
+    if (idx !== -1) collections.splice(idx, 1);
+    setData('collections', collections);
+    closeModal('deleteCollectionModal');
+    showToast('Collection deleted', 'success');
+    loadCollections();
+  }
+  </script>
+</body>
+</html>

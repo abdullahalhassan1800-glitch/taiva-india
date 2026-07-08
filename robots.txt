@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://taiva.in/sitemap.xml
+
+Disallow: /DOC/
+Disallow: /VIDEOS/
+Disallow: /cart.html

@@ -8,7 +8,7 @@ const PRODUCT_CATALOG = [
     price: 1090.00,
     originalPrice: 1499.00,
     image: 'images/sugar-pro-max-1.jpg',
-    link: 'diacurex-powder.html'
+    link: 'sugar-pro-max.html'
   },
   {
     id: 'pachan-pro',
@@ -16,7 +16,7 @@ const PRODUCT_CATALOG = [
     price: 1090.00,
     originalPrice: 1499.00,
     image: 'images/pachan-pro-main.png',
-    link: 'digestive-health.html'
+    link: 'pachan-pro.html'
   },
   {
     id: 'painopill',

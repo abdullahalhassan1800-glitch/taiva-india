@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping Cart - Taiva India</title>
-  <meta name="description" content="View and manage your shopping cart at Taiva India.">
+  <title>Careers - Taiva India</title>
+  <meta name="description" content="Join the Taiva India team. Explore career opportunities in Ayurveda, wellness, and e-commerce.">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,22 +61,22 @@
   <section class="info-page">
     <div class="container">
       <div class="page-header">
-        <h1>Shopping Cart</h1>
+        <h1>Careers at Taiva</h1>
+        <p>Join Us in Making Wellness Accessible to All</p>
       </div>
-      <div class="cart-layout">
-        <div class="cart-items-list" id="cartItemsList">
-          <div class="empty-state" id="cartEmptyState">
-            <p>Your cart is empty</p>
-            <a href="index.html" class="btn btn-primary" style="margin-top:12px;">Continue Shopping</a>
-          </div>
-        </div>
-        <div class="cart-summary">
-          <h3>Order Summary</h3>
-          <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">Rs. 0</span></div>
-          <div class="summary-row"><span>Shipping</span><span>Free</span></div>
-          <div class="summary-row total"><span>Total</span><span id="cartTotalPage">Rs. 0</span></div>
-          <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
-        </div>
+      <div class="info-content">
+        <p>At Taiva India, we are passionate about Ayurveda and wellness. We're always looking for talented individuals who share our vision of making natural health solutions accessible to everyone.</p>
+        <h2>Why Work With Us?</h2>
+        <ul>
+          <li>Be part of a rapidly growing Ayurvedic wellness brand</li>
+          <li>Work in a collaborative and innovative environment</li>
+          <li>Make a real impact on people's health and well-being</li>
+          <li>Opportunities for growth and learning</li>
+        </ul>
+        <h2>Current Openings</h2>
+        <p>We currently do not have any open positions. However, we are always interested in connecting with talented professionals. Send your resume to <strong>info@taiva.in</strong> and we'll reach out when a suitable opportunity arises.</p>
+        <h2>How to Apply</h2>
+        <p>Email your CV and cover letter to <strong>info@taiva.in</strong> with the subject line "Application - [Position Name]". We review applications on a rolling basis and will contact you if your profile matches our requirements.</p>
       </div>
     </div>
   </section>
@@ -132,53 +132,5 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
   <script src="app.js"></script>
-  <script>
-    function renderCartPage() {
-      var list = document.getElementById('cartItemsList');
-      var empty = document.getElementById('cartEmptyState');
-      var subtotalEl = document.getElementById('cartSubtotal');
-      var totalEl = document.getElementById('cartTotalPage');
-      var items = typeof cartItems !== 'undefined' ? cartItems : [];
-      if (items.length === 0) {
-        if (empty) empty.style.display = 'block';
-        if (subtotalEl) subtotalEl.textContent = 'Rs. 0';
-        if (totalEl) totalEl.textContent = 'Rs. 0';
-        return;
-      }
-      if (empty) empty.style.display = 'none';
-      var html = '';
-      var total = 0;
-      items.forEach(function (item, idx) {
-        total += item.price;
-        html += '<div class="cart-item-card">' +
-          '<img src="' + item.image + '" alt="' + item.name + '" loading="lazy">' +
-          '<div class="item-info">' +
-            '<h4>' + item.name + '</h4>' +
-            '<div class="item-price">Rs. ' + item.price.toLocaleString('en-IN') + '</div>' +
-            '<div class="item-actions">' +
-              '<button class="remove-btn" onclick="removeFromCart(' + idx + ')"><i class="fa-solid fa-trash-can"></i></button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      });
-      list.innerHTML = html;
-      if (subtotalEl) subtotalEl.textContent = 'Rs. ' + total.toLocaleString('en-IN');
-      if (totalEl) totalEl.textContent = 'Rs. ' + total.toLocaleString('en-IN');
-    }
-    function removeFromCart(idx) {
-      if (typeof cartItems !== 'undefined') {
-        cartItems.splice(idx, 1);
-        renderCartPage();
-      }
-    }
-    function checkout() {
-      if (typeof openCheckout === 'function') {
-        openCheckout();
-      } else {
-        alert('Checkout is not available right now.');
-      }
-    }
-    document.addEventListener('DOMContentLoaded', renderCartPage);
-  </script>
 </body>
 </html>

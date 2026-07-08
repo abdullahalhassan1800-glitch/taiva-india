@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metaobjects — Taiva Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+<span class="logo-text">Taiva</span>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-section">Main</div>
+<a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+<div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="products.html" class="nav-item">All products</a><a href="products-collections.html" class="nav-item">Collections</a><a href="products-inventory.html" class="nav-item">Inventory</a><a href="products-purchase-orders.html" class="nav-item">Purchase orders</a><a href="products-transfers.html" class="nav-item">Transfers</a><a href="products-gift-cards.html" class="nav-item">Gift cards</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+<a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub open">
+<a href="content-metaobjects.html" class="nav-item active">Metaobjects</a>
+<a href="content-files.html" class="nav-item">Files</a>
+<a href="content-menus.html" class="nav-item">Menus</a>
+<a href="content-blog.html" class="nav-item">Blog posts</a>
+</div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section">Settings</div>
+<a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+<a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+</nav>
+</div>
+
+<div class="main-content">
+<header class="topbar">
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+<button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+<div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+<div class="topbar-actions">
+<button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+<button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+<div class="admin-avatar">A</div>
+</div>
+</header>
+
+<div class="page-content">
+<div class="page-header">
+<div>
+<h1>Metaobjects</h1>
+<div class="page-subtitle">Custom structured data definitions</div>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openCreateModal()"><i class="fa-solid fa-plus"></i> Create metaobject</button>
+</div>
+</div>
+
+<div id="metaobjectListView">
+<div class="table-container">
+<table>
+<thead><tr><th>Name</th><th>Definition Fields</th><th>Entries</th><th>Created</th><th>Actions</th></tr></thead>
+<tbody id="metaobjectTableBody"></tbody>
+</table>
+</div>
+</div>
+
+<div id="metaobjectDetailView" style="display:none;">
+<div class="page-header">
+<div>
+<button class="btn btn-sm" onclick="backToList()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+<h2 id="detailMetaobjectName" style="margin-top:8px;"></h2>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openAddEntryModal()"><i class="fa-solid fa-plus"></i> Add entry</button>
+</div>
+</div>
+<div class="table-container">
+<table>
+<thead><tr id="detailTableHead"></tr></thead>
+<tbody id="detailTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<div class="modal" id="createMetaobjectModal">
+<div class="modal-header"><h2 id="metaobjectModalTitle">Create metaobject</h2><button class="modal-close" onclick="closeModal('createMetaobjectModal')">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="editMetaobjectId">
+<div class="form-group"><label>Name <span style="color:var(--danger)">*</span></label><input type="text" id="moName" placeholder="e.g. Team Member"></div>
+<div class="form-group"><label>Definition fields</label><div id="moFieldsContainer"></div><button class="btn btn-sm" onclick="addFieldRow()" style="margin-top:6px;"><i class="fa-solid fa-plus"></i> Add field</button></div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('createMetaobjectModal')">Cancel</button>
+<button class="btn btn-accent" onclick="saveMetaobject()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+</div>
+</div>
+
+<div class="modal" id="addEntryModal">
+<div class="modal-header"><h2>Add entry</h2><button class="modal-close" onclick="closeModal('addEntryModal')">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="editEntryId">
+<div id="entryFieldsContainer"></div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('addEntryModal')">Cancel</button>
+<button class="btn btn-accent" onclick="saveEntry()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+</div>
+</div>
+
+<div class="modal" id="deleteMetaobjectModal">
+<div class="modal-header"><h2>Delete metaobject</h2><button class="modal-close" onclick="closeModal('deleteMetaobjectModal')">&times;</button></div>
+<div class="modal-body">
+<p>Are you sure you want to delete <strong id="deleteMoName"></strong>? All entries will be removed.</p>
+<input type="hidden" id="deleteMoId">
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('deleteMetaobjectModal')">Cancel</button>
+<button class="btn btn-danger" onclick="confirmDeleteMetaobject()"><i class="fa-solid fa-trash"></i> Delete</button>
+</div>
+</div>
+
+<div class="modal" id="deleteEntryModal">
+<div class="modal-header"><h2>Delete entry</h2><button class="modal-close" onclick="closeModal('deleteEntryModal')">&times;</button></div>
+<div class="modal-body"><p>Delete this entry?</p><input type="hidden" id="deleteEntryId"></div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('deleteEntryModal')">Cancel</button>
+<button class="btn btn-danger" onclick="confirmDeleteEntry()"><i class="fa-solid fa-trash"></i> Delete</button>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var tt = document.getElementById('themeToggle');
+  if (tt) {
+    tt.addEventListener('click', function () {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      tt.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var saved = localStorage.getItem('taiva_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      tt.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    }
+  }
+});
+
+var currentMoId = null;
+
+function initPage() {
+  renderMetaobjects();
+}
+
+function getMetaobjects() {
+  return getData('metaobjects');
+}
+
+function saveMetaobjects(data) {
+  setData('metaobjects', data);
+}
+
+function renderMetaobjects() {
+  var mos = getMetaobjects();
+  var tbody = document.getElementById('metaobjectTableBody');
+  if (mos.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding:24px;">No metaobjects yet. Create your first one.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = mos.map(function (mo) {
+    var fields = (mo.definition || []).length;
+    var entries = (mo.entries || []).length;
+    return '<tr><td><a href="#" onclick="viewMetaobject(\'' + mo.id + '\');return false;" style="font-weight:500;color:var(--accent);">' + mo.name + '</a></td><td>' + fields + ' field' + (fields !== 1 ? 's' : '') + '</td><td>' + entries + ' entry' + (entries !== 1 ? 'ies' : 'y') + '</td><td>' + formatDate(mo.createdAt) + '</td><td><button class="btn btn-sm" onclick="editMetaobject(\'' + mo.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteMetaobject(\'' + mo.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+  }).join('');
+}
+
+function openCreateModal() {
+  document.getElementById('metaobjectModalTitle').textContent = 'Create metaobject';
+  document.getElementById('editMetaobjectId').value = '';
+  document.getElementById('moName').value = '';
+  document.getElementById('moFieldsContainer').innerHTML = '';
+  addFieldRow();
+  openModal('createMetaobjectModal');
+}
+
+function addFieldRow(key, type) {
+  var container = document.getElementById('moFieldsContainer');
+  var div = document.createElement('div');
+  div.className = 'form-row';
+  div.style.marginBottom = '6px';
+  div.innerHTML = '<div class="form-group" style="flex:1;"><input type="text" class="mo-field-key" placeholder="Field key" value="' + (key || '') + '"></div><div class="form-group" style="flex:0 0 140px;"><select class="mo-field-type"><option value="text"' + (type === 'text' ? ' selected' : '') + '>Text</option><option value="number"' + (type === 'number' ? ' selected' : '') + '>Number</option><option value="date"' + (type === 'date' ? ' selected' : '') + '>Date</option><option value="richtext"' + (type === 'richtext' ? ' selected' : '') + '>Rich Text</option></select></div><div class="form-group" style="flex:0;"><button class="btn btn-sm btn-danger" onclick="this.parentElement.parentElement.remove()"><i class="fa-solid fa-times"></i></button></div>';
+  container.appendChild(div);
+}
+
+function saveMetaobject() {
+  var id = document.getElementById('editMetaobjectId').value;
+  var name = document.getElementById('moName').value.trim();
+  if (!name) { showToast('Name is required', 'error'); return; }
+  var fieldKeys = document.querySelectorAll('.mo-field-key');
+  var fieldTypes = document.querySelectorAll('.mo-field-type');
+  var definition = [];
+  for (var i = 0; i < fieldKeys.length; i++) {
+    var k = fieldKeys[i].value.trim();
+    if (k) definition.push({ key: k, type: fieldTypes[i].value });
+  }
+  var mos = getMetaobjects();
+  if (id) {
+    var mo = mos.find(function (x) { return x.id === id; });
+    if (mo) { mo.name = name; mo.definition = definition; }
+    showToast('Metaobject updated', 'success');
+  } else {
+    mos.push({ id: generateId(), name: name, definition: definition, entries: [], createdAt: new Date().toISOString() });
+    showToast('Metaobject created', 'success');
+  }
+  saveMetaobjects(mos);
+  closeModal('createMetaobjectModal');
+  renderMetaobjects();
+}
+
+function editMetaobject(id) {
+  var mo = getMetaobjects().find(function (x) { return x.id === id; });
+  if (!mo) return;
+  document.getElementById('metaobjectModalTitle').textContent = 'Edit metaobject';
+  document.getElementById('editMetaobjectId').value = mo.id;
+  document.getElementById('moName').value = mo.name;
+  document.getElementById('moFieldsContainer').innerHTML = '';
+  (mo.definition || []).forEach(function (f) { addFieldRow(f.key, f.type); });
+  if (!mo.definition || mo.definition.length === 0) addFieldRow();
+  openModal('createMetaobjectModal');
+}
+
+function deleteMetaobject(id) {
+  var mo = getMetaobjects().find(function (x) { return x.id === id; });
+  if (!mo) return;
+  document.getElementById('deleteMoId').value = id;
+  document.getElementById('deleteMoName').textContent = mo.name;
+  openModal('deleteMetaobjectModal');
+}
+
+function confirmDeleteMetaobject() {
+  var id = document.getElementById('deleteMoId').value;
+  saveMetaobjects(getMetaobjects().filter(function (x) { return x.id !== id; }));
+  closeModal('deleteMetaobjectModal');
+  if (currentMoId === id) backToList();
+  renderMetaobjects();
+  showToast('Metaobject deleted', 'success');
+}
+
+function viewMetaobject(id) {
+  currentMoId = id;
+  var mo = getMetaobjects().find(function (x) { return x.id === id; });
+  if (!mo) return;
+  document.getElementById('metaobjectListView').style.display = 'none';
+  document.getElementById('metaobjectDetailView').style.display = 'block';
+  document.getElementById('detailMetaobjectName').textContent = mo.name;
+  var defs = mo.definition || [];
+  var thead = document.getElementById('detailTableHead');
+  var entries = mo.entries || [];
+  thead.innerHTML = '<th>#</th>' + defs.map(function (f) { return '<th>' + f.key + '</th>'; }).join('') + '<th>Actions</th>';
+  var tbody = document.getElementById('detailTableBody');
+  if (entries.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="' + (defs.length + 2) + '" class="text-center text-muted" style="padding:24px;">No entries yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map(function (e, i) {
+    var cells = defs.map(function (f) {
+      var val = (e.values || {})[f.key] || '-';
+      if (f.type === 'date' && val !== '-' && val) { var d = new Date(val); val = d.toLocaleDateString('en-IN'); }
+      return '<td>' + val + '</td>';
+    }).join('');
+    return '<tr><td>' + (i + 1) + '</td>' + cells + '<td><button class="btn btn-sm" onclick="editEntry(\'' + mo.id + '\',\'' + e.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteEntry(\'' + e.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+  }).join('');
+}
+
+function backToList() {
+  currentMoId = null;
+  document.getElementById('metaobjectListView').style.display = 'block';
+  document.getElementById('metaobjectDetailView').style.display = 'none';
+  renderMetaobjects();
+}
+
+function openAddEntryModal() {
+  document.getElementById('editEntryId').value = '';
+  var mo = getMetaobjects().find(function (x) { return x.id === currentMoId; });
+  if (!mo) return;
+  var container = document.getElementById('entryFieldsContainer');
+  container.innerHTML = '';
+  (mo.definition || []).forEach(function (f) {
+    var inputHtml = f.type === 'richtext' ? '<textarea class="entry-field" data-key="' + f.key + '" data-type="' + f.type + '" placeholder="' + f.key + '" style="min-height:80px;"></textarea>' : '<input type="' + (f.type === 'number' ? 'number' : f.type === 'date' ? 'date' : 'text') + '" class="entry-field" data-key="' + f.key + '" data-type="' + f.type + '" placeholder="' + f.key + '">';
+    container.innerHTML += '<div class="form-group"><label>' + f.key + ' <span class="text-muted">(' + f.type + ')</span></label>' + inputHtml + '</div>';
+  });
+  openModal('addEntryModal');
+}
+
+function saveEntry() {
+  var editId = document.getElementById('editEntryId').value;
+  var mo = getMetaobjects().find(function (x) { return x.id === currentMoId; });
+  if (!mo) return;
+  var fields = document.querySelectorAll('.entry-field');
+  var values = {};
+  fields.forEach(function (f) {
+    values[f.getAttribute('data-key')] = f.value.trim();
+  });
+  if (editId) {
+    var entry = (mo.entries || []).find(function (e) { return e.id === editId; });
+    if (entry) entry.values = values;
+  } else {
+    if (!mo.entries) mo.entries = [];
+    mo.entries.push({ id: generateId(), values: values });
+  }
+  saveMetaobjects(getMetaobjects());
+  closeModal('addEntryModal');
+  viewMetaobject(currentMoId);
+  showToast(editId ? 'Entry updated' : 'Entry added', 'success');
+}
+
+function editEntry(moId, entryId) {
+  var mo = getMetaobjects().find(function (x) { return x.id === moId; });
+  if (!mo) return;
+  var entry = (mo.entries || []).find(function (e) { return e.id === entryId; });
+  if (!entry) return;
+  document.getElementById('editEntryId').value = entryId;
+  var container = document.getElementById('entryFieldsContainer');
+  container.innerHTML = '';
+  (mo.definition || []).forEach(function (f) {
+    var val = (entry.values || {})[f.key] || '';
+    var inputHtml = f.type === 'richtext' ? '<textarea class="entry-field" data-key="' + f.key + '" data-type="' + f.type + '" placeholder="' + f.key + '" style="min-height:80px;">' + val + '</textarea>' : '<input type="' + (f.type === 'number' ? 'number' : f.type === 'date' ? 'date' : 'text') + '" class="entry-field" data-key="' + f.key + '" data-type="' + f.type + '" placeholder="' + f.key + '" value="' + val.replace(/"/g, '&quot;') + '">';
+    container.innerHTML += '<div class="form-group"><label>' + f.key + ' <span class="text-muted">(' + f.type + ')</span></label>' + inputHtml + '</div>';
+  });
+  openModal('addEntryModal');
+}
+
+function deleteEntry(id) {
+  document.getElementById('deleteEntryId').value = id;
+  openModal('deleteEntryModal');
+}
+
+function confirmDeleteEntry() {
+  var id = document.getElementById('deleteEntryId').value;
+  var mos = getMetaobjects();
+  var mo = mos.find(function (x) { return x.id === currentMoId; });
+  if (mo && mo.entries) {
+    mo.entries = mo.entries.filter(function (e) { return e.id !== id; });
+    saveMetaobjects(mos);
+  }
+  closeModal('deleteEntryModal');
+  viewMetaobject(currentMoId);
+  showToast('Entry deleted', 'success');
+}
+
+document.addEventListener('click', function (e) {
+  if (e.target.classList.contains('modal-overlay')) closeAllModals();
+});
+</script>
+<script src="app.js"></script>
+</body>
+</html>

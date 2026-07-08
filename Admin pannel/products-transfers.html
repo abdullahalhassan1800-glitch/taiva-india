@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transfers — Taiva Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+      <span class="logo-text">Taiva</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+      <div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+      <a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub open">
+        <a href="products.html" class="nav-item">All products</a>
+        <a href="products-collections.html" class="nav-item">Collections</a>
+        <a href="products-inventory.html" class="nav-item">Inventory</a>
+        <a href="products-purchase-orders.html" class="nav-item">Purchase orders</a>
+        <a href="products-transfers.html" class="nav-item active">Transfers</a>
+        <a href="products-gift-cards.html" class="nav-item">Gift cards</a>
+      </div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="content-metaobjects.html" class="nav-item">Metaobjects</a><a href="content-files.html" class="nav-item">Files</a><a href="content-menus.html" class="nav-item">Menus</a><a href="content-blog.html" class="nav-item">Blog posts</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+      <div class="nav-section">Settings</div>
+      <a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+      <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+      <button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+      <div class="topbar-actions">
+        <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+        <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>Transfers</h1>
+          <div class="page-subtitle">Move stock between locations</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-accent" onclick="openModal('addTransferModal')"><i class="fa-solid fa-plus"></i> Create transfer</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Transfer ID</th><th>From Location</th><th>To Location</th><th>Products</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="transferTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+  <div class="modal" id="addTransferModal">
+    <div class="modal-header"><h2 id="transferModalTitle">Create transfer</h2><button class="modal-close" onclick="closeModal('addTransferModal')">&times;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editTransferId">
+      <div class="form-row">
+        <div class="form-group"><label>From</label><select id="transferFrom"><option value="Warehouse">Warehouse</option><option value="Store">Store</option></select></div>
+        <div class="form-group"><label>To</label><select id="transferTo"><option value="Store">Store</option><option value="Warehouse">Warehouse</option></select></div>
+      </div>
+      <div class="form-group"><label>Products</label><div id="transferProductList"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('addTransferModal')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveTransfer()"><i class="fa-solid fa-floppy-disk"></i> Save as draft</button>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmTransferModal">
+    <div class="modal-header"><h2>Update transfer status</h2><button class="modal-close" onclick="closeModal('confirmTransferModal')">&times;</button></div>
+    <div class="modal-body">
+      <p>Change status of transfer <strong id="confirmTransferId"></strong> to:</p>
+      <select id="confirmTransferStatus" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;margin-top:8px;">
+        <option value="in_transit">In Transit</option>
+        <option value="received">Received</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <input type="hidden" id="confirmTransferIdHidden">
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('confirmTransferModal')">Cancel</button>
+      <button class="btn btn-accent" onclick="confirmTransferAction()"><i class="fa-solid fa-check"></i> Update</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('themeToggle')?.addEventListener('click', function() {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var savedTheme = localStorage.getItem('taiva_theme');
+    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
+  </script>
+  <script src="app.js"></script>
+  <script>
+  function initPage() {
+    loadTransfers();
+  }
+
+  function loadTransfers() {
+    var transfers = getData('transfers');
+    var tbody = document.getElementById('transferTableBody');
+    if (transfers.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted" style="padding:24px;">No transfers yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = transfers.map(function(t) {
+      var itemCount = (t.items || []).length;
+      var itemSummary = (t.items || []).map(function(i) { return i.name + ' x' + i.qty; }).join(', ');
+      var statusMap = { draft: 'draft', in_transit: 'processing', received: 'delivered', cancelled: 'cancelled' };
+      var statusBadge = 'badge-' + (statusMap[t.status] || 'draft');
+      var statusLabel = t.status ? t.status.replace('_', ' ') : 'draft';
+      return '<tr><td><strong>' + t.id + '</strong></td><td>' + t.from + '</td><td>' + t.to + '</td><td><span title="' + itemSummary + '">' + itemCount + ' item' + (itemCount !== 1 ? 's' : '') + '</span></td><td><span class="badge ' + statusBadge + '">' + statusLabel + '</span></td><td>' + formatDate(t.createdAt) + '</td><td><button class="btn btn-sm" onclick="openTransferStatus(\'' + t.id + '\')"><i class="fa-solid fa-pen"></i> Status</button></td></tr>';
+    }).join('');
+  }
+
+  function loadTransferProductRows() {
+    var products = getData('products');
+    var container = document.getElementById('transferProductList');
+    if (products.length === 0) {
+      container.innerHTML = '<div class="text-muted">No products available</div>';
+      return;
+    }
+    container.innerHTML = products.map(function(p) {
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);"><span style="flex:1;font-size:13px;">' + p.name + ' <span class="text-muted">(' + p.sku + ')</span></span><input type="hidden" class="tr-product-id" value="' + p.id + '"><input type="hidden" class="tr-product-name" value="' + p.name + '"><input type="number" class="tr-product-qty" placeholder="Qty" style="width:70px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;" min="0"></div>';
+    }).join('');
+  }
+
+  function saveTransfer() {
+    var id = document.getElementById('editTransferId').value;
+    var from = document.getElementById('transferFrom').value;
+    var to = document.getElementById('transferTo').value;
+    if (from === to) { showToast('Source and destination must be different', 'error'); return; }
+
+    var items = [];
+    var idInputs = document.querySelectorAll('.tr-product-id');
+    var nameInputs = document.querySelectorAll('.tr-product-name');
+    var qtyInputs = document.querySelectorAll('.tr-product-qty');
+    var hasItems = false;
+    for (var i = 0; i < idInputs.length; i++) {
+      var qty = parseInt(qtyInputs[i].value) || 0;
+      if (qty > 0) {
+        hasItems = true;
+        items.push({ productId: idInputs[i].value, name: nameInputs[i].value, qty: qty });
+      }
+    }
+    if (!hasItems) { showToast('Add at least one product with quantity', 'error'); return; }
+
+    var transfers = getData('transfers');
+    if (id) {
+      var idx = transfers.findIndex(function(t) { return t.id === id; });
+      if (idx !== -1) {
+        transfers[idx].from = from;
+        transfers[idx].to = to;
+        transfers[idx].items = items;
+      }
+      showToast('Transfer updated', 'success');
+    } else {
+      transfers.push({ id: 'TRF' + Date.now().toString(36).toUpperCase(), from: from, to: to, items: items, status: 'draft', createdAt: new Date().toISOString() });
+      showToast('Transfer created', 'success');
+    }
+    setData('transfers', transfers);
+    closeModal('addTransferModal');
+    loadTransfers();
+  }
+
+  function resetTransferForm() {
+    document.getElementById('transferModalTitle').textContent = 'Create transfer';
+    document.getElementById('editTransferId').value = '';
+    document.getElementById('transferFrom').value = 'Warehouse';
+    document.getElementById('transferTo').value = 'Store';
+    loadTransferProductRows();
+  }
+
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) { closeAllModals(); }
+  });
+
+  var origOpenModal = window.openModal;
+  window.openModal = function(id) {
+    if (id === 'addTransferModal') resetTransferForm();
+    origOpenModal(id);
+  };
+
+  function openTransferStatus(id) {
+    var transfers = getData('transfers');
+    var t = transfers.find(function(x) { return x.id === id; });
+    if (!t) return;
+    document.getElementById('confirmTransferId').textContent = id;
+    document.getElementById('confirmTransferIdHidden').value = id;
+    document.getElementById('confirmTransferStatus').value = t.status === 'draft' ? 'in_transit' : (t.status === 'in_transit' ? 'received' : 'cancelled');
+    openModal('confirmTransferModal');
+  }
+
+  function confirmTransferAction() {
+    var id = document.getElementById('confirmTransferIdHidden').value;
+    var status = document.getElementById('confirmTransferStatus').value;
+    var transfers = getData('transfers');
+    var idx = transfers.findIndex(function(t) { return t.id === id; });
+    if (idx === -1) return;
+
+    if (status === 'received' && transfers[idx].status !== 'received') {
+      var products = getData('products');
+      (transfers[idx].items || []).forEach(function(item) {
+        var pIdx = products.findIndex(function(p) { return p.id === item.productId; });
+        if (pIdx !== -1) {
+          products[pIdx].stock = (products[pIdx].stock || 0) + item.qty;
+        }
+      });
+      setData('products', products);
+    }
+
+    transfers[idx].status = status;
+    setData('transfers', transfers);
+    closeModal('confirmTransferModal');
+    showToast('Transfer status updated to ' + status.replace('_', ' '), 'success');
+    loadTransfers();
+  }
+  </script>
+</body>
+</html>

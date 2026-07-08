@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalogs — Taiva Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+<span class="logo-text">Taiva</span>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-section">Main</div>
+<a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+<div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="products.html" class="nav-item">All products</a><a href="products-collections.html" class="nav-item">Collections</a><a href="products-inventory.html" class="nav-item">Inventory</a><a href="products-purchase-orders.html" class="nav-item">Purchase orders</a><a href="products-transfers.html" class="nav-item">Transfers</a><a href="products-gift-cards.html" class="nav-item">Gift cards</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="content-metaobjects.html" class="nav-item">Metaobjects</a><a href="content-files.html" class="nav-item">Files</a><a href="content-menus.html" class="nav-item">Menus</a><a href="content-blog.html" class="nav-item">Blog posts</a></div>
+<a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub open">
+<a href="markets-catalogs.html" class="nav-item active">Catalogs</a>
+<a href="markets-rollouts.html" class="nav-item">Rollouts</a>
+</div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section">Settings</div>
+<a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+<a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+</nav>
+</div>
+
+<div class="main-content">
+<header class="topbar">
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+<button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+<div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+<div class="topbar-actions">
+<button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+<button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+<div class="admin-avatar">A</div>
+</div>
+</header>
+
+<div class="page-content">
+<div class="page-header">
+<div>
+<h1>Catalogs</h1>
+<div class="page-subtitle">Product catalogs per market</div>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openCreateCatalogModal()"><i class="fa-solid fa-plus"></i> Create catalog</button>
+</div>
+</div>
+
+<div class="table-container">
+<table>
+<thead><tr><th>Name</th><th>Market</th><th>Products</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+<tbody id="catalogTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<div class="modal" id="catalogModal">
+<div class="modal-header"><h2 id="catalogModalTitle">Create catalog</h2><button class="modal-close" onclick="closeModal('catalogModal')">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="editCatalogId">
+<div class="form-group"><label>Catalog name <span style="color:var(--danger)">*</span></label><input type="text" id="catName" placeholder="e.g. India Summer Collection"></div>
+<div class="form-group"><label>Market</label><select id="catMarket"><option value="India">India</option><option value="US">US</option><option value="UK">UK</option><option value="UAE">UAE</option></select></div>
+<div class="form-group"><label>Status</label><select id="catStatus"><option value="draft">Draft</option><option value="active">Active</option></select></div>
+<div class="form-group"><label>Select products (with price override)</label><div id="catProductList" style="max-height:250px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);padding:8px;"></div></div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('catalogModal')">Cancel</button>
+<button class="btn btn-accent" onclick="saveCatalog()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+</div>
+</div>
+
+<div class="modal" id="deleteCatalogModal">
+<div class="modal-header"><h2>Delete catalog</h2><button class="modal-close" onclick="closeModal('deleteCatalogModal')">&times;</button></div>
+<div class="modal-body">
+<p>Are you sure you want to delete <strong id="deleteCatName"></strong>?</p>
+<input type="hidden" id="deleteCatId">
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('deleteCatalogModal')">Cancel</button>
+<button class="btn btn-danger" onclick="confirmDeleteCatalog()"><i class="fa-solid fa-trash"></i> Delete</button>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var tt = document.getElementById('themeToggle');
+  if (tt) {
+    tt.addEventListener('click', function () {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      tt.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var saved = localStorage.getItem('taiva_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      tt.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    }
+  }
+});
+
+function initPage() {
+  renderCatalogs();
+}
+
+function getCatalogs() {
+  return getData('catalogs');
+}
+
+function saveCatalogs(data) {
+  setData('catalogs', data);
+}
+
+function renderCatalogs() {
+  var catalogs = getCatalogs();
+  var tbody = document.getElementById('catalogTableBody');
+  if (catalogs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:24px;">No catalogs yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = catalogs.map(function (c) {
+    var count = (c.products || []).length;
+    var statusClass = c.status === 'active' ? 'badge-active' : 'badge-draft';
+    return '<tr><td><strong>' + c.name + '</strong></td><td><span class="badge badge-active">' + c.market + '</span></td><td>' + count + ' product' + (count !== 1 ? 's' : '') + '</td><td><span class="badge ' + statusClass + '">' + c.status + '</span></td><td>' + formatDate(c.createdAt) + '</td><td><button class="btn btn-sm" onclick="editCatalog(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteCatalog(\'' + c.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+  }).join('');
+}
+
+function openCreateCatalogModal() {
+  document.getElementById('catalogModalTitle').textContent = 'Create catalog';
+  document.getElementById('editCatalogId').value = '';
+  document.getElementById('catName').value = '';
+  document.getElementById('catMarket').value = 'India';
+  document.getElementById('catStatus').value = 'draft';
+  loadCatalogProductList();
+  openModal('catalogModal');
+}
+
+function loadCatalogProductList() {
+  var products = getData('products');
+  var container = document.getElementById('catProductList');
+  var editId = document.getElementById('editCatalogId').value;
+  var existingProducts = [];
+  if (editId) {
+    var cat = getCatalogs().find(function (c) { return c.id === editId; });
+    if (cat) existingProducts = cat.products || [];
+  }
+  if (products.length === 0) {
+    container.innerHTML = '<div class="text-muted" style="padding:8px;">No products available. Create products first.</div>';
+    return;
+  }
+  container.innerHTML = products.map(function (p) {
+    var existing = existingProducts.find(function (ep) { return ep.productId === p.id; });
+    var checked = existing ? 'checked' : '';
+    var priceVal = existing ? existing.price : p.price;
+    return '<div style="border-bottom:1px solid var(--border);padding:8px 4px;"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;"><input type="checkbox" class="cat-product-cb" value="' + p.id + '" ' + checked + '> <span style="flex:1;">' + p.name + '</span></label><div style="display:flex;align-items:center;gap:6px;margin-left:26px;margin-top:4px;"><span class="text-muted" style="font-size:12px;">Price:</span><input type="number" class="cat-product-price" data-product-id="' + p.id + '" value="' + priceVal + '" style="width:100px;padding:4px 8px;font-size:12px;"></div></div>';
+  }).join('');
+}
+
+function saveCatalog() {
+  var id = document.getElementById('editCatalogId').value;
+  var name = document.getElementById('catName').value.trim();
+  var market = document.getElementById('catMarket').value;
+  var status = document.getElementById('catStatus').value;
+  if (!name) { showToast('Catalog name is required', 'error'); return; }
+  var checkboxes = document.querySelectorAll('.cat-product-cb:checked');
+  var products = [];
+  checkboxes.forEach(function (cb) {
+    var priceInput = document.querySelector('.cat-product-price[data-product-id="' + cb.value + '"]');
+    var price = priceInput ? Number(priceInput.value) || 0 : 0;
+    products.push({ productId: cb.value, price: price, available: true });
+  });
+  var catalogs = getCatalogs();
+  if (id) {
+    var c = catalogs.find(function (x) { return x.id === id; });
+    if (c) { c.name = name; c.market = market; c.products = products; c.status = status; }
+    showToast('Catalog updated', 'success');
+  } else {
+    catalogs.push({ id: generateId(), name: name, market: market, products: products, status: status, createdAt: new Date().toISOString() });
+    showToast('Catalog created', 'success');
+  }
+  saveCatalogs(catalogs);
+  closeModal('catalogModal');
+  renderCatalogs();
+}
+
+function editCatalog(id) {
+  var c = getCatalogs().find(function (x) { return x.id === id; });
+  if (!c) return;
+  document.getElementById('catalogModalTitle').textContent = 'Edit catalog';
+  document.getElementById('editCatalogId').value = c.id;
+  document.getElementById('catName').value = c.name;
+  document.getElementById('catMarket').value = c.market;
+  document.getElementById('catStatus').value = c.status || 'draft';
+  loadCatalogProductList();
+  openModal('catalogModal');
+}
+
+function deleteCatalog(id) {
+  var c = getCatalogs().find(function (x) { return x.id === id; });
+  if (!c) return;
+  document.getElementById('deleteCatId').value = id;
+  document.getElementById('deleteCatName').textContent = c.name;
+  openModal('deleteCatalogModal');
+}
+
+function confirmDeleteCatalog() {
+  var id = document.getElementById('deleteCatId').value;
+  saveCatalogs(getCatalogs().filter(function (c) { return c.id !== id; }));
+  closeModal('deleteCatalogModal');
+  renderCatalogs();
+  showToast('Catalog deleted', 'success');
+}
+
+document.addEventListener('click', function (e) {
+  if (e.target.classList.contains('modal-overlay')) closeAllModals();
+});
+</script>
+<script src="app.js"></script>
+</body>
+</html>

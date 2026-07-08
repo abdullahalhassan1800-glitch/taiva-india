@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rollouts — Taiva Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+<style>
+.status-toggle { cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+<span class="logo-text">Taiva</span>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-section">Main</div>
+<a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+<div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="products.html" class="nav-item">All products</a><a href="products-collections.html" class="nav-item">Collections</a><a href="products-inventory.html" class="nav-item">Inventory</a><a href="products-purchase-orders.html" class="nav-item">Purchase orders</a><a href="products-transfers.html" class="nav-item">Transfers</a><a href="products-gift-cards.html" class="nav-item">Gift cards</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="content-metaobjects.html" class="nav-item">Metaobjects</a><a href="content-files.html" class="nav-item">Files</a><a href="content-menus.html" class="nav-item">Menus</a><a href="content-blog.html" class="nav-item">Blog posts</a></div>
+<a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub open">
+<a href="markets-catalogs.html" class="nav-item">Catalogs</a>
+<a href="markets-rollouts.html" class="nav-item active">Rollouts</a>
+</div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section">Settings</div>
+<a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+<a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+</nav>
+</div>
+
+<div class="main-content">
+<header class="topbar">
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+<button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+<div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+<div class="topbar-actions">
+<button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+<button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+<div class="admin-avatar">A</div>
+</div>
+</header>
+
+<div class="page-content">
+<div class="page-header">
+<div>
+<h1>Rollouts</h1>
+<div class="page-subtitle">Schedule product launches</div>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openCreateRolloutModal()"><i class="fa-solid fa-plus"></i> Create rollout</button>
+</div>
+</div>
+
+<div class="table-container">
+<table>
+<thead><tr><th>Name</th><th>Products</th><th>Scheduled Date</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+<tbody id="rolloutTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<div class="modal" id="rolloutModal">
+<div class="modal-header"><h2 id="rolloutModalTitle">Create rollout</h2><button class="modal-close" onclick="closeModal('rolloutModal')">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="editRolloutId">
+<div class="form-group"><label>Rollout name <span style="color:var(--danger)">*</span></label><input type="text" id="rollName" placeholder="e.g. Summer Launch 2026"></div>
+<div class="form-group"><label>Scheduled date</label><input type="date" id="rollDate"></div>
+<div class="form-group"><label>Status</label><select id="rollStatus"><option value="draft">Draft</option><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="cancelled">Cancelled</option></select></div>
+<div class="form-group"><label>Select products</label><div id="rollProductList" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);padding:8px;"></div></div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('rolloutModal')">Cancel</button>
+<button class="btn btn-accent" onclick="saveRollout()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+</div>
+</div>
+
+<div class="modal" id="deleteRolloutModal">
+<div class="modal-header"><h2>Delete rollout</h2><button class="modal-close" onclick="closeModal('deleteRolloutModal')">&times;</button></div>
+<div class="modal-body">
+<p>Are you sure you want to delete <strong id="deleteRollName"></strong>?</p>
+<input type="hidden" id="deleteRollId">
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('deleteRolloutModal')">Cancel</button>
+<button class="btn btn-danger" onclick="confirmDeleteRollout()"><i class="fa-solid fa-trash"></i> Delete</button>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var tt = document.getElementById('themeToggle');
+  if (tt) {
+    tt.addEventListener('click', function () {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      tt.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var saved = localStorage.getItem('taiva_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      tt.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    }
+  }
+});
+
+function initPage() {
+  renderRollouts();
+}
+
+function getRollouts() {
+  return getData('rollouts');
+}
+
+function saveRollouts(data) {
+  setData('rollouts', data);
+}
+
+function renderRollouts() {
+  var rollouts = getRollouts();
+  var tbody = document.getElementById('rolloutTableBody');
+  if (rollouts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:24px;">No rollouts yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rollouts.map(function (r) {
+    var count = (r.products || []).length;
+    var statusClass = r.status === 'live' ? 'badge-active' : r.status === 'scheduled' ? 'badge-draft' : r.status === 'cancelled' ? 'badge-expired' : 'badge-draft';
+    var dateText = r.scheduledDate ? formatDate(r.scheduledDate) : '-';
+    return '<tr><td><strong>' + r.name + '</strong></td><td>' + count + ' product' + (count !== 1 ? 's' : '') + '</td><td>' + dateText + '</td><td><span class="badge ' + statusClass + ' status-toggle" onclick="advanceRolloutStatus(\'' + r.id + '\')">' + r.status + '</span></td><td>' + formatDate(r.createdAt) + '</td><td><button class="btn btn-sm" onclick="editRollout(\'' + r.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteRollout(\'' + r.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+  }).join('');
+}
+
+function openCreateRolloutModal() {
+  document.getElementById('rolloutModalTitle').textContent = 'Create rollout';
+  document.getElementById('editRolloutId').value = '';
+  document.getElementById('rollName').value = '';
+  document.getElementById('rollDate').value = '';
+  document.getElementById('rollStatus').value = 'draft';
+  loadRolloutProductList();
+  openModal('rolloutModal');
+}
+
+function loadRolloutProductList() {
+  var products = getData('products');
+  var container = document.getElementById('rollProductList');
+  var editId = document.getElementById('editRolloutId').value;
+  var selectedIds = [];
+  if (editId) {
+    var r = getRollouts().find(function (x) { return x.id === editId; });
+    if (r) selectedIds = (r.products || []).map(function (p) { return p.productId; });
+  }
+  if (products.length === 0) {
+    container.innerHTML = '<div class="text-muted" style="padding:8px;">No products available.</div>';
+    return;
+  }
+  container.innerHTML = products.map(function (p) {
+    var checked = selectedIds.indexOf(p.id) !== -1 ? 'checked' : '';
+    return '<label style="display:flex;align-items:center;gap:8px;padding:4px 8px;cursor:pointer;font-size:13px;"><input type="checkbox" class="roll-product-cb" value="' + p.id + '" ' + checked + '> ' + p.name + ' <span class="text-muted">(' + (p.sku || '-') + ')</span></label>';
+  }).join('');
+}
+
+function saveRollout() {
+  var id = document.getElementById('editRolloutId').value;
+  var name = document.getElementById('rollName').value.trim();
+  var scheduledDate = document.getElementById('rollDate').value;
+  var status = document.getElementById('rollStatus').value;
+  if (!name) { showToast('Rollout name is required', 'error'); return; }
+  var checkboxes = document.querySelectorAll('.roll-product-cb:checked');
+  var products = [];
+  checkboxes.forEach(function (cb) { products.push({ productId: cb.value }); });
+  var rollouts = getRollouts();
+  if (id) {
+    var r = rollouts.find(function (x) { return x.id === id; });
+    if (r) { r.name = name; r.scheduledDate = scheduledDate; r.status = status; r.products = products; }
+    showToast('Rollout updated', 'success');
+  } else {
+    rollouts.push({ id: generateId(), name: name, products: products, scheduledDate: scheduledDate, status: status, createdAt: new Date().toISOString() });
+    showToast('Rollout created', 'success');
+  }
+  saveRollouts(rollouts);
+  closeModal('rolloutModal');
+  renderRollouts();
+}
+
+function editRollout(id) {
+  var r = getRollouts().find(function (x) { return x.id === id; });
+  if (!r) return;
+  document.getElementById('rolloutModalTitle').textContent = 'Edit rollout';
+  document.getElementById('editRolloutId').value = r.id;
+  document.getElementById('rollName').value = r.name;
+  document.getElementById('rollDate').value = r.scheduledDate || '';
+  document.getElementById('rollStatus').value = r.status || 'draft';
+  loadRolloutProductList();
+  openModal('rolloutModal');
+}
+
+function deleteRollout(id) {
+  var r = getRollouts().find(function (x) { return x.id === id; });
+  if (!r) return;
+  document.getElementById('deleteRollId').value = id;
+  document.getElementById('deleteRollName').textContent = r.name;
+  openModal('deleteRolloutModal');
+}
+
+function confirmDeleteRollout() {
+  var id = document.getElementById('deleteRollId').value;
+  saveRollouts(getRollouts().filter(function (r) { return r.id !== id; }));
+  closeModal('deleteRolloutModal');
+  renderRollouts();
+  showToast('Rollout deleted', 'success');
+}
+
+function advanceRolloutStatus(id) {
+  var rollouts = getRollouts();
+  var r = rollouts.find(function (x) { return x.id === id; });
+  if (!r) return;
+  var flow = { draft: 'scheduled', scheduled: 'live', live: null, cancelled: null };
+  var next = flow[r.status];
+  if (!next) { showToast('This status cannot be changed', 'error'); return; }
+  r.status = next;
+  saveRollouts(rollouts);
+  renderRollouts();
+  showToast('Status changed to ' + r.status, 'info');
+}
+
+document.addEventListener('click', function (e) {
+  if (e.target.classList.contains('modal-overlay')) closeAllModals();
+});
+</script>
+<script src="app.js"></script>
+</body>
+</html>

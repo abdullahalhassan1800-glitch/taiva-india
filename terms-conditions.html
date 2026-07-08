@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms & Conditions — Taiva India</title>
+  <meta name="description" content="Taiva India's terms and conditions govern the use of our website and purchase of our products.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="announcement-bar">
+  <div class="container">
+    <span>🌿 100% Natural Ayurvedic Formulations</span>
+    <span>🚚 Free Shipping Across India on Orders Above ₹499</span>
+    <span>✅ Clinically Tested & Science-Backed</span>
+  </div>
+</div>
+
+<header class="main-header">
+  <div class="header-inner">
+    <button class="mobile-menu-btn" onclick="openMobileDrawer()"><i class="fa-solid fa-bars"></i></button>
+    <a href="index.html" class="logo">
+      <img src="images/taiva-logo-white.png" alt="Taiva">
+      <span>Taiva</span>
+    </a>
+    <nav class="desktop-nav">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="sugar-pro-max.html">Sugar Pro Max</a></li>
+        <li><a href="pachan-pro.html">Digestive Health</a></li>
+        <li><a href="joint-care.html">Joint Care</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <button><i class="fa-solid fa-magnifying-glass"></i></button>
+      <a href="cart.html"><i class="fa-solid fa-bag-shopping"></i><span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-drawer-overlay" id="mobileOverlay" onclick="closeMobileDrawer()"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="drawer-header">
+    <h3>Taiva</h3>
+    <button class="drawer-close" onclick="closeMobileDrawer()">&times;</button>
+  </div>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="sugar-pro-max.html">Sugar Pro Max</a></li>
+    <li><a href="pachan-pro.html">Digestive Health</a></li>
+    <li><a href="joint-care.html">Joint Care</a></li>
+    <li><a href="cart.html">Cart</a></li>
+  </ul>
+</div>
+
+<section class="info-page">
+  <div class="container">
+    <div class="page-header">
+      <h1>Terms & Conditions</h1>
+      <p>Last updated: January 2026</p>
+    </div>
+    <div class="info-content">
+      <h2>Acceptance of Terms</h2>
+      <p>By accessing and using this website, you accept and agree to be bound by these terms and conditions.</p>
+
+      <h2>Product Information</h2>
+      <p>We strive to provide accurate product descriptions and pricing. However, we reserve the right to correct any errors.</p>
+
+      <h2>Intellectual Property</h2>
+      <p>All content on this website, including text, images, logos, and product designs, is the property of Taiva India.</p>
+
+      <h2>Limitation of Liability</h2>
+      <p>Taiva India shall not be liable for any indirect, incidental, or consequential damages arising from the use of our products.</p>
+
+      <h2>Changes to Terms</h2>
+      <p>We reserve the right to update these terms at any time. Changes will be posted on this page.</p>
+
+      <h2>Contact</h2>
+      <p>For any questions regarding these terms, contact us at info@taiva.in</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo-text">Taiva</div>
+        <p>Premium Ayurvedic wellness products crafted with nature's finest ingredients.</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="authenticity.html">Authenticity</a></li>
+          <li><a href="cart.html">Cart</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Policies</h4>
+        <ul>
+          <li><a href="shipping-policy.html">Shipping</a></li>
+          <li><a href="refund-policy.html">Refund</a></li>
+          <li><a href="privacy-policy.html">Privacy</a></li>
+          <li><a href="terms-conditions.html">Terms</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p class="contact-item"><i class="fa-solid fa-phone"></i> +91-9582908080</p>
+        <p class="contact-item"><i class="fa-solid fa-envelope"></i> info@taiva.in</p>
+        <p>PLOT NO. 275, SECTOR-81<br>Noida, UP - 201302</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Taiva India. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<a href="https://wa.me/919582908080" target="_blank" class="whatsapp-float"><i class="fa-brands fa-whatsapp"></i></a>
+
+<script>
+function openMobileDrawer() { document.getElementById('mobileDrawer').classList.add('open'); document.getElementById('mobileOverlay').classList.add('active'); }
+function closeMobileDrawer() { document.getElementById('mobileDrawer').classList.remove('open'); document.getElementById('mobileOverlay').classList.remove('active'); }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

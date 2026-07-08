@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live View — Taiva Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+      <span class="logo-text">Taiva</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+      <div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="products.html" class="nav-item">All products</a><a href="products-collections.html" class="nav-item">Collections</a><a href="products-inventory.html" class="nav-item">Inventory</a><a href="products-purchase-orders.html" class="nav-item">Purchase orders</a><a href="products-transfers.html" class="nav-item">Transfers</a><a href="products-gift-cards.html" class="nav-item">Gift cards</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="content-metaobjects.html" class="nav-item">Metaobjects</a><a href="content-files.html" class="nav-item">Files</a><a href="content-menus.html" class="nav-item">Menus</a><a href="content-blog.html" class="nav-item">Blog posts</a></div>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
+      <a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+      <div class="nav-sub open">
+        <a href="analytics-reports.html" class="nav-item">Reports</a>
+        <a href="analytics-liveview.html" class="nav-item active">Live View</a>
+      </div>
+      <div class="nav-section">Settings</div>
+      <a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+      <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+      <button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-search">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Search..." id="globalSearch">
+      </div>
+      <div class="topbar-actions">
+        <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+        <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>Live View</h1>
+          <div class="page-subtitle">Real-time store activity</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-accent" id="simulateBtn"><i class="fa-solid fa-plus"></i> Simulate Activity</button>
+          <button class="btn" id="autoToggle"><i class="fa-solid fa-play"></i> Auto-Simulate</button>
+          <button class="btn" id="clearBtn"><i class="fa-solid fa-trash-can"></i> Clear</button>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom:16px;">
+        <div class="stat-card">
+          <div class="stat-label">Today's Visitors</div>
+          <div class="stat-value" id="statVisitors">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Today's Orders</div>
+          <div class="stat-value" id="statOrders">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Today's Revenue</div>
+          <div class="stat-value" id="statRevenue">Rs. 0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>Activity Feed</h3></div>
+        <div class="card-body" style="padding:12px;">
+          <div class="live-feed" id="liveFeed"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay"></div>
+
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('themeToggle')?.addEventListener('click', function() {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var savedTheme = localStorage.getItem('taiva_theme');
+    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
+
+    var autoInterval = null;
+    var customerNames = ['Rahul Sharma', 'Priya Mehta', 'Aman Verma', 'Sneha Patel', 'Vikram Singh', 'Ananya Gupta', 'Rohit Kumar', 'Neha Joshi', 'Arjun Nair', 'Divya Reddy'];
+    var productNames = ['Sugar Pro Max', 'Digestive Health', 'Joint Care', 'Immunity Boost', 'Protein Powder'];
+
+    function randomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function addLiveEvent(type) {
+      var events = getData('liveEvents', []);
+      var id = 'EVT' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase();
+      var now = new Date();
+      var event = { id: id, type: type, title: '', description: '', timestamp: now.toISOString() };
+
+      if (type === 'order') {
+        var customer = randomItem(customerNames);
+        var product = randomItem(productNames);
+        var amount = Math.floor(Math.random() * 1500) + 500;
+        event.title = 'New Order';
+        event.description = customer + ' ordered ' + product + ' — ' + formatCurrency(amount);
+      } else if (type === 'visit') {
+        var pages = ['Home', 'Products', 'Checkout', 'About Us', 'Contact'];
+        event.title = 'Page Visit';
+        event.description = 'Visitor on ' + randomItem(pages) + ' page';
+      } else if (type === 'sale') {
+        var prod = randomItem(productNames);
+        var amt = Math.floor(Math.random() * 2000) + 300;
+        event.title = 'Sale';
+        event.description = prod + ' sold — ' + formatCurrency(amt);
+      }
+
+      events.push(event);
+      if (events.length > 50) events = events.slice(events.length - 50);
+      setData('liveEvents', events);
+      renderLiveFeed();
+      updateStats();
+    }
+
+    function renderLiveFeed() {
+      var feed = document.getElementById('liveFeed');
+      var events = getData('liveEvents', []);
+      if (events.length === 0) {
+        feed.innerHTML = '<div class="empty-state"><i class="fa-solid fa-clock"></i><h3>No Activity Yet</h3><p>Simulate activity or wait for auto-simulation</p></div>';
+        return;
+      }
+      feed.innerHTML = events.slice().reverse().map(function(e) {
+        var iconClass = e.type === 'order' ? 'fa-solid fa-cart-plus' : e.type === 'visit' ? 'fa-solid fa-eye' : 'fa-solid fa-circle-dollar';
+        var iconBg = e.type === 'order' ? 'order' : e.type === 'visit' ? 'visit' : 'sale';
+        var timeAgo = getTimeAgo(e.timestamp);
+        return '<div class="live-item"><div class="live-icon ' + iconBg + '"><i class="' + iconClass + '"></i></div><div class="live-info"><div class="live-title">' + e.title + '</div><div class="live-meta">' + e.description + '</div></div><div class="live-time">' + timeAgo + '</div></div>';
+      }).join('');
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function getTimeAgo(ts) {
+      var diff = Date.now() - new Date(ts).getTime();
+      var sec = Math.floor(diff / 1000);
+      if (sec < 60) return sec + 's ago';
+      var min = Math.floor(sec / 60);
+      if (min < 60) return min + 'm ago';
+      var hrs = Math.floor(min / 60);
+      if (hrs < 24) return hrs + 'h ago';
+      return Math.floor(hrs / 24) + 'd ago';
+    }
+
+    function updateStats() {
+      var events = getData('liveEvents', []);
+      var todayStr = new Date().toISOString().split('T')[0];
+      var todayEvents = events.filter(function(e) { return e.timestamp && e.timestamp.split('T')[0] === todayStr; });
+      var visitors = todayEvents.filter(function(e) { return e.type === 'visit'; }).length;
+      var orders = todayEvents.filter(function(e) { return e.type === 'order'; }).length;
+      var revenue = 0;
+      todayEvents.forEach(function(e) {
+        if (e.type === 'order' || e.type === 'sale') {
+          var match = e.description.match(/Rs\.?\s*([0-9,]+)/);
+          if (match) revenue += parseInt(match[1].replace(/,/g, ''));
+        }
+      });
+      document.getElementById('statVisitors').textContent = visitors;
+      document.getElementById('statOrders').textContent = orders;
+      document.getElementById('statRevenue').textContent = formatCurrency(revenue);
+    }
+
+    function simulateRandomEvent() {
+      var types = ['order', 'visit', 'sale'];
+      var weights = [0.3, 0.4, 0.3];
+      var r = Math.random();
+      var type;
+      if (r < weights[0]) type = types[0];
+      else if (r < weights[0] + weights[1]) type = types[1];
+      else type = types[2];
+      addLiveEvent(type);
+    }
+
+    function seedInitialEvents() {
+      var events = getData('liveEvents', []);
+      if (events.length === 0) {
+        var now = Date.now();
+        for (var i = 0; i < 8; i++) {
+          var types = ['order', 'visit', 'sale'];
+          var type = types[i % 3];
+          var ts = new Date(now - (8 - i) * 30000);
+          var e = { id: 'SEED' + i, type: type, title: '', description: '', timestamp: ts.toISOString() };
+          if (type === 'order') {
+            e.title = 'New Order';
+            e.description = randomItem(customerNames) + ' ordered ' + randomItem(productNames) + ' — ' + formatCurrency(Math.floor(Math.random() * 1500) + 500);
+          } else if (type === 'visit') {
+            e.title = 'Page Visit';
+            e.description = 'Visitor on ' + randomItem(['Home', 'Products', 'Checkout']) + ' page';
+          } else if (type === 'sale') {
+            e.title = 'Sale';
+            e.description = randomItem(productNames) + ' sold — ' + formatCurrency(Math.floor(Math.random() * 2000) + 300);
+          }
+          events.push(e);
+        }
+        setData('liveEvents', events);
+      }
+    }
+
+    initPage = function() {
+      seedInitialEvents();
+      renderLiveFeed();
+      updateStats();
+
+      document.getElementById('simulateBtn').addEventListener('click', function() {
+        simulateRandomEvent();
+      });
+
+      document.getElementById('autoToggle').addEventListener('click', function() {
+        if (autoInterval) {
+          clearInterval(autoInterval);
+          autoInterval = null;
+          this.innerHTML = '<i class="fa-solid fa-play"></i> Auto-Simulate';
+        } else {
+          autoInterval = setInterval(simulateRandomEvent, 5000);
+          this.innerHTML = '<i class="fa-solid fa-stop"></i> Stop Auto';
+        }
+      });
+
+      document.getElementById('clearBtn').addEventListener('click', function() {
+        setData('liveEvents', []);
+        if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
+        document.getElementById('autoToggle').innerHTML = '<i class="fa-solid fa-play"></i> Auto-Simulate';
+        renderLiveFeed();
+        updateStats();
+        showToast('Feed cleared', 'info');
+      });
+    };
+  </script>
+</body>
+</html>

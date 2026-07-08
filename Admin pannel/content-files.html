@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Files — Taiva Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+<style>
+.file-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; }
+.file-card { background:var(--card-bg); border:2px solid var(--border); border-radius:var(--radius); padding:20px 16px; text-align:center; cursor:pointer; transition:border-color 0.2s; position:relative; }
+.file-card:hover { border-color:var(--accent); }
+.file-card.selected { border-color:var(--accent); background:var(--accent-light); }
+.file-icon { font-size:36px; margin-bottom:10px; color:var(--text-muted); }
+.file-card.selected .file-icon { color:var(--accent); }
+.file-name { font-size:13px; font-weight:500; word-break:break-all; margin-bottom:4px; }
+.file-meta { font-size:11px; color:var(--text-muted); }
+.copy-btn { position:absolute; top:8px; right:8px; background:var(--page-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer; padding:4px 8px; font-size:12px; opacity:0; transition:opacity 0.2s; }
+.file-card:hover .copy-btn { opacity:1; }
+.filter-bar { display:flex; gap:12px; align-items:center; margin-bottom:20px; flex-wrap:wrap; }
+.filter-bar input { flex:1; min-width:180px; }
+.filter-bar select { width:auto; }
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div style="background:#008060;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;">T</div>
+<span class="logo-text">Taiva</span>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-section">Main</div>
+<a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+<div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="products.html" class="nav-item">All products</a><a href="products-collections.html" class="nav-item">Collections</a><a href="products-inventory.html" class="nav-item">Inventory</a><a href="products-purchase-orders.html" class="nav-item">Purchase orders</a><a href="products-transfers.html" class="nav-item">Transfers</a><a href="products-gift-cards.html" class="nav-item">Gift cards</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span class="nav-label">Customers</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="customers.html" class="nav-item">All customers</a><a href="customers-segments.html" class="nav-item">Segments</a><a href="customers-companies.html" class="nav-item">Companies</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span class="nav-label">Growth</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="growth-attribution.html" class="nav-item">Attribution</a><a href="growth-campaigns.html" class="nav-item">Campaigns</a></div>
+<a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span><span class="nav-label">Content</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub open">
+<a href="content-metaobjects.html" class="nav-item">Metaobjects</a>
+<a href="content-files.html" class="nav-item active">Files</a>
+<a href="content-menus.html" class="nav-item">Menus</a>
+<a href="content-blog.html" class="nav-item">Blog posts</a>
+</div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span class="nav-label">Markets</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
+<div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section">Settings</div>
+<a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+<a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
+</nav>
+</div>
+
+<div class="main-content">
+<header class="topbar">
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+<button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+<div class="topbar-search"><i class="fa-solid fa-search"></i><input type="text" placeholder="Search..." id="globalSearch"></div>
+<div class="topbar-actions">
+<button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+<button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+<div class="admin-avatar">A</div>
+</div>
+</header>
+
+<div class="page-content">
+<div class="page-header">
+<div>
+<h1>Files</h1>
+<div class="page-subtitle">Manage uploaded files and assets</div>
+</div>
+<div class="page-actions">
+<button class="btn btn-accent" onclick="openAddFileModal()"><i class="fa-solid fa-plus"></i> Add file</button>
+<button class="btn btn-danger" id="deleteSelectedBtn" style="display:none;" onclick="deleteSelectedFile()"><i class="fa-solid fa-trash"></i> Delete</button>
+</div>
+</div>
+
+<div class="filter-bar">
+<input type="text" id="fileSearch" placeholder="Search by name..." oninput="renderFiles()">
+<select id="fileTypeFilter" onchange="renderFiles()">
+<option value="">All types</option>
+<option value="image">Image</option>
+<option value="video">Video</option>
+<option value="document">Document</option>
+</select>
+</div>
+
+<div class="file-grid" id="fileGrid"></div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+<div class="modal" id="addFileModal">
+<div class="modal-header"><h2 id="fileModalTitle">Add file</h2><button class="modal-close" onclick="closeModal('addFileModal')">&times;</button></div>
+<div class="modal-body">
+<input type="hidden" id="editFileId">
+<div class="form-group"><label>File name <span style="color:var(--danger)">*</span></label><input type="text" id="fileName" placeholder="e.g. product-banner.jpg"></div>
+<div class="form-group"><label>File URL <span style="color:var(--danger)">*</span></label><input type="text" id="fileUrl" placeholder="https://example.com/image.jpg"></div>
+<div class="form-row">
+<div class="form-group"><label>Type <span style="color:var(--danger)">*</span></label><select id="fileType"><option value="image">Image</option><option value="video">Video</option><option value="document">Document</option></select></div>
+<div class="form-group"><label>Size (optional)</label><input type="text" id="fileSize" placeholder="e.g. 2.5 MB"></div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('addFileModal')">Cancel</button>
+<button class="btn btn-accent" onclick="saveFile()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var tt = document.getElementById('themeToggle');
+  if (tt) {
+    tt.addEventListener('click', function () {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      tt.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var saved = localStorage.getItem('taiva_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      tt.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    }
+  }
+});
+
+var selectedFileId = null;
+
+function initPage() {
+  renderFiles();
+}
+
+function getFiles() {
+  return getData('files');
+}
+
+function saveFiles(data) {
+  setData('files', data);
+}
+
+var typeIcons = { image: 'fa-regular fa-image', video: 'fa-solid fa-video', document: 'fa-regular fa-file-lines' };
+
+function renderFiles() {
+  var files = getFiles();
+  var search = (document.getElementById('fileSearch').value || '').toLowerCase();
+  var typeFilter = document.getElementById('fileTypeFilter').value;
+  if (search) files = files.filter(function (f) { return f.name.toLowerCase().indexOf(search) !== -1; });
+  if (typeFilter) files = files.filter(function (f) { return f.type === typeFilter; });
+  var grid = document.getElementById('fileGrid');
+  if (files.length === 0) {
+    grid.innerHTML = '<div class="text-muted" style="grid-column:1/-1;text-align:center;padding:40px;">No files found.</div>';
+    return;
+  }
+  grid.innerHTML = files.map(function (f) {
+    var sel = selectedFileId === f.id ? ' selected' : '';
+    var icon = typeIcons[f.type] || 'fa-regular fa-file';
+    return '<div class="file-card' + sel + '" onclick="selectFile(\'' + f.id + '\')"><button class="copy-btn" onclick="event.stopPropagation();copyFileUrl(\'' + f.url.replace(/'/g, "\\'") + '\');"><i class="fa-regular fa-copy"></i> Copy URL</button><div class="file-icon"><i class="' + icon + '"></i></div><div class="file-name">' + f.name + '</div><div class="file-meta">' + (f.size || '') + ' &middot; ' + f.type + '</div><div class="file-meta">' + formatDate(f.createdAt) + '</div></div>';
+  }).join('');
+  document.getElementById('deleteSelectedBtn').style.display = selectedFileId ? 'inline-flex' : 'none';
+}
+
+function selectFile(id) {
+  selectedFileId = selectedFileId === id ? null : id;
+  renderFiles();
+}
+
+function openAddFileModal() {
+  document.getElementById('fileModalTitle').textContent = 'Add file';
+  document.getElementById('editFileId').value = '';
+  document.getElementById('fileName').value = '';
+  document.getElementById('fileUrl').value = '';
+  document.getElementById('fileType').value = 'image';
+  document.getElementById('fileSize').value = '';
+  openModal('addFileModal');
+}
+
+function saveFile() {
+  var id = document.getElementById('editFileId').value;
+  var name = document.getElementById('fileName').value.trim();
+  var url = document.getElementById('fileUrl').value.trim();
+  var type = document.getElementById('fileType').value;
+  var size = document.getElementById('fileSize').value.trim();
+  if (!name || !url) { showToast('Name and URL are required', 'error'); return; }
+  var files = getFiles();
+  if (id) {
+    var f = files.find(function (x) { return x.id === id; });
+    if (f) { f.name = name; f.url = url; f.type = type; f.size = size; }
+    showToast('File updated', 'success');
+  } else {
+    files.push({ id: generateId(), name: name, url: url, type: type, size: size, createdAt: new Date().toISOString() });
+    showToast('File added', 'success');
+  }
+  saveFiles(files);
+  closeModal('addFileModal');
+  selectedFileId = null;
+  renderFiles();
+}
+
+function deleteSelectedFile() {
+  if (!selectedFileId) return;
+  if (!confirm('Delete this file?')) return;
+  saveFiles(getFiles().filter(function (f) { return f.id !== selectedFileId; }));
+  selectedFileId = null;
+  renderFiles();
+  showToast('File deleted', 'success');
+}
+
+function copyFileUrl(url) {
+  navigator.clipboard.writeText(url).then(function () {
+    showToast('URL copied to clipboard', 'success');
+  }).catch(function () {
+    var ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    showToast('URL copied to clipboard', 'success');
+  });
+}
+
+document.addEventListener('click', function (e) {
+  if (e.target.classList.contains('modal-overlay')) closeAllModals();
+});
+</script>
+<script src="app.js"></script>
+</body>
+</html>

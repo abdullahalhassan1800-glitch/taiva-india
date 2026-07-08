@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home — Taiva Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .chart-container { height: 300px; }
+    .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+    @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="logo-icon">T</span>
+      <span class="logo-text">Taiva</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="dashboard.html" class="nav-item active">
+        <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+        <span class="nav-label">Home</span>
+      </a>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
+        <span class="nav-label">Orders</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        <span class="nav-badge">31</span>
+      </a>
+      <div class="nav-sub">
+        <a href="orders.html" class="nav-item">All orders</a>
+        <a href="orders-draft.html" class="nav-item">Drafts</a>
+        <a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-tag"></i></span>
+        <span class="nav-label">Products</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="products.html" class="nav-item">All products</a>
+        <a href="products-collections.html" class="nav-item">Collections</a>
+        <a href="products-inventory.html" class="nav-item">Inventory</a>
+        <a href="products-purchase-orders.html" class="nav-item">Purchase orders</a>
+        <a href="products-transfers.html" class="nav-item">Transfers</a>
+        <a href="products-gift-cards.html" class="nav-item">Gift cards</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+        <span class="nav-label">Customers</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="customers.html" class="nav-item">All customers</a>
+        <a href="customers-segments.html" class="nav-item">Segments</a>
+        <a href="customers-companies.html" class="nav-item">Companies</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span>
+        <span class="nav-label">Growth</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="growth-attribution.html" class="nav-item">Attribution</a>
+        <a href="growth-campaigns.html" class="nav-item">Campaigns</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span>
+        <span class="nav-label">Content</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="content-metaobjects.html" class="nav-item">Metaobjects</a>
+        <a href="content-files.html" class="nav-item">Files</a>
+        <a href="content-menus.html" class="nav-item">Menus</a>
+        <a href="content-blog.html" class="nav-item">Blog posts</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-globe"></i></span>
+        <span class="nav-label">Markets</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="markets-catalogs.html" class="nav-item">Catalogs</a>
+        <a href="markets-rollouts.html" class="nav-item">Rollouts</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span class="nav-label">Analytics</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="analytics-reports.html" class="nav-item">Reports</a>
+        <a href="analytics-liveview.html" class="nav-item">Live View</a>
+      </div>
+      <div class="nav-section">Settings</div>
+      <a href="settings.html" class="nav-item">
+        <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+        <span class="nav-label">Settings</span>
+      </a>
+      <a href="#" class="nav-item" onclick="logout()">
+        <span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+        <span class="nav-label">Logout</span>
+      </a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+      <button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-search">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Search..." id="globalSearch">
+      </div>
+      <div class="topbar-actions">
+        <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+        <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>Home</h1>
+          <div class="page-subtitle">Overview of your store</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-label">Today Sales</div>
+          <div class="stat-value" id="statTodaySales">Rs. 0</div>
+          <div class="stat-change" id="statTodayChange">+0% vs yesterday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value" id="statTotalOrders">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Products</div>
+          <div class="stat-value" id="statTotalProducts">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Customers</div>
+          <div class="stat-value" id="statTotalCustomers">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Revenue (30d)</div>
+          <div class="stat-value" id="statRevenue30d">Rs. 0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Order Value</div>
+          <div class="stat-value" id="statAvgOrder">Rs. 0</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><h3>7-Day Sales Trend</h3></div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="salesChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Recent Orders</h3></div>
+          <div class="card-body" style="padding:0;">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recentOrdersBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('themeToggle')?.addEventListener('click', function() {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var savedTheme = localStorage.getItem('taiva_theme');
+    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
+
+    initPage = function() {
+      var orders = getData('orders');
+      var products = getData('products');
+
+      // Stat: Total Products
+      document.getElementById('statTotalProducts').textContent = products.length;
+
+      // Stat: Total Orders
+      document.getElementById('statTotalOrders').textContent = orders.length;
+
+      // Stat: Total Customers (unique customers by phone)
+      var uniqueCustomers = {};
+      orders.forEach(function(o) { if (o.phone) uniqueCustomers[o.phone] = 1; });
+      document.getElementById('statTotalCustomers').textContent = Object.keys(uniqueCustomers).length;
+
+      // Stat: Today Sales
+      var today = new Date();
+      var todayStr = today.toISOString().split('T')[0];
+      var yesterdayStr = new Date(today.getTime() - 86400000).toISOString().split('T')[0];
+      var todayTotal = 0, yesterdayTotal = 0;
+      orders.forEach(function(o) {
+        var d = o.createdAt ? o.createdAt.split('T')[0] : '';
+        if (d === todayStr && o.status !== 'cancelled') todayTotal += o.total;
+        if (d === yesterdayStr && o.status !== 'cancelled') yesterdayTotal += o.total;
+      });
+      document.getElementById('statTodaySales').textContent = formatCurrency(todayTotal);
+      var changeEl = document.getElementById('statTodayChange');
+      if (yesterdayTotal > 0) {
+        var pct = Math.round((todayTotal - yesterdayTotal) / yesterdayTotal * 100);
+        changeEl.textContent = (pct >= 0 ? '+' : '') + pct + '% vs yesterday';
+      } else {
+        changeEl.textContent = 'No data vs yesterday';
+      }
+
+      // Stat: Revenue 30d
+      var thirtyDaysAgo = new Date(today.getTime() - 30 * 86400000).toISOString().split('T')[0];
+      var revenue30 = 0;
+      orders.forEach(function(o) {
+        var d = o.createdAt ? o.createdAt.split('T')[0] : '';
+        if (d >= thirtyDaysAgo && o.status !== 'cancelled') revenue30 += o.total;
+      });
+      document.getElementById('statRevenue30d').textContent = formatCurrency(revenue30);
+
+      // Stat: Avg Order Value
+      var completedOrders = orders.filter(function(o) { return o.status !== 'cancelled'; });
+      var totalRev = completedOrders.reduce(function(sum, o) { return sum + o.total; }, 0);
+      var avgVal = completedOrders.length > 0 ? totalRev / completedOrders.length : 0;
+      document.getElementById('statAvgOrder').textContent = formatCurrency(avgVal);
+
+      // Recent Orders (last 5)
+      var recentTbody = document.getElementById('recentOrdersBody');
+      var recent = orders.slice().sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); }).slice(0, 5);
+      if (recent.length === 0) {
+        recentTbody.innerHTML = '<tr><td colspan="4" class="text-muted text-center" style="padding:24px;">No orders yet</td></tr>';
+      } else {
+        recentTbody.innerHTML = recent.map(function(o) {
+          return '<tr><td><a href="#" style="color:var(--accent);text-decoration:none;font-weight:500;">' + o.id + '</a></td><td>' + o.customerName + '</td><td>' + formatCurrency(o.total) + '</td><td><span class="badge badge-' + o.status + '">' + o.status + '</span></td></tr>';
+        }).join('');
+      }
+
+      // 7-Day Sales Chart
+      var labels = [];
+      var chartData = [];
+      for (var i = 6; i >= 0; i--) {
+        var d = new Date(today.getTime() - i * 86400000);
+        var ds = d.toISOString().split('T')[0];
+        labels.push(d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' }));
+        var dayTotal = 0;
+        orders.forEach(function(o) {
+          var od = o.createdAt ? o.createdAt.split('T')[0] : '';
+          if (od === ds && o.status !== 'cancelled') dayTotal += o.total;
+        });
+        chartData.push(dayTotal);
+      }
+
+      var ctx = document.getElementById('salesChart');
+      if (ctx) {
+        var gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(0, 128, 96, 0.2)');
+        gradient.addColorStop(1, 'rgba(0, 128, 96, 0)');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Sales (Rs.)',
+              data: chartData,
+              borderColor: '#008060',
+              backgroundColor: gradient,
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: '#008060',
+              pointRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.06)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+    };
+  </script>
+</body>
+</html>

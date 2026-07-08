@@ -3,558 +3,219 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painopill Tablets - Ayurvedic Joint Pain Relief | Taiva</title>
-  <meta name="description" content="Shop Painopill at Taiva. An Ayurvedic proprietary medicine with Swarna Bhasma, Yograj Guggulu & Maharasnadi Kwath for arthritis, joint pain & stiffness relief.">
+  <title>Joint Care - Painopill | Taiva India</title>
+  <meta name="description" content="Ayurvedic joint care formula with Yograj Guggulu, Rasasindura & Swarna Bhasma for joint pain relief and mobility support.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
 
-  <!-- Announcement Bar -->
+  <!-- ANNOUNCEMENT BAR -->
   <div class="announcement-bar">
-    <div class="announcement-container">
-      <span class="slider-text"> 100% Natural Ayurvedic Formulations  Shop Now</span>
-      <span class="slider-text"> Free Shipping Across India on Orders Above 499!</span>
-      <span class="slider-text"> Clinically Tested & Science-Backed Wellness</span>
+    <div class="container">
+      <span>🌿 100% Natural Ayurvedic Formulations</span>
+      <span>🚚 Free Shipping Across India on Orders Above ₹499</span>
+      <span>✅ Clinically Tested & Science-Backed</span>
     </div>
   </div>
 
-  <!-- Header -->
-  <header>
-    <div class="header-container">
-      <div class="menu-btn header-actions">
-        <button><i class="fa-solid fa-bars"></i></button>
-      </div>
-      <div class="logo">
-        <a href="index.html">
-      <img src="images/taiva-logo-white.png" alt="Taiva Logo" style="height:32px;background:#000;padding:4px 10px;border-radius:6px;">
-        </a>
-      </div>
-      <nav>
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="header-inner">
+      <button class="mobile-menu-btn" onclick="openMobileDrawer()"><i class="fa-solid fa-bars"></i></button>
+      <a href="index.html" class="logo">
+        <img src="images/taiva-logo-white.png" alt="Taiva">
+        <span>Taiva</span>
+      </a>
+      <nav class="desktop-nav">
         <ul>
           <li><a href="index.html">Home</a></li>
-          <li><a href="diacurex-powder.html">Sugar Pro Max</a></li>
-          <li><a href="digestive-health.html">Digestive Health</a></li>
-          <li><a href="joint-care.html" style="color: var(--primary-color);">Joint Care</a></li>
+          <li><a href="sugar-pro-max.html">Sugar Pro Max</a></li>
+          <li><a href="pachan-pro.html">Digestive Health</a></li>
+          <li><a href="joint-care.html" class="active">Joint Care</a></li>
         </ul>
       </nav>
       <div class="header-actions">
-        <button class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-        <a href="#" class="cart-btn">
-          <i class="fa-solid fa-bag-shopping"></i>
-          <span class="cart-count">0</span>
-        </a>
+        <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        <a href="cart.html"><i class="fa-solid fa-bag-shopping"></i><span class="cart-count">0</span></a>
       </div>
     </div>
   </header>
 
-  <!-- Mobile Nav Drawer -->
-  <div class="mobile-nav-drawer">
-    <div class="mobile-nav-header">
-      <img src="images/taiva-logo-white.png" alt="Taiva Logo" style="height:32px;background:#000;padding:4px 10px;border-radius:6px;">
-      <button class="mobile-nav-close"><i class="fa-solid fa-xmark"></i></button>
+  <!-- MOBILE DRAWER -->
+  <div class="mobile-drawer-overlay" id="mobileOverlay" onclick="closeMobileDrawer()"></div>
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <h3>Taiva</h3>
+      <button class="drawer-close" onclick="closeMobileDrawer()">&times;</button>
     </div>
-    <ul class="mobile-nav-links">
+    <ul>
       <li><a href="index.html">Home</a></li>
-      <li><a href="diacurex-powder.html">Sugar Pro Max</a></li>
-      <li><a href="digestive-health.html">Digestive Health</a></li>
+      <li><a href="sugar-pro-max.html">Sugar Pro Max</a></li>
+      <li><a href="pachan-pro.html">Digestive Health</a></li>
       <li><a href="joint-care.html">Joint Care</a></li>
-      <li><a href="cart.html">View Cart</a></li>
+      <li><a href="cart.html">Cart</a></li>
     </ul>
   </div>
 
-  <!-- Product Detail Section -->
-  <section class="product-detail">
-    <div class="product-detail-container">
-      
-      <!-- Gallery (Left) -->
-      <div class="product-gallery">
-        <div class="main-image">
-          <img id="galleryMain" src="images/joint-care.jpg" alt="Painopill Tablets" class="gallery-main-img">
-          <button class="gallery-arrow gallery-arrow-left" onclick="changeGallery(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-          <button class="gallery-arrow gallery-arrow-right" onclick="changeGallery(1)"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
-        <div class="gallery-thumbs">
-          <img src="images/joint-care.jpg" alt="View 1" class="gallery-thumb active" data-index="0" onclick="setGallery(0)">
-          <img src="images/joint-care-main.png" alt="Main Poster" class="gallery-thumb" data-index="1" onclick="setGallery(1)">
-          <img src="images/joint-care-ingredients.png" alt="Ingredients" class="gallery-thumb" data-index="2" onclick="setGallery(2)">
-          <img src="images/joint-care-benefits.png" alt="Benefits" class="gallery-thumb" data-index="3" onclick="setGallery(3)">
-          <img src="images/joint-care-how-to-use.png" alt="How to Use" class="gallery-thumb" data-index="4" onclick="setGallery(4)">
-        </div>
-      </div>
+  <main>
 
-      <!-- Info (Right) -->
-      <div class="product-detail-info">
-        <div class="product-detail-meta">
-          <div class="product-stars">
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star-half-alt"></i>
-            <span>4.6 (248 reviews)</span>
+    <!-- PRODUCT DETAIL SECTION -->
+    <section class="pd-section">
+      <div class="container">
+        <div class="pd-layout">
+          <div class="pd-gallery">
+            <div class="pd-main-image">
+              <img id="galleryMain" src="images/joint-care-main.png" alt="Joint Care">
+            </div>
+            <div class="pd-thumbs" id="galleryThumbs">
+              <img src="images/joint-care-main.png" alt="Main" class="active" data-index="0" onclick="setGallery(0)">
+              <img src="images/joint-care.jpg" alt="Joint Care" data-index="1" onclick="setGallery(1)">
+              <img src="images/joint-care-ingredients.png" alt="Ingredients" data-index="2" onclick="setGallery(2)">
+              <img src="images/joint-care-benefits.png" alt="Benefits" data-index="3" onclick="setGallery(3)">
+              <img src="images/joint-care-how-to-use.png" alt="How to Use" data-index="4" onclick="setGallery(4)">
+            </div>
           </div>
-        </div>
-        <h1>Painopill Tablets</h1>
-        <p style="color: var(--text-muted); margin-bottom: 20px;">Ayurvedic Relief for Arthritis, Joint Pain & Stiffness</p>
-        
-        <div class="product-detail-price">
-          <span class="price-current" style="color: var(--primary-color); font-weight: 700;" data-base-price="1040">₹1,040.00</span>
-          <span class="price-original" style="text-decoration: line-through; color: var(--text-muted);">₹1,140.00</span>
-          <span class="product-tag" style="position: static; background-color: #2e7d32;">9% OFF</span>
-          <span style="color: #2e7d32; font-size: 14px; margin-left: 8px;">You save ₹100.00</span>
-        </div>
-
-        <p style="margin-bottom: 24px; color: var(--text-muted);">
-          Painopill is a powerful Ayurvedic Proprietary Medicine that provides natural relief from arthritis, joint pain and stiffness. Formulated with Swarna Bhasma, Maharasnadi Kwath and Yograj Guggulu.
-        </p>
-
-        <div class="pd-benefit-icons">
-          <div class="pd-benefit-icon-item">
-            <svg viewBox="0 0 48 48" fill="none" width="36" height="36"><circle cx="24" cy="24" r="22" stroke="#2e7d32" stroke-width="1.5" fill="#e8f5e9"/><path d="M16 26l5 5 11-11" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Supports Joint Comfort</span>
-          </div>
-          <div class="pd-benefit-icon-item">
-            <svg viewBox="0 0 48 48" fill="none" width="36" height="36"><circle cx="24" cy="24" r="22" stroke="#2e7d32" stroke-width="1.5" fill="#e8f5e9"/><path d="M16 24h16M24 16v16" stroke="#2e7d32" stroke-width="2" stroke-linecap="round"/></svg>
-            <span>Promotes Mobility & Flexibility</span>
-          </div>
-          <div class="pd-benefit-icon-item">
-            <svg viewBox="0 0 48 48" fill="none" width="36" height="36"><circle cx="24" cy="24" r="22" stroke="#2e7d32" stroke-width="1.5" fill="#e8f5e9"/><path d="M18 28c2-4 10-4 12 0M15 24c4-6 14-6 18 0" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"/><path d="M24 32h.01" stroke="#2e7d32" stroke-width="2" stroke-linecap="round"/></svg>
-            <span>Maintains Cartilage Health</span>
-          </div>
-          <div class="pd-benefit-icon-item">
-            <svg viewBox="0 0 48 48" fill="none" width="36" height="36"><circle cx="24" cy="24" r="22" stroke="#2e7d32" stroke-width="1.5" fill="#e8f5e9"/><path d="M16 24c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round"/><path d="M20 24l4 4 4-4" stroke="#2e7d32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Soothes Swelling & Stiffness</span>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="product-detail-actions">
-          <div class="qty-control">
-            <button class="qty-btn minus"><i class="fa-solid fa-minus"></i></button>
-            <span class="qty-val">1</span>
-            <button class="qty-btn plus"><i class="fa-solid fa-plus"></i></button>
-          </div>
-          <button class="btn btn-full add-to-cart-action" data-product-id="painopill" style="flex-grow: 1;">Add to Cart</button>
-        </div>
-
-        <button class="btn btn-accent btn-full" onclick="var q=parseInt(document.querySelector('.qty-val').textContent);addToCart('painopill',q,q>=2?980:undefined);setTimeout(openCartDrawer,100);" style="margin-bottom: 16px; padding: 16px;">Buy Now</button>
-
-        <!-- Trust Bullet Points -->
-        <div class="trust-bullets">
-          <div><i class="fa-solid fa-leaf" style="color: var(--primary-color); margin-right: 8px;"></i> 100% Vegan & Herbal</div>
-          <div><i class="fa-solid fa-wheat-awn" style="color: var(--primary-color); margin-right: 8px;"></i> Gluten-Free & Non-GMO</div>
-          <div><i class="fa-solid fa-ban" style="color: var(--primary-color); margin-right: 8px;"></i> No Added Sugars</div>
-          <div><i class="fa-solid fa-flask" style="color: var(--primary-color); margin-right: 8px;"></i> Lab Tested for Heavy Metals</div>
-        </div>
-
-        <div class="product-highlights">
-          <div class="highlight-item"><i class="fa-regular fa-clock"></i> <span>90-Day Supply</span></div>
-          <div class="highlight-item"><i class="fa-solid fa-microscope"></i> <span>Lab Tested</span></div>
-          <div class="highlight-item"><i class="fa-solid fa-truck-fast"></i> <span>Free Shipping</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- What's Inside Section -->
-  <section class="section ingredients-section">
-    <div class="section-container">
-      <div class="section-header">
-        <h2>What's Inside</h2>
-        <p>Honest, Transparent, and 100% Natural Ayurvedic Ingredients</p>
-      </div>
-      <div class="ingredient-grid">
-        <div class="ingredient-card">
-          <img src="images/ingredients-rasasindura.png" alt="Rasasindura" loading="lazy">
-          <h3>Rasasindura</h3>
-          <p>Supports energy, immunity, respiratory wellness, and overall vitality naturally</p>
-        </div>
-        <div class="ingredient-card">
-          <img src="images/ingredients-swarna-bhasma.png" alt="Swarna Bhasma" loading="lazy">
-          <h3>Swarna Bhasma</h3>
-          <p>Premium Ayurvedic formulation that supports immunity, energy, mental clarity & rejuvenation</p>
-        </div>
-        <div class="ingredient-card">
-          <img src="images/ingredients-maharasnadi-kwath.png" alt="Maharasnadi Kwath" loading="lazy">
-          <h3>Maharasnadi Kwath</h3>
-          <p>Supports joint health, muscle strength, and mobility for an active lifestyle</p>
-        </div>
-        <div class="ingredient-card">
-          <img src="images/ingredients-abhrak-bhasma.png" alt="Abhrak Bhasma" loading="lazy">
-          <h3>Abhrak Bhasma</h3>
-          <p>Traditional formulation known for promoting strength, stamina, and overall vitality</p>
-        </div>
-        <div class="ingredient-card">
-          <img src="images/ingredients-mandura-bhasma.png" alt="Mandura Bhasma" loading="lazy">
-          <h3>Mandura Bhasma</h3>
-          <p>Supports healthy iron levels, energy, and overall vitality for daily wellness</p>
-        </div>
-        <div class="ingredient-card">
-          <img src="images/ingredients-yograj-guggulu.png" alt="Yograj Guggulu" loading="lazy">
-          <h3>Yograj Guggulu</h3>
-          <p>Traditional Ayurvedic formulation for joint health, flexibility, and musculoskeletal wellness</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Why Choose Section -->
-  <section class="section why-choose-section">
-    <div class="section-container">
-      <div class="section-header">
-        <h2>Why Choose Painopill Tablets?</h2>
-        <p>Because your joints deserve pure Ayurvedic healing</p>
-      </div>
-      <div class="why-choose-layout">
-        <div class="why-choose-list">
-          <ul>
-            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> Powerful Bhasma Formula &mdash; Swarna Bhasma, Abhrak Bhasma & Lauha Bhasma for deep joint strength and pain relief</li>
-            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> Targets Root Cause &mdash; Maharasnadi Kwath & Yograj Guggulu reduce chronic inflammation and stiffness from within</li>
-            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> Strengthens Joints & Nerves &mdash; 10 natural Bhasma ingredients support cartilage, nerve strength & tissue repair</li>
-            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> 100% Ayurvedic & Steroid-Free &mdash; No harsh chemicals. Safe for long-term use as directed by a physician</li>
-            <li><i class="fa-solid fa-check-circle" style="color: var(--primary-color);"></i> Fast-Acting Pain Relief &mdash; Controls joint pain, swelling & morning stiffness for an active, pain-free life</li>
-          </ul>
-        </div>
-        <div class="why-choose-image">
-          <img src="images/why-choose-painopill.png" alt="Why Choose Painopill Tablets?" loading="lazy">
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Testimonials Section -->
-  <section class="section testimonials-section">
-    <div class="section-container">
-      <div class="section-header">
-        <h2>What Our Customers Say</h2>
-        <p>Real results from real people who trusted Painopill Tablets.</p>
-      </div>
-      <div class="reviews-carousel">
-        <button class="review-arrow review-arrow-left"><i class="fa-solid fa-chevron-left"></i></button>
-        <div class="reviews-track">
-          <div class="review-card">
-            <div class="review-card-header">
-              <img src="images/client1.png" alt="Rohit Malhotra" class="review-avatar-img">
-              <div>
-                <h4 class="review-author">Rohit Malhotra</h4>
-                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
+          <div class="pd-info">
+            <div class="pd-meta">
+              <span class="stars">★★★★★</span>
+              <span class="review-count">4.6 (248 reviews)</span>
+            </div>
+            <h1>Joint Care</h1>
+            <p class="pd-subtitle">Natural Joint & Mobility Support (Painopill)</p>
+            <div class="pd-price">
+              <span class="current">Rs. 1,040</span>
+              <span class="original">Rs. 1,140</span>
+              <span class="discount">-9%</span>
+            </div>
+            <p class="pd-desc">Ayurvedic joint care formula with Yograj Guggulu, Rasasindura & Swarna Bhasma for natural relief from joint pain and stiffness.</p>
+            <div class="pd-benefits">
+              <div class="pd-benefit"><i class="fa-solid fa-check-circle"></i> Reduces Joint Pain</div>
+              <div class="pd-benefit"><i class="fa-solid fa-check-circle"></i> Improves Mobility</div>
+              <div class="pd-benefit"><i class="fa-solid fa-check-circle"></i> Strengthens Bones</div>
+              <div class="pd-benefit"><i class="fa-solid fa-check-circle"></i> Natural Anti-Inflammatory</div>
+            </div>
+            <div class="pd-actions">
+              <div class="qty-control">
+                <button onclick="changeQty(-1)">-</button>
+                <span id="qtyVal">1</span>
+                <button onclick="changeQty(1)">+</button>
               </div>
+              <button class="add-to-cart-btn">Add to Cart</button>
+              <button class="buy-now-btn">Buy Now</button>
             </div>
-            <div class="review-stars">
-              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            <div class="pd-trust">
+              <span><i class="fa-solid fa-leaf"></i> 100% Natural</span>
+              <span><i class="fa-solid fa-flask"></i> Lab Tested</span>
+              <span><i class="fa-solid fa-truck"></i> Free Shipping</span>
             </div>
-            <p class="review-text">"I had severe knee pain, even sitting down straight was difficult. After using Painopill for 3 weeks, I could clearly see a difference. Highly recommend."</p>
-          </div>
-          <div class="review-card">
-            <div class="review-card-header">
-              <img src="images/client2.png" alt="Neha Gupta" class="review-avatar-img">
-              <div>
-                <h4 class="review-author">Neha Gupta</h4>
-                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
-              </div>
-            </div>
-            <div class="review-stars">
-              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-            </div>
-            <p class="review-text">"The stiffness I used to feel in my joints every morning has significantly reduced. Starting the day is much easier now with Painopill."</p>
-          </div>
-          <div class="review-card">
-            <div class="review-card-header">
-              <img src="images/client3.png" alt="Suresh Verma" class="review-avatar-img">
-              <div>
-                <h4 class="review-author">Suresh Verma</h4>
-                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
-              </div>
-            </div>
-            <div class="review-stars">
-              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-            </div>
-            <p class="review-text">"I've tried many products, but Painopill was the most effective. Since it's Ayurvedic, I had no side effects either."</p>
-          </div>
-          <div class="review-card">
-            <div class="review-card-header">
-              <img src="images/client4.png" alt="Anand Gautam" class="review-avatar-img">
-              <div>
-                <h4 class="review-author">Anand Gautam</h4>
-                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
-              </div>
-            </div>
-            <div class="review-stars">
-              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-            </div>
-            <p class="review-text">"Bending and stretching feels much more comfortable now. I've noticed a clear improvement in overall joint flexibility."</p>
-          </div>
-          <div class="review-card">
-            <div class="review-card-header">
-              <img src="images/client5.png" alt="Meena Devi" class="review-avatar-img">
-              <div>
-                <h4 class="review-author">Meena Devi</h4>
-                <span class="review-google"><i class="fa-regular fa-circle-check" style="color:var(--primary-color);"></i> Verified Customer</span>
-              </div>
-            </div>
-            <div class="review-stars">
-              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-            </div>
-            <p class="review-text">"I had knee pain for 2 years. Within the first month of using Painopill, I saw great improvement. The pain has significantly reduced now."</p>
           </div>
         </div>
-        <button class="review-arrow review-arrow-right"><i class="fa-solid fa-chevron-right"></i></button>
-        <div class="reviews-dots"></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- FAQ Section -->
-  <section class="section faq-section">
-    <div class="section-container">
-      <div class="section-header">
-        <h2>Frequently Asked Questions</h2>
-        <p>Everything you need to know about Painopill Tablets.</p>
-      </div>
-      <div class="faq-list">
-        <div class="faq-item active">
-          <div class="faq-header">
-            <h4>What is Painopill Tablets?</h4>
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-content">
-            <p>Painopill is an Ayurvedic Proprietary Medicine formulated with 10 powerful Bhasma ingredients including Swarna Bhasma, Abhrak Bhasma, and Yograj Guggulu to provide relief from joint pain, arthritis, and stiffness.</p>
-          </div>
+    <!-- INGREDIENTS SECTION -->
+    <section class="section ingredients-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>What's Inside</h2>
+          <p>Honest, Transparent, and 100% Natural Ayurvedic Ingredients</p>
         </div>
-        <div class="faq-item">
-          <div class="faq-header">
-            <h4>Who can use Painopill Tablets?</h4>
-            <i class="fa-solid fa-chevron-down"></i>
+        <div class="ingredient-grid">
+          <div class="ingredient-card">
+            <img src="images/ingredients-yograj-guggulu.png" alt="Yograj Guggulu" loading="lazy">
+            <h3>Yograj Guggulu</h3>
+            <p>Traditional Ayurvedic formulation for joint health and flexibility</p>
           </div>
-          <div class="faq-content">
-            <p>Anyone suffering from joint pain, arthritis, stiffness, chronic inflammation, or nerve weakness can use Painopill. Consult your physician before use, especially if you have underlying conditions.</p>
+          <div class="ingredient-card">
+            <img src="images/ingredients-rasasindura.png" alt="Rasasindura" loading="lazy">
+            <h3>Rasasindura</h3>
+            <p>Supports energy, immunity and overall vitality naturally</p>
           </div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-header">
-            <h4>How does Painopill work?</h4>
-            <i class="fa-solid fa-chevron-down"></i>
+          <div class="ingredient-card">
+            <img src="images/ingredients-swarna-bhasma.png" alt="Swarna Bhasma" loading="lazy">
+            <h3>Swarna Bhasma</h3>
+            <p>Premium formulation that supports immunity and rejuvenation</p>
           </div>
-          <div class="faq-content">
-            <p>Maharasnadi Kwath and Yograj Guggulu reduce inflammation at the root level, while Bhasma ingredients strengthen joints, nerves, and tissues from within for comprehensive joint support.</p>
+          <div class="ingredient-card">
+            <img src="images/ingredients-abhrak-bhasma.png" alt="Abhrak Bhasma" loading="lazy">
+            <h3>Abhrak Bhasma</h3>
+            <p>Known for promoting strength, stamina and overall vitality</p>
           </div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-header">
-            <h4>How should I take Painopill Tablets?</h4>
-            <i class="fa-solid fa-chevron-down"></i>
+          <div class="ingredient-card">
+            <img src="images/ingredients-mandura-bhasma.png" alt="Mandura Bhasma" loading="lazy">
+            <h3>Mandura Bhasma</h3>
+            <p>Supports healthy iron levels and energy for daily wellness</p>
           </div>
-          <div class="faq-content">
-            <p>Take 1-2 tablets daily with warm water, preferably 30 minutes before meals, or as directed by your physician. Use consistently for at least 90 days for optimal results.</p>
-          </div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-header">
-            <h4>How long does it take to see results?</h4>
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-content">
-            <p>Most users notice improvement within 2-4 weeks of regular use. For best and lasting results, we recommend using Painopill consistently for at least 90 days.</p>
-          </div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-header">
-            <h4>Is Painopill safe for daily use?</h4>
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-content">
-            <p>Yes, Painopill is 100% Ayurvedic with no steroids or harsh chemicals. It is safe for daily use as directed by a qualified physician. Suitable for elderly individuals as well.</p>
+          <div class="ingredient-card">
+            <img src="images/ingredients-maharasnadi-kwath.png" alt="Maharasnadi Kwath" loading="lazy">
+            <h3>Maharasnadi Kwath</h3>
+            <p>Supports joint health, muscle strength and active mobility</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Science Behind Section -->
-  <section class="section science-section">
-    <div class="section-container">
-      <div class="section-header">
-        <h2>Science Behind Painopill Ingredients</h2>
-      </div>
-      <div class="science-grid">
-        <div class="science-card">
-          <span class="science-tag">Published Study</span>
-          <h3>Yograj Guggulu Research</h3>
-          <span class="science-year">2015 Research</span>
-          <p>Studies published in the Journal of Ethnopharmacology demonstrated significant anti-inflammatory effects and meaningful improvement in joint mobility in adults with chronic arthritis.</p>
-        </div>
-        <div class="science-card">
-          <span class="science-tag">Clinical Trial</span>
-          <h3>Maharasnadi Kwath Study</h3>
-          <span class="science-year">2019 Research</span>
-          <p>Ancient Science of Life Journal research showed promising results in reducing joint stiffness, swelling, and pain in patients with rheumatoid arthritis.</p>
-        </div>
-        <div class="science-card">
-          <span class="science-tag">Latest Findings</span>
-          <h3>Bhasma Formulation Evidence</h3>
-          <span class="science-year">2021 Research</span>
-          <p>International Ayurvedic Medical Journal findings support Bhasma-based formulations containing Swarna Bhasma and Abhrak Bhasma in strengthening joints, nerves, and reducing chronic inflammation.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Warning Banner -->
-  <section class="section warning-section">
-    <div class="section-container">
-      <div class="warning-banner">
-        <img src="images/beware-fake-joint-care.png" alt="Beware of Fake Products - Choose Original Taiva" loading="lazy">
-      </div>
-    </div>
-  </section>
-
-  <!-- Certificate Section -->
-  <section class="section certificate-section">
-    <div class="section-container">
-      <div class="section-header">
-        <h2>Certificate of Natural Goodness</h2>
-      </div>
-      <div class="certificate-grid">
-        <div class="certificate-item"><img src="images/Certificate1.svg" alt="AYUSH Premium" loading="lazy"></div>
-        <div class="certificate-item"><img src="images/Certificate2.svg" alt="FSSAI Certified" loading="lazy"></div>
-        <div class="certificate-item"><img src="images/Certificate3.svg" alt="High Quality Ingredients" loading="lazy"></div>
-        <div class="certificate-item"><img src="images/Certificate4.svg" alt="Expert Formulations" loading="lazy"></div>
-        <div class="certificate-item"><img src="images/Certificate5.svg" alt="Expert Formulations" loading="lazy"></div>
-        <div class="certificate-item"><img src="images/Certificate6.svg" alt="100% Pure & Vegan" loading="lazy"></div>
-        <div class="certificate-item"><img src="images/Certificate7.svg" alt="No Added Sugar" loading="lazy"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Related Products -->
-  <section class="section" style="background-color: var(--bg-light); border-top: 1px solid var(--border-color);">
-    <div class="section-container">
-      <div class="section-header" style="margin-bottom: 32px;">
-        <h2>You May Also Like</h2>
-      </div>
-      <div class="product-grid">
-        <div class="product-card">
-          <span class="product-tag">27% OFF</span>
-          <div class="product-image-container">
-            <a href="diacurex-powder.html">
-              <img src="images/sugar-pro-max-1.jpg" alt="Sugar Pro Max">
-            </a>
-          </div>
-          <div class="product-info">
-            <h3 class="product-title"><a href="diacurex-powder.html">Sugar Pro Max - Natural Blood Sugar Support</a></h3>
-            <div class="product-price">
-              <span class="price-current">1,090.00</span>
-              <span class="price-original">1,499.00</span>
-            </div>
-            <div class="product-action">
-              <button class="btn btn-full" onclick="addToCart('sugar-pro-max')">Add to Cart</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="product-card">
-          <span class="product-tag">27% OFF</span>
-          <div class="product-image-container">
-            <a href="digestive-health.html">
-              <img src="images/pachan-pro-main.png" alt="Paachan Pro">
-            </a>
-          </div>
-          <div class="product-info">
-            <h3 class="product-title"><a href="digestive-health.html">Paachan Pro - Ayurvedic Digestive Powder</a></h3>
-            <div class="product-price">
-              <span class="price-current">1,090.00</span>
-              <span class="price-original">1,499.00</span>
-            </div>
-            <div class="product-action">
-              <button class="btn btn-full" onclick="addToCart('pachan-pro')">Add to Cart</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  </main>
 
   <!-- FOOTER -->
   <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-col">
-        <h4>Quick Links</h4>
-        <ul class="footer-links">
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Careers</a></li>
-          <li><a href="#">Contact Us</a></li>
-          <li><a href="#">Authenticity</a></li>
-          <li><a href="#">Refund Policy</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Shipping Policy</a></li>
-          <li><a href="#">Cancellation Policy</a></li>
-          <li><a href="#">Terms & Conditions</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Contact</h4>
-        <p><strong>Taiva India</strong></p>
-        <p>PLOT NO. 275, PILLAR NO. 168, Sector-81 Noida, Gautam Buddha Nagar, Uttar Pradesh - 201302</p>
-        <p class="footer-contact-item"><i class="fa-solid fa-phone"></i> +91-9582908080</p>
-        <p class="footer-contact-item"><i class="fa-solid fa-envelope"></i> info@taiva.in</p>
-        <p><strong>Hours:</strong> Monday - Saturday, 10:00 AM - 07:00 PM</p>
-        <div class="footer-socials">
-          <a href="https://www.facebook.com/profile.php?id=61590565554083" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="https://www.instagram.com/taivanatural/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="https://www.youtube.com/@TaivaNatural" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo-text">Taiva</div>
+          <p>Premium Ayurvedic wellness products crafted with nature's finest ingredients.</p>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="authenticity.html">Authenticity</a></li>
+            <li><a href="cart.html">Cart</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Policies</h4>
+          <ul>
+            <li><a href="shipping-policy.html">Shipping</a></li>
+            <li><a href="refund-policy.html">Refund</a></li>
+            <li><a href="privacy-policy.html">Privacy</a></li>
+            <li><a href="terms-conditions.html">Terms</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <p class="contact-item"><i class="fa-solid fa-phone"></i> +91-9582908080</p>
+          <p class="contact-item"><i class="fa-solid fa-envelope"></i> info@taiva.in</p>
+          <p>PLOT NO. 275, SECTOR-81<br>Noida, UP - 201302</p>
         </div>
       </div>
-      <div class="footer-col footer-map-col">
-        <h4>Our Location</h4>
-        <div class="footer-map">
-          <iframe src="https://www.google.com/maps?q=Plot+No+275+Pillar+No+168+Sector+81+Noida+Uttar+Pradesh+201302&output=embed" 
-            width="100%" height="180" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Taiva India. All Rights Reserved.</p>
       </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 Taiva India. All Rights Reserved.</p>
     </div>
   </footer>
 
-  <!-- Drawer Elements & Overlays -->
-  <div class="overlay"></div>
+  <!-- WHATSAPP FLOAT -->
+  <a href="https://wa.me/919582908080" target="_blank" class="whatsapp-float"><i class="fa-brands fa-whatsapp"></i></a>
 
-  <!-- Cart Drawer -->
-  <div class="cart-drawer">
-    <div class="cart-drawer-header">
-      <h3>Shopping Cart</h3>
-      <button class="cart-drawer-close"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div class="cart-drawer-items">
-      <!-- Dynamic render via JS -->
-    </div>
-    <div class="cart-drawer-footer">
-      <div class="cart-subtotal">
-        <span>Subtotal:</span>
-        <span class="cart-subtotal-val">0.00</span>
-      </div>
-      <a href="cart.html" class="btn btn-full" style="margin-bottom: 12px;">View Shopping Cart</a>
-      <button class="btn btn-accent btn-full" onclick="openCheckout()">Checkout Now</button>
-    </div>
-  </div>
-
-  <!-- Search Overlay -->
-  <div class="search-overlay">
-    <button class="search-close"><i class="fa-solid fa-xmark"></i></button>
-    <form class="search-container">
-      <input type="text" placeholder="Search for products (e.g. Sugar, Pachan, Pain)..." required>
-      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-    </form>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
-  <script src="assets/js/app.js"></script>
+  <!-- SCRIPTS -->
   <script>
+    function openMobileDrawer() { document.getElementById('mobileDrawer').classList.add('open'); document.getElementById('mobileOverlay').classList.add('active'); }
+    function closeMobileDrawer() { document.getElementById('mobileDrawer').classList.remove('open'); document.getElementById('mobileOverlay').classList.remove('active'); }
+
     var galleryImages = [
-      "images/joint-care.jpg",
       "images/joint-care-main.png",
+      "images/joint-care.jpg",
       "images/joint-care-ingredients.png",
       "images/joint-care-benefits.png",
       "images/joint-care-how-to-use.png"
@@ -563,15 +224,17 @@
     function setGallery(idx) {
       currentGalleryIndex = idx;
       document.getElementById('galleryMain').src = galleryImages[idx];
-      document.querySelectorAll('.gallery-thumb').forEach(function(t) { t.classList.remove('active'); });
-      document.querySelector('.gallery-thumb[data-index="'+idx+'"]').classList.add('active');
+      document.querySelectorAll('.pd-thumbs img').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelector('.pd-thumbs img[data-index="'+idx+'"]').classList.add('active');
     }
-    function changeGallery(dir) {
-      var n = currentGalleryIndex + dir;
-      if (n < 0) n = galleryImages.length - 1;
-      if (n >= galleryImages.length) n = 0;
-      setGallery(n);
+    function changeQty(d) {
+      var el = document.getElementById('qtyVal');
+      var v = parseInt(el.textContent) + d;
+      if (v < 1) v = 1;
+      el.textContent = v;
     }
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
