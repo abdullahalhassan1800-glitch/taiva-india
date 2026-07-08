@@ -24,16 +24,67 @@ function requireAuth() {
     window.location.href = 'index.html';
   }
 }
+function getCurrentUser() {
+  try { return JSON.parse(sessionStorage.getItem('taiva_admin')); } catch(e) { return null; }
+}
+function requireRole(roles) {
+  var u = getCurrentUser();
+  if (!u) { window.location.href = 'index.html'; return false; }
+  if (roles && roles.indexOf(u.role) === -1) {
+    window.location.href = 'dashboard.html';
+    return false;
+  }
+  return true;
+}
 function login(username, password) {
-  if (username === 'Admin' && password === 'Taiva@2026FB') {
-    sessionStorage.setItem('taiva_admin', JSON.stringify({ user: username, name: 'Admin' }));
-    return true;
+  var users = getUsers();
+  if (users.length === 0) {
+    users = [{ id:'USR001', username:'Admin', password:'Taiva@2026FB', name:'Super Admin', role:'super_admin', status:'active', createdAt:new Date().toISOString() }];
+    saveUsers(users);
+  }
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].username === username && users[i].password === password && users[i].status === 'active') {
+      var u = users[i];
+      sessionStorage.setItem('taiva_admin', JSON.stringify({ user: u.username, name: u.name, role: u.role, id: u.id }));
+      return true;
+    }
   }
   return false;
 }
 function logout() {
   sessionStorage.removeItem('taiva_admin');
   window.location.href = 'index.html';
+}
+
+// ---- USERS CRUD ----
+function getUsers() {
+  return getData('users', []);
+}
+function saveUsers(users) {
+  setData('users', users);
+}
+function addUser(user) {
+  var users = getUsers();
+  user.id = 'USR' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2,4).toUpperCase();
+  user.createdAt = new Date().toISOString();
+  user.status = user.status || 'active';
+  users.push(user);
+  saveUsers(users);
+  return user;
+}
+function updateUser(id, updates) {
+  var users = getUsers();
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].id === id) {
+      for (var k in updates) users[i][k] = updates[k];
+      saveUsers(users);
+      return true;
+    }
+  }
+  return false;
+}
+function deleteUser(id) {
+  saveUsers(getUsers().filter(function(u) { return u.id !== id; }));
 }
 
 // ---- SIDEBAR ----
@@ -487,6 +538,17 @@ function initCityAutocomplete(inputId, stateId, pincodeId) {
   });
 }
 
+// ---- ROLE-BASED SIDEBAR ----
+function applyRoleGate() {
+  var u = getCurrentUser();
+  if (!u) return;
+  document.querySelectorAll('.nav-role-restricted').forEach(function(el) {
+    if (u.role !== 'super_admin') {
+      el.style.display = 'none';
+    }
+  });
+}
+
 // ---- CALLBACKS FOR PAGE SCRIPTS ----
 // Each page can define its own initPage() function
 document.addEventListener('DOMContentLoaded', function () {
@@ -494,6 +556,7 @@ document.addEventListener('DOMContentLoaded', function () {
     requireAuth();
   }
   initSidebar();
+  applyRoleGate();
   seedInitialData();
   // Restore last sync badge on sidebar if present
   var lastSync = getDriveLastSync();

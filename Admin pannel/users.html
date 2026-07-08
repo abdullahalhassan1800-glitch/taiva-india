@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users — Taiva Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .role-badge {
+      display:inline-flex; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px;
+    }
+    .role-super_admin { background:#d4edda; color:#155724; }
+    .role-manager { background:#cce5ff; color:#004085; }
+    .role-viewer { background:#e2e3e5; color:#383d41; }
+    .user-status { font-size:12px; font-weight:500; }
+    .user-status.active { color:var(--success); }
+    .user-status.inactive { color:var(--danger); }
+    [data-theme="dark"] .role-super_admin { background:#00331a; color:#4caf50; }
+    [data-theme="dark"] .role-manager { background:#00264d; color:#66b0ff; }
+    [data-theme="dark"] .role-viewer { background:#333; color:#aaa; }
+  </style>
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="logo-icon">T</span>
+      <span class="logo-text">Taiva</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+        <span class="nav-label">Home</span>
+      </a>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
+        <span class="nav-label">Orders</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        <span class="nav-badge">31</span>
+      </a>
+      <div class="nav-sub">
+        <a href="orders.html" class="nav-item">All orders</a>
+        <a href="orders-draft.html" class="nav-item">Drafts</a>
+        <a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-tag"></i></span>
+        <span class="nav-label">Products</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="products.html" class="nav-item">All products</a>
+        <a href="products-collections.html" class="nav-item">Collections</a>
+        <a href="products-inventory.html" class="nav-item">Inventory</a>
+        <a href="products-purchase-orders.html" class="nav-item">Purchase orders</a>
+        <a href="products-transfers.html" class="nav-item">Transfers</a>
+        <a href="products-gift-cards.html" class="nav-item">Gift cards</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+        <span class="nav-label">Customers</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="customers.html" class="nav-item">All customers</a>
+        <a href="customers-segments.html" class="nav-item">Segments</a>
+        <a href="customers-companies.html" class="nav-item">Companies</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span>
+        <span class="nav-label">Growth</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="growth-attribution.html" class="nav-item">Attribution</a>
+        <a href="growth-campaigns.html" class="nav-item">Campaigns</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span>
+        <span class="nav-label">Content</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="content-metaobjects.html" class="nav-item">Metaobjects</a>
+        <a href="content-files.html" class="nav-item">Files</a>
+        <a href="content-menus.html" class="nav-item">Menus</a>
+        <a href="content-blog.html" class="nav-item">Blog posts</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-globe"></i></span>
+        <span class="nav-label">Markets</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="markets-catalogs.html" class="nav-item">Catalogs</a>
+        <a href="markets-rollouts.html" class="nav-item">Rollouts</a>
+      </div>
+      <a href="#" class="nav-item has-submenu">
+        <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span class="nav-label">Analytics</span>
+        <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+      </a>
+      <div class="nav-sub">
+        <a href="analytics-reports.html" class="nav-item">Reports</a>
+        <a href="analytics-liveview.html" class="nav-item">Live View</a>
+      </div>
+      <div class="nav-section">Settings</div>
+      <a href="users.html" class="nav-item nav-role-restricted active">
+        <span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span>
+        <span class="nav-label">Users</span>
+      </a>
+      <a href="settings.html" class="nav-item nav-role-restricted">
+        <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+        <span class="nav-label">Settings</span>
+      </a>
+      <a href="#" class="nav-item" onclick="logout()">
+        <span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+        <span class="nav-label">Logout</span>
+      </a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+      <button class="sidebar-toggle" id="mobileToggle" style="display:none"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-search">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Search..." id="globalSearch">
+      </div>
+      <div class="topbar-actions">
+        <span id="driveSyncStatus" style="font-size:12px;color:var(--text-muted);display:none;"></span>
+        <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
+        <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>Users</h1>
+          <div class="page-subtitle">Manage admin panel users and roles</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="addUserBtn"><i class="fa-solid fa-plus"></i> Add user</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay"></div>
+
+  <!-- User Modal -->
+  <div class="modal" id="userModal">
+    <div class="modal-header">
+      <h2 id="userModalTitle">Add User</h2>
+      <button class="modal-close" onclick="closeModal('userModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editUserId">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="userUsername" placeholder="e.g., manager1">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="userPassword" placeholder="Enter password">
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="userName" placeholder="e.g., Rahul Sharma">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Role</label>
+          <select id="userRole">
+            <option value="super_admin">Super Admin</option>
+            <option value="manager" selected>Manager</option>
+            <option value="viewer">Viewer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="userStatus">
+            <option value="active" selected>Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('userModal')">Cancel</button>
+      <button class="btn btn-primary" id="saveUserBtn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('themeToggle')?.addEventListener('click', function() {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    var savedTheme = localStorage.getItem('taiva_theme');
+    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
+
+    function renderUsers() {
+      var users = getUsers();
+      var tbody = document.getElementById('usersBody');
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-muted text-center" style="padding:40px;">No users found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(function(u) {
+        var roleClass = 'role-' + u.role;
+        var roleLabel = u.role === 'super_admin' ? 'Super Admin' : u.role === 'manager' ? 'Manager' : 'Viewer';
+        var statusClass = u.status === 'active' ? 'active' : 'inactive';
+        return '<tr>' +
+          '<td><span class="font-medium">' + u.username + '</span></td>' +
+          '<td>' + u.name + '</td>' +
+          '<td><span class="role-badge ' + roleClass + '">' + roleLabel + '</span></td>' +
+          '<td><span class="user-status ' + statusClass + '">' + u.status + '</span></td>' +
+          '<td>' + formatDate(u.createdAt) + '</td>' +
+          '<td>' +
+            '<button class="btn btn-sm" onclick="editUser(\'' + u.id + '\')"><i class="fa-solid fa-pen"></i></button> ' +
+            (u.username !== 'Admin' ? '<button class="btn btn-sm btn-danger" onclick="deleteUserConfirm(\'' + u.id + '\',\'' + u.username + '\')"><i class="fa-solid fa-trash"></i></button>' : '') +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function editUser(id) {
+      var users = getUsers();
+      var u = null;
+      for (var i = 0; i < users.length; i++) { if (users[i].id === id) { u = users[i]; break; } }
+      if (!u) return;
+      document.getElementById('editUserId').value = u.id;
+      document.getElementById('userUsername').value = u.username;
+      document.getElementById('userPassword').value = '';
+      document.getElementById('userName').value = u.name;
+      document.getElementById('userRole').value = u.role;
+      document.getElementById('userStatus').value = u.status;
+      document.getElementById('userModalTitle').textContent = 'Edit User';
+      openModal('userModal');
+    }
+
+    function deleteUserConfirm(id, username) {
+      if (username === 'Admin') { showToast('Cannot delete the default Admin user', 'error'); return; }
+      if (!confirm('Delete user "' + username + '"? This cannot be undone.')) return;
+      deleteUser(id);
+      renderUsers();
+      showToast('User deleted', 'success');
+    }
+
+    document.getElementById('addUserBtn').addEventListener('click', function() {
+      document.getElementById('editUserId').value = '';
+      document.getElementById('userUsername').value = '';
+      document.getElementById('userPassword').value = '';
+      document.getElementById('userName').value = '';
+      document.getElementById('userRole').value = 'manager';
+      document.getElementById('userStatus').value = 'active';
+      document.getElementById('userModalTitle').textContent = 'Add User';
+      openModal('userModal');
+    });
+
+    document.getElementById('saveUserBtn').addEventListener('click', function() {
+      var id = document.getElementById('editUserId').value;
+      var username = document.getElementById('userUsername').value.trim();
+      var password = document.getElementById('userPassword').value;
+      var name = document.getElementById('userName').value.trim();
+      var role = document.getElementById('userRole').value;
+      var status = document.getElementById('userStatus').value;
+
+      if (!username || !name) { showToast('Username and name are required', 'error'); return; }
+
+      if (id) {
+        var updates = { username: username, name: name, role: role, status: status };
+        if (password) updates.password = password;
+        updateUser(id, updates);
+        showToast('User updated', 'success');
+      } else {
+        if (!password) { showToast('Password is required for new users', 'error'); return; }
+        addUser({ username: username, password: password, name: name, role: role, status: status });
+        showToast('User created', 'success');
+      }
+      closeModal('userModal');
+      renderUsers();
+    });
+
+    initPage = function() {
+      requireRole(['super_admin']);
+      renderUsers();
+    };
+  </script>
+</body>
+</html>
