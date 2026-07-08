@@ -410,7 +410,7 @@ function driveSave(key, data) {
   if (!dc || !dc.url || !dc.token) return Promise.resolve({success:false,error:'Not configured'});
   var fullKey = 'taiva_' + key;
   var payload = data !== undefined ? data : (function(){ try{return JSON.parse(localStorage.getItem(fullKey));}catch(e){return null;}})();
-  if (payload === null || payload === undefined) return Promise.resolve({success:false,error:'No data'});
+  if (payload === null || payload === undefined) return Promise.resolve({success:true, skipped:true});
   var url = dc.url + '?action=save&key=' + encodeURIComponent(fullKey) + '&data=' + encodeURIComponent(JSON.stringify(payload)) + '&token=' + encodeURIComponent(dc.token);
   return driveGet(url).then(function(r){
     if (r.success) localStorage.setItem(DRIVE_LAST_SYNC_KEY, new Date().toISOString());
@@ -434,8 +434,8 @@ function driveBackupAll(progressCb) {
   var step = function(i) {
     if (i >= keys.length) {
       localStorage.setItem(DRIVE_LAST_SYNC_KEY, new Date().toISOString());
-      var allOk = results.every(function(r){return r && r.success;});
-      return {success:allOk, results:results, error: allOk ? '' : (results.find(function(r){return r && !r.success;}) || {}).error || 'Unknown'};
+      var allOk = results.every(function(r){return r && (r.success || r.skipped);});
+      return {success:allOk, results:results, error: allOk ? '' : (results.find(function(r){return r && !r.success && !r.skipped;}) || {}).error || 'Unknown'};
     }
     if (progressCb) progressCb(keys[i], i+1, keys.length);
     return driveSave(keys[i]).then(function(res){

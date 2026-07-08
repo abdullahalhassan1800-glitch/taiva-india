@@ -338,9 +338,12 @@
       // ---- Sheets backup init ----
       var dc = getDriveConfig();
       if (dc) {
-        document.getElementById('driveUrl').value = dc.url || '';
-        document.getElementById('driveToken').value = dc.token || '';
+        document.getElementById('driveUrl').value = dc.url || 'https://script.google.com/macros/s/AKfycbwfDN6CjQGWdb5aYGQHYoakP5rUTTgItVtZPFZKH_Hdr7p5oFhJ1Gp7jfl4_13uG2OZRQ/exec';
+        document.getElementById('driveToken').value = dc.token || 'TaivaBackup@2026';
         document.getElementById('driveAutoSync').checked = dc.autoSync !== false;
+      } else {
+        document.getElementById('driveUrl').value = 'https://script.google.com/macros/s/AKfycbwfDN6CjQGWdb5aYGQHYoakP5rUTTgItVtZPFZKH_Hdr7p5oFhJ1Gp7jfl4_13uG2OZRQ/exec';
+        document.getElementById('driveToken').value = 'TaivaBackup@2026';
       }
       var lastSync = getDriveLastSync();
       if (lastSync) {
