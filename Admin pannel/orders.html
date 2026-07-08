@@ -307,6 +307,21 @@
 </div>
 </div>
 
+<div class="modal" id="orderNotesModal">
+<div class="modal-header">
+<h2>Order Notes</h2>
+<button class="modal-close" onclick="closeModal('orderNotesModal')">&times;</button>
+</div>
+<div class="modal-body">
+<input type="hidden" id="notesOrderId">
+<textarea id="orderNotesText" placeholder="Add notes for this order..." style="width:100%;min-height:120px;padding:10px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;background:var(--card-bg);color:var(--text);resize:vertical;box-sizing:border-box;"></textarea>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('orderNotesModal')">Cancel</button>
+<button class="btn btn-accent" onclick="saveOrderNotes()">Save Notes</button>
+</div>
+</div>
+
 <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
 <script src="data/indian-cities.js"></script>
@@ -427,7 +442,7 @@ var cur = getCurrentUser();
 var orderData = {
 id: generateId(), customerName: name, phone: phone, email: email, address: address, city: city, state: state, pincode: pincode,
 items: items, subtotal: subtotal, discount: discount, discountVal: discountVal, discountType: discountType,
-total: total, paymentMethod: paymentMethod, status: 'pending', createdAt: new Date().toISOString(), shiprocketId: null,
+total: total, paymentMethod: paymentMethod, status: 'pending', createdAt: new Date().toISOString(), shiprocketId: null, notes: '',
 createdBy: cur ? cur.name : 'Unknown', createdById: cur ? cur.id : null
 };
 
@@ -484,7 +499,9 @@ tbody.innerHTML = '<tr><td colspan="8" class="text-muted text-center" style="pad
 } else {
 tbody.innerHTML = pageOrders.map(function(o) {
 var itemsHtml = o.items.map(function(i) { return i.name + ' x' + i.qty; }).join(', ');
-return '<tr><td><span style="color:var(--accent);font-weight:500;">' + o.id + '</span></td>' +
+return '<tr><td><span style="color:var(--accent);font-weight:500;">' + o.id + '</span>' +
+'<button class="btn btn-sm" onclick="event.stopPropagation();openOrderNotes(\'' + o.id + '\')" title="' + (o.notes ? o.notes.replace(/"/g,'&quot;').replace(/'/g,'&#39;') : 'Add notes') + '" style="margin-left:4px;background:none;border:none;cursor:pointer;padding:2px;font-size:14px;">' +
+'<i class="' + (o.notes ? 'fa-solid' : 'fa-regular') + ' fa-sticky-note" style="color:' + (o.notes ? 'var(--accent)' : 'var(--text-muted)') + ';"></i></button></td>' +
 '<td><div class="customer-cell"><div class="avatar">' + (o.customerName ? o.customerName.charAt(0) : '?') + '</div><div>' + o.customerName + '<br><span class="text-muted" style="font-size:11px;">' + o.phone + '</span></div></div></td>' +
 '<td style="font-size:12px;">' + itemsHtml + '</td>' +
 '<td>' + formatCurrency(o.total) + '</td>' +
@@ -528,7 +545,8 @@ body.innerHTML =
 '<div class="form-row"><div class="view-section"><div class="label">Address</div><div class="value">' + o.address + ', ' + o.city + (o.state ? ', ' + o.state : '') + ' - ' + o.pincode + '</div></div><div class="view-section"><div class="label">Date / Created by</div><div class="value">' + formatDateTime(o.createdAt) + (o.createdBy ? '<br><span style="font-size:12px;color:var(--text-muted);">by ' + o.createdBy + '</span>' : '') + '</div></div></div>' +
 '<div class="view-section"><div class="label">Items</div>' + itemsHtml + '</div>' +
 '<div class="view-section"><div class="label">Subtotal</div><div class="value">' + formatCurrency(o.subtotal || o.total) + '</div></div>' +
-(o.discount && o.discount > 0 ? '<div class="form-row"><div class="view-section"><div class="label">Discount</div><div class="value" style="color:var(--danger);">' + (o.discountType === 'percent' ? '(' + o.discountVal + '%) ' : '') + '- ' + formatCurrency(o.discount) + '</div></div><div class="view-section"><div class="label">Total</div><div class="value" style="font-size:18px;font-weight:700;">' + formatCurrency(o.total) + '</div></div></div>' : '<div class="form-row"><div class="view-section"><div class="label">Total</div><div class="value" style="font-size:18px;font-weight:700;">' + formatCurrency(o.total) + '</div></div><div class="view-section"><div class="label">Shiprocket ID</div>' + shipHtml + '</div></div>');
+(o.discount && o.discount > 0 ? '<div class="form-row"><div class="view-section"><div class="label">Discount</div><div class="value" style="color:var(--danger);">' + (o.discountType === 'percent' ? '(' + o.discountVal + '%) ' : '') + '- ' + formatCurrency(o.discount) + '</div></div><div class="view-section"><div class="label">Total</div><div class="value" style="font-size:18px;font-weight:700;">' + formatCurrency(o.total) + '</div></div></div>' : '<div class="form-row"><div class="view-section"><div class="label">Total</div><div class="value" style="font-size:18px;font-weight:700;">' + formatCurrency(o.total) + '</div></div><div class="view-section"><div class="label">Shiprocket ID</div>' + shipHtml + '</div></div>') +
+(o.notes ? '<div class="view-section" style="margin-top:8px;"><div class="label">Notes</div><div class="value" style="background:var(--page-bg);padding:10px;border-radius:var(--radius);white-space:pre-wrap;font-size:13px;">' + o.notes + '</div></div>' : '');
 openModal('viewOrderModal');
 }
 
@@ -557,6 +575,28 @@ var idx = orders.findIndex(function(o) { return o.id === id; });
 if (idx !== -1) { orders.splice(idx, 1); setData('orders', orders); }
 closeModal('deleteModal');
 showToast('Order deleted', 'success');
+renderOrders();
+}
+
+function openOrderNotes(id) {
+var orders = getData('orders');
+var o = orders.find(function(x) { return x.id === id; });
+if (!o) return;
+document.getElementById('notesOrderId').value = id;
+document.getElementById('orderNotesText').value = o.notes || '';
+openModal('orderNotesModal');
+}
+
+function saveOrderNotes() {
+var id = document.getElementById('notesOrderId').value;
+var notes = document.getElementById('orderNotesText').value.trim();
+var orders = getData('orders');
+var o = orders.find(function(x) { return x.id === id; });
+if (!o) return;
+o.notes = notes;
+setData('orders', orders);
+closeModal('orderNotesModal');
+showToast('Notes saved', 'success');
 renderOrders();
 }
 
