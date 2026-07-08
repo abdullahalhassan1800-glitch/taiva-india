@@ -498,7 +498,7 @@ async function milesSave(key, data) {
   if (!mc || !mc.url || !mc.token) return {success:false,error:'Not configured'};
   var fullKey = 'taiva_' + key;
   var payload = data !== undefined ? data : (function(){ try{return JSON.parse(localStorage.getItem(fullKey));}catch(e){return null;}})();
-  if (payload === null || payload === undefined) return {success:false,error:'No data'};
+  if (payload === null || payload === undefined) return {success:true, skipped:true};
   try {
     var url = mc.url + '?action=save&key=' + encodeURIComponent(fullKey) + '&token=' + encodeURIComponent(mc.token);
     var res = await fetch(url, {
@@ -532,9 +532,9 @@ async function milesBackupAll(progressCb) {
     var r = await milesSave(keys[i]);
     results.push(r);
   }
-  var allOk = results.every(function(r){return r && r.success;});
+  var allOk = results.every(function(r){return r && (r.success || r.skipped);});
   localStorage.setItem(MILES_LAST_SYNC_KEY, new Date().toISOString());
-  return {success:allOk, results:results, error: allOk ? '' : (results.find(function(r){return r && !r.success;}) || {}).error || 'Unknown'};
+  return {success:allOk, results:results, error: allOk ? '' : (results.find(function(r){return r && !r.success && !r.skipped;}) || {}).error || 'Unknown'};
 }
 
 async function milesRestoreAll() {
