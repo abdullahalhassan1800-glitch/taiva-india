@@ -43,13 +43,17 @@ function requireRole(roles) {
 }
 function login(username, password) {
   var users = getUsers();
-  if (users.length === 0) {
-    users = [
-      { id:'USR001', username:'Admin', password:'Taiva@2026FB', name:'Super Admin', role:'super_admin', status:'active', createdAt:new Date().toISOString() },
-      { id:'USR002', username:'Shivam', password:'Admin@123', name:'Shivam', role:'manager', status:'active', createdAt:new Date().toISOString() }
-    ];
-    saveUsers(users);
-  }
+  var defaults = [
+    { id:'USR001', username:'Admin', password:'Taiva@2026FB', name:'Super Admin', role:'super_admin', status:'active', createdAt:new Date().toISOString() },
+    { id:'USR002', username:'Shivam', password:'Admin@123', name:'Shivam', role:'manager', status:'active', createdAt:new Date().toISOString() }
+  ];
+  var needsSave = false;
+  defaults.forEach(function(d) {
+    if (!users.some(function(u) { return u.username === d.username; })) {
+      users.push(d); needsSave = true;
+    }
+  });
+  if (needsSave) saveUsers(users);
   for (var i = 0; i < users.length; i++) {
     if (users[i].username === username && users[i].password === password && users[i].status === 'active') {
       var u = users[i];
