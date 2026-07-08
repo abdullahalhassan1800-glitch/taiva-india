@@ -46,6 +46,7 @@
         <input type="text" placeholder="Search..." id="globalSearch">
       </div>
       <div class="topbar-actions">
+        <span id="driveSyncStatus" style="font-size:12px;color:var(--text-muted);display:none;"></span>
         <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
         <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
         <div class="admin-avatar">A</div>
@@ -105,6 +106,36 @@
             <button class="btn btn-accent" id="saveShipBtn"><i class="fa-solid fa-floppy-disk"></i> Save Credentials</button>
             <button class="btn" id="testShipBtn"><i class="fa-solid fa-plug"></i> Test Connection</button>
           </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3><i class="fa-solid fa-cloud"></i> Google Sheets Backup</h3>
+        <div class="settings-card">
+          <div class="form-group">
+            <label>Google Apps Script URL</label>
+            <input type="text" id="driveUrl" placeholder="https://script.google.com/macros/s/.../exec">
+          </div>
+          <div class="form-group">
+            <label>Access Token</label>
+            <input type="password" id="driveToken" placeholder="Enter token set in Code.gs">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Auto-sync on data change</label>
+              <label class="switch"><input type="checkbox" id="driveAutoSync" checked><span class="slider"></span></label>
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;">
+              <span id="driveLastSync" style="font-size:13px;color:var(--text-muted);display:none;"></span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-accent" id="saveDriveBtn"><i class="fa-solid fa-floppy-disk"></i> Save Backup Settings</button>
+            <button class="btn" id="authDriveBtn"><i class="fa-solid fa-key"></i> Test Connection</button>
+            <button class="btn" id="backupNowBtn"><i class="fa-solid fa-upload"></i> Backup Now</button>
+            <button class="btn" id="restoreNowBtn"><i class="fa-solid fa-download"></i> Restore from Sheets</button>
+          </div>
+          <div id="driveResult" style="margin-top:8px;font-size:14px;"></div>
         </div>
       </div>
 
@@ -179,6 +210,82 @@
         }
         this.disabled = false;
         this.innerHTML = '<i class="fa-solid fa-plug"></i> Test Connection';
+      });
+
+      // ---- Sheets backup init ----
+      var dc = getDriveConfig();
+      if (dc) {
+        document.getElementById('driveUrl').value = dc.url || '';
+        document.getElementById('driveToken').value = dc.token || '';
+        document.getElementById('driveAutoSync').checked = dc.autoSync !== false;
+      }
+      var lastSync = getDriveLastSync();
+      if (lastSync) {
+        document.getElementById('driveLastSync').textContent = 'Last sync: ' + formatDateTime(lastSync);
+        document.getElementById('driveLastSync').style.display = 'inline';
+      }
+
+      function driveResult(msg, type) {
+        var el = document.getElementById('driveResult');
+        el.innerHTML = '<span style="color:' + (type === 'error' ? 'var(--danger)' : 'var(--success)') + '">' + msg + '</span>';
+      }
+
+      document.getElementById('saveDriveBtn').addEventListener('click', function() {
+        var cfg = {
+          url: document.getElementById('driveUrl').value.trim(),
+          token: document.getElementById('driveToken').value.trim(),
+          enabled: true,
+          autoSync: document.getElementById('driveAutoSync').checked
+        };
+        setDriveConfig(cfg);
+        showToast('Sheets settings saved', 'success');
+        driveResult('Settings saved. ' + (cfg.url ? 'Click "Test Connection" first, then Backup.' : 'Add URL to connect.'), 'success');
+      });
+
+      document.getElementById('authDriveBtn').addEventListener('click', function() {
+        var dc = getDriveConfig();
+        if (!dc || !dc.url) { showToast('Save Sheets URL first', 'error'); return; }
+        showToast('Opening test connection in new tab...', 'info');
+        driveAuthorize();
+      });
+
+      document.getElementById('backupNowBtn').addEventListener('click', function() {
+        var dc = getDriveConfig();
+        if (!dc || !dc.url) { showToast('Configure Sheets URL first', 'error'); return; }
+        this.disabled = true;
+        driveResult('Starting...', 'success');
+        var btn = this;
+        driveBackupAll(function(key, done, total) {
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving ' + key + ' (' + done + '/' + total + ')';
+          driveResult('Saving ' + key + ' (' + done + '/' + total + ')...', 'success');
+        }).then(function(r) {
+          if (r.success) {
+            showToast('Backup complete!', 'success');
+            driveResult('All data backed up to Google Sheets.', 'success');
+            btn.innerHTML = '<i class="fa-solid fa-upload"></i> Backup Now';
+            var ls = getDriveLastSync();
+            if (ls) { document.getElementById('driveLastSync').textContent = 'Last sync: ' + formatDateTime(ls); document.getElementById('driveLastSync').style.display = 'inline'; }
+          } else {
+            showToast('Backup failed', 'error');
+            driveResult('Backup failed: ' + (r.error || 'Unknown error'), 'error');
+          }
+          btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-upload"></i> Backup Now';
+        });
+      });
+
+      document.getElementById('restoreNowBtn').addEventListener('click', function() {
+        if (!confirm('This will overwrite all local data with Sheets data. Continue?')) return;
+        this.disabled = true; this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Restoring...';
+        driveRestoreAll().then(function(r) {
+          if (r.success) {
+            showToast('Restored ' + r.restored + ' datasets from Sheets!', 'success');
+            driveResult('Restored ' + r.restored + ' datasets. Reload pages to see changes.', 'success');
+          } else {
+            showToast('Restore failed', 'error');
+            driveResult('Restore failed. ' + (r.error || 'Check URL and token.'), 'error');
+          }
+          this.disabled = false; this.innerHTML = '<i class="fa-solid fa-download"></i> Restore from Drive';
+        });
       });
     };
   </script>

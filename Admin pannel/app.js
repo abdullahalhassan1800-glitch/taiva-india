@@ -11,6 +11,11 @@ function getData(key, defaults) {
 }
 function setData(key, data) {
   localStorage.setItem('taiva_' + key, JSON.stringify(data));
+  // Auto-sync to Drive if enabled
+  var dc = getDriveConfig();
+  if (dc && dc.enabled && dc.url && dc.token && (dc.autoSync !== false)) {
+    driveSave(key, data);
+  }
 }
 
 // ---- AUTH ----
@@ -259,6 +264,117 @@ function seedInitialData() {
   }
 }
 
+// ---- DRIVE SYNC ----
+var DRIVE_LAST_SYNC_KEY = 'taiva_driveLastSync';
+
+function getDriveConfig() {
+  try {
+    var d = localStorage.getItem('taiva_driveConfig');
+    return d ? JSON.parse(d) : null;
+  } catch(e) { return null; }
+}
+function setDriveConfig(cfg) {
+  localStorage.setItem('taiva_driveConfig', JSON.stringify(cfg));
+}
+
+function driveB64(s) {
+  // Convert JSON string to base64 (ASCII-safe)
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+  var result = '', i = 0, c1, c2, c3, b1, b2, b3, b4;
+  while (i < s.length) {
+    c1 = s.charCodeAt(i++);
+    c2 = i < s.length ? s.charCodeAt(i++) : NaN;
+    c3 = i < s.length ? s.charCodeAt(i++) : NaN;
+    b1 = c1 >> 2;
+    b2 = ((c1 & 3) << 4) | (c2 >> 4);
+    b3 = isNaN(c2) ? 64 : ((c2 & 15) << 2) | (c3 >> 6);
+    b4 = isNaN(c3) ? 64 : (c3 & 63);
+    result += chars.charAt(b1) + chars.charAt(b2) + chars.charAt(b3) + chars.charAt(b4);
+  }
+  return result;
+}
+
+function driveAddParam(url, param, value) {
+  var sep = url.indexOf('?') > -1 ? '&' : '?';
+  return url + sep + param + '=' + encodeURIComponent(value);
+}
+
+function driveGet(url) {
+  return fetch(url, {method:'GET', mode:'cors'}).then(function(r){
+    if (!r.ok) return {success:false,error:'HTTP '+r.status};
+    return r.json();
+  });
+}
+
+function driveSave(key, data) {
+  var dc = getDriveConfig();
+  if (!dc || !dc.url || !dc.token) return Promise.resolve({success:false,error:'Not configured'});
+  var fullKey = 'taiva_' + key;
+  var payload = data !== undefined ? data : (function(){ try{return JSON.parse(localStorage.getItem(fullKey));}catch(e){return null;}})();
+  if (payload === null || payload === undefined) return Promise.resolve({success:false,error:'No data'});
+  var url = dc.url + '?action=save&key=' + encodeURIComponent(fullKey) + '&data=' + encodeURIComponent(JSON.stringify(payload)) + '&token=' + encodeURIComponent(dc.token);
+  return driveGet(url).then(function(r){
+    if (r.success) localStorage.setItem(DRIVE_LAST_SYNC_KEY, new Date().toISOString());
+    return r;
+  }).catch(function(e){ return {success:false,error:e.message}; });
+}
+
+function driveLoad(key) {
+  var dc = getDriveConfig();
+  if (!dc || !dc.url || !dc.token) return Promise.resolve({success:false,error:'Not configured'});
+  var url = driveAddParam(driveAddParam(driveAddParam(dc.url, 'action', 'load'), 'token', dc.token), 'key', key ? ('taiva_' + key) : '');
+  return driveGet(url);
+}
+
+function driveBackupAll(progressCb) {
+  var dc = getDriveConfig();
+  if (!dc || !dc.url || !dc.token) return Promise.resolve({success:false,error:'Not configured'});
+  var keys = ['products','orders','settings','drafts','abandoned','collections','giftCards','purchaseOrders','transfers','segments','users'];
+  // Save each key separately with base64 encoding (smaller URLs)
+  var results = [];
+  var step = function(i) {
+    if (i >= keys.length) {
+      localStorage.setItem(DRIVE_LAST_SYNC_KEY, new Date().toISOString());
+      var allOk = results.every(function(r){return r && r.success;});
+      return {success:allOk, results:results, error: allOk ? '' : (results.find(function(r){return r && !r.success;}) || {}).error || 'Unknown'};
+    }
+    if (progressCb) progressCb(keys[i], i+1, keys.length);
+    return driveSave(keys[i]).then(function(res){
+      results.push(res);
+      return step(i+1);
+    });
+  };
+  return step(0);
+}
+
+function driveRestoreAll() {
+  var dc = getDriveConfig();
+  if (!dc || !dc.url || !dc.token) return Promise.resolve({success:false,error:'Not configured'});
+  return driveLoad(null).then(function(resp){
+    if (!resp.success) return resp;
+    var count = 0;
+    Object.keys(resp.data).forEach(function(k){
+      if (resp.data[k] !== null) {
+        try {
+          localStorage.setItem(k, JSON.stringify(resp.data[k]));
+          count++;
+        } catch(e){}
+      }
+    });
+    return {success:true,restored:count};
+  });
+}
+
+function getDriveLastSync() {
+  return localStorage.getItem(DRIVE_LAST_SYNC_KEY) || null;
+}
+
+function driveAuthorize() {
+  var dc = getDriveConfig();
+  if (!dc || !dc.url) return;
+  var url = driveAddParam(driveAddParam(dc.url, 'action', 'load'), 'token', dc.token || '');
+  window.open(url, '_blank');
+}
 // ---- CITY AUTOCOMPLETE ----
 function initCityAutocomplete(inputId, stateId, pincodeId) {
   var input = document.getElementById(inputId);
@@ -379,5 +495,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   initSidebar();
   seedInitialData();
+  // Restore last sync badge on sidebar if present
+  var lastSync = getDriveLastSync();
+  if (lastSync) {
+    var el = document.getElementById('driveSyncStatus');
+    if (el) { el.textContent = 'Last sync: ' + formatDateTime(lastSync); el.style.display = 'block'; }
+  }
   if (typeof initPage === 'function') initPage();
 });
