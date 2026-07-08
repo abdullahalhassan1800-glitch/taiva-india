@@ -28,11 +28,11 @@
       var username = document.getElementById('username').value;
       var password = document.getElementById('password').value;
       var errorEl = document.getElementById('loginError');
+      errorEl.textContent = 'Syncing data...';
+      errorEl.style.display = 'block';
+      errorEl.style.color = 'var(--accent)';
+      await autoRestoreFromMilesweb();
       if (login(username, password)) {
-        errorEl.textContent = 'Syncing data...';
-        errorEl.style.display = 'block';
-        errorEl.style.color = 'var(--accent)';
-        await autoRestoreFromMilesweb();
         window.location.href = 'dashboard.html';
       } else {
         errorEl.style.display = 'block';
