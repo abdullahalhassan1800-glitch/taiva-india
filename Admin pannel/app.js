@@ -558,7 +558,10 @@ async function milesRestoreAll() {
 }
 async function autoRestoreFromMilesweb() {
   var mc = getMilesConfig();
-  if (!mc || !mc.url || !mc.token) return;
+  if (!mc || !mc.url || !mc.token) {
+    mc = { url: 'https://taiva.in/Admin%20pannel/api.php', token: 'MilesToken@2026', enabled: true, autoSync: true };
+    setMilesConfig(mc);
+  }
   try {
     var res = await milesRestoreAll();
     if (res.success && res.restored > 0) {
