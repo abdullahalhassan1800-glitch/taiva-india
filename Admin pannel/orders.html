@@ -247,7 +247,29 @@
 </div>
 </div>
 <div class="form-group" style="border-top:1px solid var(--border);padding-top:12px;margin-top:12px;">
-<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:600;">
+<label>Discount</label>
+<div class="form-row">
+<div class="form-group" style="margin-bottom:0;">
+<select id="coDiscountType" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;background:var(--card-bg);color:var(--text);outline:none;">
+<option value="percent">Percentage (%)</option>
+<option value="fixed">Fixed (Rs.)</option>
+</select>
+</div>
+<div class="form-group" style="margin-bottom:0;">
+<input type="number" id="coDiscount" placeholder="0" min="0" value="0" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;background:var(--card-bg);color:var(--text);outline:none;">
+</div>
+</div>
+</div>
+<div class="form-group" style="border-top:1px solid var(--border);padding-top:12px;">
+<div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text-muted);">
+<span>Subtotal:</span>
+<span id="coSubtotal">Rs. 0</span>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text-muted);">
+<span>Discount:</span>
+<span id="coDiscountDisplay">- Rs. 0</span>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:600;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
 <span>Total:</span>
 <span id="coTotal">Rs. 0</span>
 </div>
@@ -340,12 +362,19 @@ calcOrderTotal();
 }
 
 function calcOrderTotal() {
-var total = 0;
+var subtotal = 0;
 document.querySelectorAll('.order-item-row').forEach(function(row) {
 var qty = parseInt(row.querySelector('.coQty').value) || 1;
 var price = parseFloat(row.querySelector('.coPrice').value) || 0;
-total += qty * price;
+subtotal += qty * price;
 });
+var discountVal = parseFloat(document.getElementById('coDiscount').value) || 0;
+var discountType = document.getElementById('coDiscountType').value;
+var discount = discountType === 'percent' ? subtotal * (discountVal / 100) : discountVal;
+if (discount > subtotal) discount = subtotal;
+var total = subtotal - discount;
+document.getElementById('coSubtotal').textContent = formatCurrency(subtotal);
+document.getElementById('coDiscountDisplay').textContent = '- ' + formatCurrency(discount);
 document.getElementById('coTotal').textContent = formatCurrency(total);
 }
 
@@ -360,6 +389,8 @@ document.getElementById('coCity').value = '';
 document.getElementById('coState').value = '';
 document.getElementById('coPincode').value = '';
 document.querySelector('input[name="coPayment"][value="cod"]').checked = true;
+document.getElementById('coDiscount').value = '0';
+document.getElementById('coDiscountType').value = 'percent';
 calcOrderTotal();
 openModal('createOrderModal');
 }
@@ -385,12 +416,18 @@ items.push({ name: opt.getAttribute('data-name'), price: parseFloat(opt.getAttri
 if (items.length === 0) { showToast('Please add at least one item', 'error'); return; }
 
 var paymentMethod = document.querySelector('input[name="coPayment"]:checked').value;
-var total = items.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
+var subtotal = items.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
+var discountVal = parseFloat(document.getElementById('coDiscount').value) || 0;
+var discountType = document.getElementById('coDiscountType').value;
+var discount = discountType === 'percent' ? subtotal * (discountVal / 100) : discountVal;
+if (discount > subtotal) discount = subtotal;
+var total = subtotal - discount;
 
 var cur = getCurrentUser();
 var orderData = {
 id: generateId(), customerName: name, phone: phone, email: email, address: address, city: city, state: state, pincode: pincode,
-items: items, total: total, paymentMethod: paymentMethod, status: 'pending', createdAt: new Date().toISOString(), shiprocketId: null,
+items: items, subtotal: subtotal, discount: discount, discountVal: discountVal, discountType: discountType,
+total: total, paymentMethod: paymentMethod, status: 'pending', createdAt: new Date().toISOString(), shiprocketId: null,
 createdBy: cur ? cur.name : 'Unknown', createdById: cur ? cur.id : null
 };
 
@@ -490,7 +527,8 @@ body.innerHTML =
 '<div class="form-row"><div class="view-section"><div class="label">Email</div><div class="value">' + (o.email || '-') + '</div></div><div class="view-section"><div class="label">Payment</div><div class="value">' + (o.paymentMethod === 'cod' ? 'COD' : o.paymentMethod === 'upi' ? 'UPI' : 'Card') + '</div></div></div>' +
 '<div class="form-row"><div class="view-section"><div class="label">Address</div><div class="value">' + o.address + ', ' + o.city + (o.state ? ', ' + o.state : '') + ' - ' + o.pincode + '</div></div><div class="view-section"><div class="label">Date / Created by</div><div class="value">' + formatDateTime(o.createdAt) + (o.createdBy ? '<br><span style="font-size:12px;color:var(--text-muted);">by ' + o.createdBy + '</span>' : '') + '</div></div></div>' +
 '<div class="view-section"><div class="label">Items</div>' + itemsHtml + '</div>' +
-'<div class="form-row"><div class="view-section"><div class="label">Total</div><div class="value" style="font-size:18px;font-weight:700;">' + formatCurrency(o.total) + '</div></div><div class="view-section"><div class="label">Shiprocket ID</div>' + shipHtml + '</div></div>';
+'<div class="view-section"><div class="label">Subtotal</div><div class="value">' + formatCurrency(o.subtotal || o.total) + '</div></div>' +
+(o.discount && o.discount > 0 ? '<div class="form-row"><div class="view-section"><div class="label">Discount</div><div class="value" style="color:var(--danger);">' + (o.discountType === 'percent' ? '(' + o.discountVal + '%) ' : '') + '- ' + formatCurrency(o.discount) + '</div></div><div class="view-section"><div class="label">Total</div><div class="value" style="font-size:18px;font-weight:700;">' + formatCurrency(o.total) + '</div></div></div>' : '<div class="form-row"><div class="view-section"><div class="label">Total</div><div class="value" style="font-size:18px;font-weight:700;">' + formatCurrency(o.total) + '</div></div><div class="view-section"><div class="label">Shiprocket ID</div>' + shipHtml + '</div></div>');
 openModal('viewOrderModal');
 }
 
@@ -528,6 +566,8 @@ document.getElementById('statusFilter').addEventListener('change', filterOrders)
 document.getElementById('paymentFilter').addEventListener('change', filterOrders);
 document.getElementById('dateFrom').addEventListener('change', filterOrders);
 document.getElementById('dateTo').addEventListener('change', filterOrders);
+document.getElementById('coDiscount').addEventListener('input', calcOrderTotal);
+document.getElementById('coDiscountType').addEventListener('change', calcOrderTotal);
 initCityAutocomplete('coCity', 'coState', 'coPincode');
 renderOrders();
 };
