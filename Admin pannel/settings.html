@@ -260,6 +260,7 @@
           driveResult('Saving ' + key + ' (' + done + '/' + total + ')...', 'success');
         }).then(function(r) {
           if (r.success) {
+            logActivity('backup', 'All data backed up to Google Sheets');
             showToast('Backup complete!', 'success');
             driveResult('All data backed up to Google Sheets.', 'success');
             btn.innerHTML = '<i class="fa-solid fa-upload"></i> Backup Now';
@@ -278,6 +279,7 @@
         this.disabled = true; this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Restoring...';
         driveRestoreAll().then(function(r) {
           if (r.success) {
+            logActivity('restore', 'Data restored from Google Sheets (' + r.restored + ' datasets)');
             showToast('Restored ' + r.restored + ' datasets from Sheets!', 'success');
             driveResult('Restored ' + r.restored + ' datasets. Reload pages to see changes.', 'success');
           } else {

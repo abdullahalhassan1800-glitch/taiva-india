@@ -387,15 +387,18 @@ if (items.length === 0) { showToast('Please add at least one item', 'error'); re
 var paymentMethod = document.querySelector('input[name="coPayment"]:checked').value;
 var total = items.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
 
+var cur = getCurrentUser();
 var orderData = {
 id: generateId(), customerName: name, phone: phone, email: email, address: address, city: city, state: state, pincode: pincode,
-items: items, total: total, paymentMethod: paymentMethod, status: 'pending', createdAt: new Date().toISOString(), shiprocketId: null
+items: items, total: total, paymentMethod: paymentMethod, status: 'pending', createdAt: new Date().toISOString(), shiprocketId: null,
+createdBy: cur ? cur.name : 'Unknown', createdById: cur ? cur.id : null
 };
 
 var orders = getData('orders');
 orders.unshift(orderData);
 setData('orders', orders);
 closeModal('createOrderModal');
+logActivity('order_created', 'Order ' + orderData.id + ' created for ' + name);
 
 showToast('Order created locally. Processing Shiprocket...', 'info');
 var result = await createShiprocketOrder(orderData);
@@ -484,7 +487,7 @@ body.innerHTML =
 '</select></div></div>' +
 '<div class="form-row"><div class="view-section"><div class="label">Customer</div><div class="value">' + o.customerName + '</div></div><div class="view-section"><div class="label">Phone</div><div class="value">' + o.phone + '</div></div></div>' +
 '<div class="form-row"><div class="view-section"><div class="label">Email</div><div class="value">' + (o.email || '-') + '</div></div><div class="view-section"><div class="label">Payment</div><div class="value">' + (o.paymentMethod === 'cod' ? 'COD' : o.paymentMethod === 'upi' ? 'UPI' : 'Card') + '</div></div></div>' +
-'<div class="form-row"><div class="view-section"><div class="label">Address</div><div class="value">' + o.address + ', ' + o.city + (o.state ? ', ' + o.state : '') + ' - ' + o.pincode + '</div></div><div class="view-section"><div class="label">Date</div><div class="value">' + formatDateTime(o.createdAt) + '</div></div></div>' +
+'<div class="form-row"><div class="view-section"><div class="label">Address</div><div class="value">' + o.address + ', ' + o.city + (o.state ? ', ' + o.state : '') + ' - ' + o.pincode + '</div></div><div class="view-section"><div class="label">Date / Created by</div><div class="value">' + formatDateTime(o.createdAt) + (o.createdBy ? '<br><span style="font-size:12px;color:var(--text-muted);">by ' + o.createdBy + '</span>' : '') + '</div></div></div>' +
 '<div class="view-section"><div class="label">Items</div>' + itemsHtml + '</div>' +
 '<div class="form-row"><div class="view-section"><div class="label">Total</div><div class="value" style="font-size:18px;font-weight:700;">' + formatCurrency(o.total) + '</div></div><div class="view-section"><div class="label">Shiprocket ID</div>' + shipHtml + '</div></div>';
 openModal('viewOrderModal');
@@ -492,12 +495,13 @@ openModal('viewOrderModal');
 
 function updateOrderStatus(id) {
 var orders = getData('orders');
-var o = orders.find(function(x) { return x.id === id; });
+var o = orders.find(function(o){ return o.id === id; });
 if (!o) return;
+var prev = o.status;
 o.status = document.querySelector('#viewOrderModal select').value;
 setData('orders', orders);
+logActivity('order_status', 'Order ' + id + ' status changed from ' + prev + ' to ' + o.status);
 showToast('Order status updated to ' + o.status, 'success');
-renderOrders();
 }
 
 function openDeleteModal(id) {

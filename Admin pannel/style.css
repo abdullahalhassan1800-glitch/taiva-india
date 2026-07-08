@@ -552,11 +552,13 @@ table .customer-cell .avatar {
 .badge-expired { background: #f8d7da; color: #721c24; }
 .badge-low { background: #fff3cd; color: #856404; }
 .badge-ok { background: #d4edda; color: #155724; }
+.badge-info { background: #cce5ff; color: #004085; }
 [data-theme="dark"] .badge-pending { background: #3d3200; color: #ffc107; }
 [data-theme="dark"] .badge-processing { background: #00264d; color: #66b0ff; }
 [data-theme="dark"] .badge-shipped { background: #00331a; color: #4caf50; }
 [data-theme="dark"] .badge-delivered { background: #004d26; color: #66bb6a; }
 [data-theme="dark"] .badge-cancelled { background: #4d0013; color: #ef5350; }
+[data-theme="dark"] .badge-info { background: #00264d; color: #66b0ff; }
 
 /* MODALS */
 .modal-overlay {

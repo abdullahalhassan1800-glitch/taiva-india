@@ -165,6 +165,36 @@
           </table>
         </div>
       </div>
+
+      <div class="card" style="margin-top:24px;">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-clock-rotate-left"></i> Activity Log</h3>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="activityFilter" style="padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;background:var(--card-bg);color:var(--text);">
+              <option value="">All actions</option>
+              <option value="order_created">Orders</option>
+              <option value="user_created">Users</option>
+              <option value="backup">Backup</option>
+              <option value="login">Login</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;max-height:400px;overflow-y:auto;">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="activityBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -270,6 +300,7 @@
       if (username === 'Admin') { showToast('Cannot delete the default Admin user', 'error'); return; }
       if (!confirm('Delete user "' + username + '"? This cannot be undone.')) return;
       deleteUser(id);
+      logActivity('user_deleted', 'User "' + username + '" deleted');
       renderUsers();
       showToast('User deleted', 'success');
     }
@@ -299,19 +330,44 @@
         var updates = { username: username, name: name, role: role, status: status };
         if (password) updates.password = password;
         updateUser(id, updates);
+        logActivity('user_updated', 'User "' + username + '" updated (role: ' + role + ')');
         showToast('User updated', 'success');
       } else {
         if (!password) { showToast('Password is required for new users', 'error'); return; }
         addUser({ username: username, password: password, name: name, role: role, status: status });
+        logActivity('user_created', 'User "' + username + '" created (role: ' + role + ')');
         showToast('User created', 'success');
       }
       closeModal('userModal');
       renderUsers();
     });
 
+    function renderActivity() {
+      var all = getActivity();
+      var filter = document.getElementById('activityFilter').value;
+      if (filter) all = all.filter(function(a) { return a.action === filter; });
+      var tbody = document.getElementById('activityBody');
+      if (all.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-muted text-center" style="padding:32px;">No activity recorded yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = all.slice(0, 100).map(function(a) {
+        var actionLabel = formatActivityAction(a.action);
+        return '<tr>' +
+          '<td style="white-space:nowrap;font-size:12px;">' + formatDateTime(a.timestamp) + '</td>' +
+          '<td><span class="font-medium">' + a.user + '</span></td>' +
+          '<td><span class="badge badge-' + (a.action.indexOf('deleted') > -1 ? 'danger' : a.action.indexOf('created') > -1 ? 'success' : 'info') + '" style="font-size:11px;">' + actionLabel + '</span></td>' +
+          '<td style="color:var(--text-muted);font-size:13px;">' + a.details + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    document.getElementById('activityFilter').addEventListener('change', renderActivity);
+
     initPage = function() {
       requireRole(['super_admin']);
       renderUsers();
+      renderActivity();
     };
   </script>
 </body>

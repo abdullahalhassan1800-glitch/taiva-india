@@ -239,6 +239,7 @@
     if (!name) { showToast('Product name is required', 'error'); return; }
     if (price <= 0) { showToast('Price must be greater than 0', 'error'); return; }
 
+    var cur = getCurrentUser();
     var products = getData('products');
     if (id) {
       var idx = products.findIndex(function(p) { return p.id === id; });
@@ -251,9 +252,11 @@
         products[idx].image = image;
         products[idx].sku = sku;
       }
+      logActivity('product_updated', 'Product "' + name + '" (' + id + ') updated');
       showToast('Product updated', 'success');
     } else {
-      products.push({ id: 'PROD' + Date.now().toString(36).toUpperCase(), name: name, price: price, originalPrice: origPrice, category: category, stock: stock, image: image, sku: sku || generateSku(), createdAt: new Date().toISOString() });
+      products.push({ id: 'PROD' + Date.now().toString(36).toUpperCase(), name: name, price: price, originalPrice: origPrice, category: category, stock: stock, image: image, sku: sku || generateSku(), createdAt: new Date().toISOString(), createdBy: cur ? cur.name : 'Unknown' });
+      logActivity('product_created', 'Product "' + name + '" created');
       showToast('Product added', 'success');
     }
     setData('products', products);
@@ -312,9 +315,11 @@
   function confirmDeleteProduct() {
     var id = document.getElementById('deleteProdId').value;
     var products = getData('products');
+    var p = products.find(function(x) { return x.id === id; });
     var idx = products.findIndex(function(p) { return p.id === id; });
     if (idx !== -1) products.splice(idx, 1);
     setData('products', products);
+    if (p) logActivity('product_deleted', 'Product "' + p.name + '" (' + id + ') deleted');
     closeModal('deleteProductModal');
     showToast('Product deleted', 'success');
     loadCategoryFilter();

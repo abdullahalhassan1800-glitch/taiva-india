@@ -46,6 +46,7 @@ function login(username, password) {
     if (users[i].username === username && users[i].password === password && users[i].status === 'active') {
       var u = users[i];
       sessionStorage.setItem('taiva_admin', JSON.stringify({ user: u.username, name: u.name, role: u.role, id: u.id }));
+      logActivity('login', 'User ' + u.username + ' logged in');
       return true;
     }
   }
@@ -85,6 +86,48 @@ function updateUser(id, updates) {
 }
 function deleteUser(id) {
   saveUsers(getUsers().filter(function(u) { return u.id !== id; }));
+}
+
+// ---- ACTIVITY LOG ----
+function getActivity() {
+  return getData('activity', []);
+}
+function saveActivity(log) {
+  setData('activity', log);
+}
+function logActivity(action, details) {
+  var u = getCurrentUser();
+  var log = getActivity();
+  log.unshift({
+    id: 'ACT' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2,4).toUpperCase(),
+    user: u ? u.name : 'Unknown',
+    userId: u ? u.id : null,
+    username: u ? u.user : 'unknown',
+    action: action,
+    details: details || '',
+    timestamp: new Date().toISOString()
+  });
+  if (log.length > 500) log = log.slice(0, 500);
+  saveActivity(log);
+}
+function formatActivityAction(action) {
+  var map = {
+    'login': 'Logged in',
+    'logout': 'Logged out',
+    'order_created': 'Created order',
+    'order_status': 'Changed order status',
+    'order_deleted': 'Deleted order',
+    'product_created': 'Created product',
+    'product_updated': 'Updated product',
+    'product_deleted': 'Deleted product',
+    'user_created': 'Created user',
+    'user_updated': 'Updated user',
+    'user_deleted': 'Deleted user',
+    'backup': 'Backed up data',
+    'restore': 'Restored data',
+    'settings': 'Updated settings'
+  };
+  return map[action] || action;
 }
 
 // ---- SIDEBAR ----
