@@ -999,3 +999,56 @@ table .customer-cell .avatar {
 /* GRID / LIST VIEW containers */
 .view-container.table-view .card-grid-view { display: none; }
 .view-container.grid-view .table-view-default { display: none; }
+
+/* CITY AUTOCOMPLETE */
+.city-autocomplete-wrap {
+  position: relative;
+}
+.city-autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  max-height: 260px;
+  overflow-y: auto;
+  display: none;
+  margin-top: 2px;
+}
+.city-autocomplete-dropdown.active {
+  display: block;
+}
+.city-autocomplete-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.city-autocomplete-item:last-child {
+  border-bottom: none;
+}
+.city-autocomplete-item:hover,
+.city-autocomplete-item.selected {
+  background: rgba(0, 128, 96, 0.08);
+}
+.city-autocomplete-item .city-name {
+  font-weight: 500;
+}
+.city-autocomplete-item .city-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  .city-autocomplete-dropdown {
+    max-height: 180px;
+  }
+}

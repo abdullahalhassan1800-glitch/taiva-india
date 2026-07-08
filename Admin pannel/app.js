@@ -259,6 +259,118 @@ function seedInitialData() {
   }
 }
 
+// ---- CITY AUTOCOMPLETE ----
+function initCityAutocomplete(inputId, stateId, pincodeId) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+
+  var container = document.createElement('div');
+  container.className = 'city-autocomplete-wrap';
+  input.parentNode.insertBefore(container, input.nextSibling);
+
+  var dropdown = document.createElement('div');
+  dropdown.className = 'city-autocomplete-dropdown';
+  container.appendChild(dropdown);
+
+  var selectedIndex = -1, results = [];
+
+  function getMatches(val) {
+    if (!val || val.length < 1) return [];
+    var v = val.toLowerCase().trim();
+    var exact = [], starts = [], includes = [];
+
+    INDIA_CITIES.forEach(function (item) {
+      var cn = item.city.toLowerCase();
+      if (cn === v) { exact.push(item); return; }
+      if (cn.indexOf(v) === 0) { starts.push(item); return; }
+      if (cn.indexOf(v) > 0) { includes.push(item); return; }
+    });
+
+    // Also match pincode
+    if (/^\d{3,6}$/.test(v)) {
+      INDIA_CITIES.forEach(function (item) {
+        if (item.pincode.indexOf(v) === 0) {
+          if (exact.indexOf(item) === -1 && starts.indexOf(item) === -1 && includes.indexOf(item) === -1) {
+            includes.push(item);
+          }
+        }
+      });
+    }
+
+    return exact.concat(starts).concat(includes).slice(0, 15);
+  }
+
+  function renderDropdown() {
+    dropdown.innerHTML = '';
+    if (results.length === 0 || selectedIndex < -1) { dropdown.classList.remove('active'); return; }
+
+    results.forEach(function (item, i) {
+      var div = document.createElement('div');
+      div.className = 'city-autocomplete-item' + (i === selectedIndex ? ' selected' : '');
+      div.innerHTML = '<span class="city-name">' + item.city + '</span><span class="city-meta">' + item.state + ' - ' + item.pincode + '</span>';
+      div.addEventListener('click', function () { selectCity(item); });
+      div.addEventListener('mouseenter', function () { selectedIndex = i; renderDropdown(); });
+      dropdown.appendChild(div);
+    });
+    dropdown.classList.add('active');
+  }
+
+  function selectCity(item) {
+    input.value = item.city;
+    if (stateId) {
+      var stateField = document.getElementById(stateId);
+      if (stateField) stateField.value = item.state;
+    }
+    if (pincodeId) {
+      var pincodeField = document.getElementById(pincodeId);
+      if (pincodeField) pincodeField.value = item.pincode;
+    }
+    dropdown.classList.remove('active');
+    results = [];
+    selectedIndex = -1;
+  }
+
+  input.addEventListener('input', function () {
+    results = getMatches(this.value);
+    selectedIndex = results.length > 0 ? 0 : -1;
+    renderDropdown();
+  });
+
+  input.addEventListener('keydown', function (e) {
+    if (results.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, results.length - 1);
+      renderDropdown();
+      var el = dropdown.children[selectedIndex];
+      if (el) el.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, 0);
+      renderDropdown();
+      var el = dropdown.children[selectedIndex];
+      if (el) el.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (selectedIndex >= 0 && selectedIndex < results.length) {
+        e.preventDefault();
+        selectCity(results[selectedIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      dropdown.classList.remove('active');
+      results = [];
+      selectedIndex = -1;
+    }
+  });
+
+  input.addEventListener('blur', function () {
+    setTimeout(function () { dropdown.classList.remove('active'); }, 200);
+  });
+
+  input.addEventListener('focus', function () {
+    if (results.length > 0) dropdown.classList.add('active');
+  });
+}
+
 // ---- CALLBACKS FOR PAGE SCRIPTS ----
 // Each page can define its own initPage() function
 document.addEventListener('DOMContentLoaded', function () {

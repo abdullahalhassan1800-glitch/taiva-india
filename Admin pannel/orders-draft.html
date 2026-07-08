@@ -247,6 +247,7 @@
 
 <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
+<script src="data/indian-cities.js"></script>
 <script src="app.js"></script>
 <script>
 document.getElementById('themeToggle')?.addEventListener('click', function() {
@@ -435,6 +436,7 @@ showToast('Order saved. Shiprocket: ' + result.error, 'error');
 
 initPage = function() {
 document.getElementById('searchInput').addEventListener('input', function() { renderDrafts(); });
+initCityAutocomplete('cdCity', 'cdState', 'cdPincode');
 renderDrafts();
 };
 </script>

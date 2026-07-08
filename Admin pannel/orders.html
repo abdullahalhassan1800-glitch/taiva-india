@@ -283,6 +283,7 @@
 
 <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
+<script src="data/indian-cities.js"></script>
 <script src="app.js"></script>
 <script>
 document.getElementById('themeToggle')?.addEventListener('click', function() {
@@ -516,6 +517,7 @@ document.getElementById('statusFilter').addEventListener('change', filterOrders)
 document.getElementById('paymentFilter').addEventListener('change', filterOrders);
 document.getElementById('dateFrom').addEventListener('change', filterOrders);
 document.getElementById('dateTo').addEventListener('change', filterOrders);
+initCityAutocomplete('coCity', 'coState', 'coPincode');
 renderOrders();
 };
 </script>
