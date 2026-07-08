@@ -602,7 +602,7 @@ function initCityAutocomplete(inputId, stateId, pincodeId) {
       var div = document.createElement('div');
       div.className = 'city-autocomplete-item' + (i === selectedIndex ? ' selected' : '');
       div.innerHTML = '<span class="city-name">' + item.city + '</span><span class="city-meta">' + item.state + ' - ' + item.pincode + '</span>';
-      div.addEventListener('click', function () { selectCity(item); });
+      div.addEventListener('mousedown', function (e) { e.preventDefault(); selectCity(item); });
       div.addEventListener('mouseenter', function () { selectedIndex = i; renderDropdown(); });
       dropdown.appendChild(div);
     });
@@ -657,7 +657,7 @@ function initCityAutocomplete(inputId, stateId, pincodeId) {
   });
 
   input.addEventListener('blur', function () {
-    setTimeout(function () { dropdown.classList.remove('active'); }, 200);
+    dropdown.classList.remove('active');
   });
 
   input.addEventListener('focus', function () {
