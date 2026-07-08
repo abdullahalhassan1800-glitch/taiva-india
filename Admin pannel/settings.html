@@ -110,7 +110,37 @@
       </div>
 
       <div class="settings-section">
-        <h3><i class="fa-solid fa-cloud"></i> Google Sheets Backup</h3>
+        <h3><i class="fa-solid fa-server"></i> Milesweb Backup <span style="font-size:11px;color:var(--accent);font-weight:400;">(Primary)</span></h3>
+        <div class="settings-card">
+          <div class="form-group">
+            <label>Milesweb API URL</label>
+            <input type="text" id="milesUrl" placeholder="https://taiva.in/Admin pannel/api.php" value="https://taiva.in/Admin%20pannel/api.php">
+          </div>
+          <div class="form-group">
+            <label>Access Token</label>
+            <input type="password" id="milesToken" value="MilesToken@2026" placeholder="MilesToken@2026">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Auto-sync on data change</label>
+              <label class="switch"><input type="checkbox" id="milesAutoSync" checked><span class="slider"></span></label>
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;">
+              <span id="milesLastSync" style="font-size:13px;color:var(--text-muted);display:none;"></span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-accent" id="saveMilesBtn"><i class="fa-solid fa-floppy-disk"></i> Save Backup Settings</button>
+            <button class="btn" id="testMilesBtn"><i class="fa-solid fa-key"></i> Test Connection</button>
+            <button class="btn" id="milesBackupBtn"><i class="fa-solid fa-upload"></i> Backup Now</button>
+            <button class="btn" id="milesRestoreBtn"><i class="fa-solid fa-download"></i> Restore from Milesweb</button>
+          </div>
+          <div id="milesResult" style="margin-top:8px;font-size:14px;"></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3><i class="fa-solid fa-cloud"></i> Google Sheets Backup <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(Secondary)</span></h3>
         <div class="settings-card">
           <div class="form-group">
             <label>Google Apps Script URL</label>
@@ -210,6 +240,99 @@
         }
         this.disabled = false;
         this.innerHTML = '<i class="fa-solid fa-plug"></i> Test Connection';
+      });
+
+      // ---- Milesweb backup init ----
+      var mc = getMilesConfig();
+      if (mc) {
+        document.getElementById('milesUrl').value = mc.url || '';
+        document.getElementById('milesToken').value = mc.token || 'MilesToken@2026';
+        document.getElementById('milesAutoSync').checked = mc.autoSync !== false;
+      }
+      var milesLastSync = getMilesLastSync();
+      if (milesLastSync) {
+        document.getElementById('milesLastSync').textContent = 'Last sync: ' + formatDateTime(milesLastSync);
+        document.getElementById('milesLastSync').style.display = 'inline';
+      }
+
+      function milesResult(msg, type) {
+        var el = document.getElementById('milesResult');
+        el.innerHTML = '<span style="color:' + (type === 'error' ? 'var(--danger)' : 'var(--success)') + '">' + msg + '</span>';
+      }
+
+      document.getElementById('saveMilesBtn').addEventListener('click', function() {
+        var cfg = {
+          url: document.getElementById('milesUrl').value.trim(),
+          token: document.getElementById('milesToken').value.trim(),
+          enabled: true,
+          autoSync: document.getElementById('milesAutoSync').checked
+        };
+        setMilesConfig(cfg);
+        showToast('Milesweb settings saved', 'success');
+        milesResult('Settings saved. ' + (cfg.url ? 'Click "Test Connection" first, then Backup.' : 'Add URL to connect.'), 'success');
+      });
+
+      document.getElementById('testMilesBtn').addEventListener('click', async function() {
+        var mc = getMilesConfig();
+        if (!mc || !mc.url) { showToast('Save Milesweb URL first', 'error'); return; }
+        this.disabled = true; this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing...';
+        try {
+          var url = mc.url + '?action=list&token=' + encodeURIComponent(mc.token);
+          var res = await fetch(url);
+          var json = await res.json();
+          if (json.success) {
+            showToast('Connection successful! Keys: ' + (json.keys || []).join(', '), 'success');
+            milesResult('Connected. Stored keys: ' + (json.keys || []).join(', ') || '(empty)', 'success');
+          } else {
+            showToast('Connection failed: ' + (json.error || 'Unknown'), 'error');
+            milesResult('Error: ' + json.error, 'error');
+          }
+        } catch(e) {
+          showToast('Connection failed: ' + e.message, 'error');
+          milesResult('Error: ' + e.message, 'error');
+        }
+        this.disabled = false; this.innerHTML = '<i class="fa-solid fa-key"></i> Test Connection';
+      });
+
+      document.getElementById('milesBackupBtn').addEventListener('click', function() {
+        var mc = getMilesConfig();
+        if (!mc || !mc.url) { showToast('Configure Milesweb URL first', 'error'); return; }
+        this.disabled = true;
+        milesResult('Starting...', 'success');
+        var btn = this;
+        milesBackupAll(function(key, done, total) {
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving ' + key + ' (' + done + '/' + total + ')';
+          milesResult('Saving ' + key + ' (' + done + '/' + total + ')...', 'success');
+        }).then(function(r) {
+          if (r.success) {
+            logActivity('backup', 'All data backed up to Milesweb');
+            showToast('Backup complete!', 'success');
+            milesResult('All data backed up to Milesweb.', 'success');
+            btn.innerHTML = '<i class="fa-solid fa-upload"></i> Backup Now';
+            var ls = getMilesLastSync();
+            if (ls) { document.getElementById('milesLastSync').textContent = 'Last sync: ' + formatDateTime(ls); document.getElementById('milesLastSync').style.display = 'inline'; }
+          } else {
+            showToast('Backup failed', 'error');
+            milesResult('Backup failed: ' + (r.error || 'Unknown error'), 'error');
+          }
+          btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-upload"></i> Backup Now';
+        });
+      });
+
+      document.getElementById('milesRestoreBtn').addEventListener('click', function() {
+        if (!confirm('This will overwrite all local data with Milesweb server data. Continue?')) return;
+        this.disabled = true; this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Restoring...';
+        milesRestoreAll().then(function(r) {
+          if (r.success) {
+            logActivity('restore', 'Data restored from Milesweb (' + r.restored + ' datasets)');
+            showToast('Restored ' + r.restored + ' datasets from Milesweb!', 'success');
+            milesResult('Restored ' + r.restored + ' datasets. Reload pages to see changes.', 'success');
+          } else {
+            showToast('Restore failed', 'error');
+            milesResult('Restore failed. ' + (r.error || 'Check URL and token.'), 'error');
+          }
+          this.disabled = false; this.innerHTML = '<i class="fa-solid fa-download"></i> Restore from Milesweb';
+        });
       });
 
       // ---- Sheets backup init ----

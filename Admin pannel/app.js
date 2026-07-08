@@ -11,7 +11,12 @@ function getData(key, defaults) {
 }
 function setData(key, data) {
   localStorage.setItem('taiva_' + key, JSON.stringify(data));
-  // Auto-sync to Drive if enabled
+  // Auto-sync to Milesweb (primary)
+  var mc = getMilesConfig();
+  if (mc && mc.enabled && mc.url && mc.token && (mc.autoSync !== false)) {
+    milesSave(key, data);
+  }
+  // Auto-sync to Sheets (secondary)
   var dc = getDriveConfig();
   if (dc && dc.enabled && dc.url && dc.token && (dc.autoSync !== false)) {
     driveSave(key, data);
@@ -468,6 +473,85 @@ function driveAuthorize() {
   if (!dc || !dc.url) return;
   var url = driveAddParam(driveAddParam(dc.url, 'action', 'load'), 'token', dc.token || '');
   window.open(url, '_blank');
+}
+
+// ---- MILESWEB SYNC ----
+const MILES_TOKEN = 'MilesToken@2026';
+const MILES_LAST_SYNC_KEY = 'taiva_milesLastSync';
+
+function getMilesConfig() {
+  try {
+    var d = localStorage.getItem('taiva_milesConfig');
+    return d ? JSON.parse(d) : null;
+  } catch(e) { return null; }
+}
+function setMilesConfig(cfg) {
+  localStorage.setItem('taiva_milesConfig', JSON.stringify(cfg));
+}
+
+function getMilesLastSync() {
+  return localStorage.getItem(MILES_LAST_SYNC_KEY) || null;
+}
+
+async function milesSave(key, data) {
+  var mc = getMilesConfig();
+  if (!mc || !mc.url || !mc.token) return {success:false,error:'Not configured'};
+  var fullKey = 'taiva_' + key;
+  var payload = data !== undefined ? data : (function(){ try{return JSON.parse(localStorage.getItem(fullKey));}catch(e){return null;}})();
+  if (payload === null || payload === undefined) return {success:false,error:'No data'};
+  try {
+    var url = mc.url + '?action=save&key=' + encodeURIComponent(fullKey) + '&token=' + encodeURIComponent(mc.token);
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({data: JSON.stringify(payload)})
+    });
+    var json = await res.json();
+    if (json.success) localStorage.setItem(MILES_LAST_SYNC_KEY, new Date().toISOString());
+    return json;
+  } catch(e) { return {success:false,error:e.message}; }
+}
+
+async function milesLoad(key) {
+  var mc = getMilesConfig();
+  if (!mc || !mc.url || !mc.token) return {success:false,error:'Not configured'};
+  try {
+    var url = mc.url + '?action=load&key=' + encodeURIComponent(key ? 'taiva_' + key : '') + '&token=' + encodeURIComponent(mc.token);
+    var res = await fetch(url);
+    return await res.json();
+  } catch(e) { return {success:false,error:e.message}; }
+}
+
+async function milesBackupAll(progressCb) {
+  var mc = getMilesConfig();
+  if (!mc || !mc.url || !mc.token) return {success:false,error:'Not configured'};
+  var keys = ['products','orders','settings','drafts','abandoned','collections','giftCards','purchaseOrders','transfers','segments','users'];
+  var results = [];
+  for (var i = 0; i < keys.length; i++) {
+    if (progressCb) progressCb(keys[i], i+1, keys.length);
+    var r = await milesSave(keys[i]);
+    results.push(r);
+  }
+  var allOk = results.every(function(r){return r && r.success;});
+  localStorage.setItem(MILES_LAST_SYNC_KEY, new Date().toISOString());
+  return {success:allOk, results:results, error: allOk ? '' : (results.find(function(r){return r && !r.success;}) || {}).error || 'Unknown'};
+}
+
+async function milesRestoreAll() {
+  var mc = getMilesConfig();
+  if (!mc || !mc.url || !mc.token) return {success:false,error:'Not configured'};
+  var keys = ['products','orders','settings','drafts','abandoned','collections','giftCards','purchaseOrders','transfers','segments','users'];
+  var restored = 0;
+  for (var i = 0; i < keys.length; i++) {
+    var r = await milesLoad(keys[i]);
+    if (r.success && r.data) {
+      try {
+        localStorage.setItem('taiva_' + keys[i], r.data);
+        restored++;
+      } catch(e){}
+    }
+  }
+  return {success:true, restored:restored};
 }
 // ---- CITY AUTOCOMPLETE ----
 function initCityAutocomplete(inputId, stateId, pincodeId) {
