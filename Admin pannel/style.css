@@ -954,6 +954,8 @@ table .customer-cell .avatar {
   .topbar {
     padding: 0 12px;
   }
+  #sidebarToggle { display: none; }
+  #mobileToggle { display: block !important; }
   .topbar .topbar-search {
     display: none;
   }
