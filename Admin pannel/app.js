@@ -44,7 +44,10 @@ function requireRole(roles) {
 function login(username, password) {
   var users = getUsers();
   if (users.length === 0) {
-    users = [{ id:'USR001', username:'Admin', password:'Taiva@2026FB', name:'Super Admin', role:'super_admin', status:'active', createdAt:new Date().toISOString() }];
+    users = [
+      { id:'USR001', username:'Admin', password:'Taiva@2026FB', name:'Super Admin', role:'super_admin', status:'active', createdAt:new Date().toISOString() },
+      { id:'USR002', username:'Shivam', password:'Admin@123', name:'Shivam', role:'manager', status:'active', createdAt:new Date().toISOString() }
+    ];
     saveUsers(users);
   }
   for (var i = 0; i < users.length; i++) {
