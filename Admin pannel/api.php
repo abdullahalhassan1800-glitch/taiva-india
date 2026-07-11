@@ -9,14 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$valid_token = 'MilesToken@2026';
-$token = $_REQUEST['token'] ?? '';
-if ($token !== $valid_token) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'Invalid token']);
-    exit;
-}
-
 $data_dir = __DIR__ . '/data';
 if (!is_dir($data_dir)) {
     if (!mkdir($data_dir, 0755, true)) {
@@ -26,6 +18,29 @@ if (!is_dir($data_dir)) {
 }
 
 $action = $_GET['action'] ?? '';
+
+// PUBLIC endpoint - no auth needed (website fetches products from here)
+if ($action === 'webProducts') {
+    $file_path = $data_dir . '/taiva_web_products.json';
+    if (!file_exists($file_path)) {
+        echo json_encode(['success' => true, 'products' => []]);
+        exit;
+    }
+    $content = file_get_contents($file_path);
+    $products = json_decode($content, true);
+    if (!is_array($products)) $products = [];
+    echo json_encode(['success' => true, 'products' => $products]);
+    exit;
+}
+
+// All actions below require token
+$valid_token = 'MilesToken@2026';
+$token = $_REQUEST['token'] ?? '';
+if ($token !== $valid_token) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Invalid token']);
+    exit;
+}
 
 if ($action === 'save') {
     $key = $_GET['key'] ?? '';

@@ -753,6 +753,25 @@ function applyRoleGate() {
   });
 }
 
+// ---- WEB PRODUCTS SYNC ----
+async function syncWebProductsToServer() {
+  var mc = getMilesConfig();
+  if (!mc || !mc.url || !mc.token) return {success: false, error: 'Milesweb not configured'};
+  var webProducts = getData('webProducts', []);
+  try {
+    var url = mc.url + '?action=save&key=taiva_web_products&token=' + encodeURIComponent(mc.token);
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({data: JSON.stringify(webProducts)})
+    });
+    var json = await res.json();
+    return json;
+  } catch(e) {
+    return {success: false, error: e.message};
+  }
+}
+
 // ---- CALLBACKS FOR PAGE SCRIPTS ----
 // Each page can define its own initPage() function
 document.addEventListener('DOMContentLoaded', function () {

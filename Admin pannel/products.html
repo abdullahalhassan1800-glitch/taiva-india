@@ -68,7 +68,7 @@
             <button class="active" data-view="grid" title="Grid view"><i class="fa-solid fa-grip"></i></button>
             <button data-view="table" title="Table view"><i class="fa-solid fa-list"></i></button>
           </div>
-          <button class="btn btn-accent" onclick="openModal('addProductModal')"><i class="fa-solid fa-plus"></i> Add product</button>
+          <button class="btn btn-accent viewer-hide" onclick="openModal('addProductModal')"><i class="fa-solid fa-plus"></i> Add product</button>
         </div>
       </div>
 
@@ -105,7 +105,30 @@
         <div class="form-group"><label>Category</label><select id="prodCategory"><option value="">Select category</option><option>Sugar Control</option><option>Digestive</option><option>Joint Care</option><option>General</option></select></div>
         <div class="form-group"><label>Stock</label><input type="number" id="prodStock" placeholder="0"></div>
       </div>
-      <div class="form-group"><label>Image URL</label><input type="text" id="prodImage" placeholder="https://example.com/image.jpg"></div>
+      <div class="form-group">
+        <label>Product Image</label>
+        <div class="image-upload-section">
+          <div class="image-tabs">
+            <button class="image-tab active" data-tab="url" onclick="switchImageTab('url')"><i class="fa-solid fa-link"></i> URL</button>
+            <button class="image-tab" data-tab="upload" onclick="switchImageTab('upload')"><i class="fa-solid fa-upload"></i> Upload</button>
+          </div>
+          <div class="image-tab-content active" id="imageUrlTab">
+            <input type="text" id="prodImage" placeholder="https://example.com/image.jpg" oninput="previewImageUrl(this.value)">
+          </div>
+          <div class="image-tab-content" id="imageUploadTab">
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('prodImageFile').click()" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleImageDrop(event)">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <p>Click or drag image here</p>
+              <span>JPG, PNG, GIF - Max 5MB</span>
+            </div>
+            <input type="file" id="prodImageFile" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+          </div>
+          <div class="image-preview" id="imagePreview" style="display:none">
+            <img id="previewImg" src="" alt="Preview">
+            <button class="remove-preview" onclick="removeImagePreview()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
+      </div>
       <div class="form-group"><label>SKU</label><input type="text" id="prodSku" readonly><div class="form-hint">Auto-generated</div></div>
     </div>
     <div class="modal-footer">
@@ -126,6 +149,30 @@
     </div>
   </div>
 
+  <div class="modal" id="publishToWebModal">
+    <div class="modal-header"><h2><i class="fa-solid fa-globe"></i> Publish to Website</h2><button class="modal-close" onclick="closeModal('publishToWebModal')">&times;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="webProductId">
+      <div class="form-group"><label>Product Name</label><input type="text" id="webProdName" placeholder="Product name"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Selling Price (Rs.)</label><input type="number" id="webProdPrice" placeholder="0"></div>
+        <div class="form-group"><label>Original Price (Rs.)</label><input type="number" id="webProdOrigPrice" placeholder="0"></div>
+      </div>
+      <div class="form-group"><label>Short Tagline</label><input type="text" id="webProdTagline" placeholder="e.g. Natural Blood Sugar Support"></div>
+      <div class="form-group"><label>Description</label><textarea id="webProdDesc" rows="3" placeholder="Product description for website..."></textarea></div>
+      <div class="form-group"><label>Benefits (one per line)</label><textarea id="webProdBenefits" rows="3" placeholder="Balances Sugar Levels&#10;Reduces Cravings&#10;Improves Heart Health"></textarea></div>
+      <div class="form-group">
+        <label>Product Images (Gallery)</label>
+        <div id="webImageList"></div>
+        <button type="button" class="btn btn-sm" onclick="addWebImageRow('')" style="margin-top:8px;"><i class="fa-solid fa-plus"></i> Add Image URL</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('publishToWebModal')">Cancel</button>
+      <button class="btn btn-accent" onclick="publishToWeb()"><i class="fa-solid fa-globe"></i> Publish to Web</button>
+    </div>
+  </div>
+
   <script>
     document.getElementById('themeToggle')?.addEventListener('click', function() {
       var html = document.documentElement;
@@ -139,11 +186,68 @@
   </script>
   <script src="app.js"></script>
   <script>
+  function switchImageTab(tab) {
+    document.querySelectorAll('.image-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelector('.image-tab[data-tab="'+tab+'"]').classList.add('active');
+    document.querySelectorAll('.image-tab-content').forEach(function(c) { c.classList.remove('active'); });
+    document.getElementById(tab === 'url' ? 'imageUrlTab' : 'imageUploadTab').classList.add('active');
+  }
+
+  function previewImageUrl(url) {
+    var preview = document.getElementById('imagePreview');
+    var img = document.getElementById('previewImg');
+    if (url && url.trim()) {
+      img.src = url;
+      img.onload = function() { preview.style.display = 'inline-block'; };
+      img.onerror = function() { preview.style.display = 'none'; };
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  function handleImageUpload(input) {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('Max 5MB allowed', 'error'); return; }
+    if (!file.type.startsWith('image/')) { showToast('Only images allowed', 'error'); return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('prodImage').value = e.target.result;
+      document.getElementById('previewImg').src = e.target.result;
+      document.getElementById('imagePreview').style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleImageDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    var file = e.dataTransfer.files[0];
+    if (file) {
+      var dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('prodImageFile').files = dt.files;
+      handleImageUpload(document.getElementById('prodImageFile'));
+    }
+  }
+
+  function removeImagePreview() {
+    document.getElementById('prodImage').value = '';
+    document.getElementById('previewImg').src = '';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('prodImageFile').value = '';
+  }
+
   function initPage() {
     loadCategoryFilter();
     loadProducts();
     document.getElementById('productSearch').addEventListener('input', loadProducts);
     document.getElementById('categoryFilter').addEventListener('change', loadProducts);
+
+    var cur = getCurrentUser();
+    if (cur && cur.role === 'viewer') {
+      document.querySelectorAll('.viewer-hide').forEach(function(el) { el.style.display = 'none'; });
+    }
 
     document.getElementById('viewToggle').querySelectorAll('button').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -200,13 +304,19 @@
       grid.innerHTML = '<div class="empty-state"><i class="fa-solid fa-box-open"></i><h3>No products found</h3><p>Add your first product to get started.</p></div>';
       return;
     }
+    var cur = getCurrentUser();
+    var isViewer = cur && cur.role === 'viewer';
+    var webProducts = getData('webProducts', []);
     grid.innerHTML = products.map(function(p) {
       var stockLabel = 'In stock';
       var stockClass = 'badge-ok';
       if (p.stock <= 0) { stockLabel = 'Out of stock'; stockClass = 'badge-cancelled'; }
       else if (p.stock <= 5) { stockLabel = 'Low stock'; stockClass = 'badge-low'; }
+      var isPublished = webProducts.some(function(wp) { return wp.adminProductId === p.id; });
+      var publishBadge = isPublished ? '<span class="badge badge-web"><i class="fa-solid fa-globe"></i> Live</span> ' : '';
       var img = p.image || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=No+Image';
-      return '<div class="product-card-admin"><div class="pcard-img"><img src="' + img + '" alt="' + p.name + '" onerror="this.src=\'https://placehold.co/200x200/e2e8f0/94a3b8?text=No+Image\'"></div><div class="pcard-body"><h4>' + p.name + '</h4><div class="pcard-price">' + formatCurrency(p.price) + '</div><div class="pcard-stock"><span class="badge ' + stockClass + '">' + stockLabel + '</span> &middot; ' + (p.category || 'Uncategorized') + '</div></div><div class="pcard-actions"><button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i> Edit</button><button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button></div></div>';
+      var actions = isViewer ? '' : '<div class="pcard-actions"><button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')"><i class="fa-solid fa-globe"></i> Add to Web</button><button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i> Edit</button><button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button></div>';
+      return '<div class="product-card-admin"><div class="pcard-img"><img src="' + img + '" alt="' + p.name + '" onerror="this.src=\'https://placehold.co/200x200/e2e8f0/94a3b8?text=No+Image\'"></div><div class="pcard-body"><h4>' + p.name + '</h4><div class="pcard-price">' + formatCurrency(p.price) + '</div><div class="pcard-stock">' + publishBadge + '<span class="badge ' + stockClass + '">' + stockLabel + '</span> &middot; ' + (p.category || 'Uncategorized') + '</div></div>' + actions + '</div>';
     }).join('');
   }
 
@@ -216,13 +326,16 @@
       tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:24px;">No products found</td></tr>';
       return;
     }
+    var cur = getCurrentUser();
+    var isViewer = cur && cur.role === 'viewer';
     tbody.innerHTML = products.map(function(p) {
       var stockLabel = 'OK';
       var stockClass = 'badge-ok';
       if (p.stock <= 0) { stockLabel = 'Out'; stockClass = 'badge-cancelled'; }
       else if (p.stock <= 5) { stockLabel = 'Low'; stockClass = 'badge-low'; }
       var img = p.image || 'https://placehold.co/40x40/e2e8f0/94a3b8?text=N';
-      return '<tr><td><div class="product-cell"><img src="' + img + '" alt="" onerror="this.src=\'https://placehold.co/40x40/e2e8f0/94a3b8?text=N\'"></div></td><td><strong>' + p.name + '</strong></td><td>' + p.sku + '</td><td>' + (p.category || '-') + '</td><td>' + formatCurrency(p.price) + '</td><td>' + p.stock + '</td><td><span class="badge ' + stockClass + '">' + stockLabel + '</span></td><td><button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+      var actions = isViewer ? '' : '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')"><i class="fa-solid fa-globe"></i></button> <button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>';
+      return '<tr><td><div class="product-cell"><img src="' + img + '" alt="" onerror="this.src=\'https://placehold.co/40x40/e2e8f0/94a3b8?text=N\'"></div></td><td><strong>' + p.name + '</strong></td><td>' + p.sku + '</td><td>' + (p.category || '-') + '</td><td>' + formatCurrency(p.price) + '</td><td>' + p.stock + '</td><td><span class="badge ' + stockClass + '">' + stockLabel + '</span></td><td>' + actions + '</td></tr>';
     }).join('');
   }
 
@@ -278,6 +391,8 @@
     document.getElementById('prodStock').value = p.stock || '';
     document.getElementById('prodImage').value = p.image || '';
     document.getElementById('prodSku').value = p.sku || '';
+    switchImageTab('url');
+    if (p.image) { previewImageUrl(p.image); }
     openModal('addProductModal');
   }
 
@@ -291,6 +406,8 @@
     document.getElementById('prodStock').value = '';
     document.getElementById('prodImage').value = '';
     document.getElementById('prodSku').value = generateSku();
+    removeImagePreview();
+    switchImageTab('url');
   }
 
   document.addEventListener('click', function(e) {
@@ -323,6 +440,105 @@
     closeModal('deleteProductModal');
     showToast('Product deleted', 'success');
     loadCategoryFilter();
+    loadProducts();
+  }
+
+  // ---- PUBLISH TO WEB ----
+  function openPublishModal(adminProductId) {
+    var products = getData('products');
+    var p = products.find(function(x) { return x.id === adminProductId; });
+    if (!p) return;
+
+    document.getElementById('webProductId').value = adminProductId;
+    document.getElementById('webProdName').value = p.name || '';
+    document.getElementById('webProdPrice').value = p.price || '';
+    document.getElementById('webProdOrigPrice').value = p.originalPrice || '';
+    document.getElementById('webProdTagline').value = '';
+    document.getElementById('webProdDesc').value = '';
+    document.getElementById('webProdBenefits').value = '';
+
+    var webProducts = getData('webProducts', []);
+    var existing = webProducts.find(function(x) { return x.adminProductId === adminProductId; });
+    if (existing) {
+      document.getElementById('webProdTagline').value = existing.tagline || '';
+      document.getElementById('webProdDesc').value = existing.description || '';
+      document.getElementById('webProdBenefits').value = (existing.benefits || []).join('\n');
+      renderWebImages(existing.images || []);
+    } else {
+      renderWebImages(p.image ? [p.image] : []);
+    }
+
+    openModal('publishToWebModal');
+  }
+
+  function renderWebImages(images) {
+    var list = document.getElementById('webImageList');
+    list.innerHTML = '';
+    images.forEach(function(url) { addWebImageRow(url); });
+    if (images.length === 0) addWebImageRow('');
+  }
+
+  function addWebImageRow(url) {
+    var list = document.getElementById('webImageList');
+    var row = document.createElement('div');
+    row.className = 'web-image-row';
+    row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:6px;';
+    row.innerHTML = '<input type="text" class="web-img-url" value="' + (url || '') + '" placeholder="https://example.com/image.jpg" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--card-bg);color:var(--text);"><button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>';
+    list.appendChild(row);
+  }
+
+  async function publishToWeb() {
+    var adminId = document.getElementById('webProductId').value;
+    var name = document.getElementById('webProdName').value.trim();
+    var price = parseFloat(document.getElementById('webProdPrice').value) || 0;
+    var origPrice = parseFloat(document.getElementById('webProdOrigPrice').value) || 0;
+    var tagline = document.getElementById('webProdTagline').value.trim();
+    var description = document.getElementById('webProdDesc').value.trim();
+    var benefitsText = document.getElementById('webProdBenefits').value.trim();
+    var benefits = benefitsText ? benefitsText.split('\n').filter(function(b) { return b.trim(); }) : [];
+
+    var images = [];
+    document.querySelectorAll('.web-img-url').forEach(function(input) {
+      if (input.value.trim()) images.push(input.value.trim());
+    });
+
+    if (!name) { showToast('Product name is required', 'error'); return; }
+    if (price <= 0) { showToast('Price must be greater than 0', 'error'); return; }
+    if (images.length === 0) { showToast('Add at least one image', 'error'); return; }
+
+    var slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+    var webProduct = {
+      id: 'WP' + Date.now().toString(36).toUpperCase(),
+      adminProductId: adminId,
+      name: name,
+      slug: slug,
+      price: price,
+      originalPrice: origPrice,
+      tagline: tagline,
+      description: description,
+      benefits: benefits,
+      images: images,
+      publishedAt: new Date().toISOString()
+    };
+
+    var webProducts = getData('webProducts', []);
+    var idx = webProducts.findIndex(function(x) { return x.adminProductId === adminId; });
+    if (idx !== -1) {
+      webProducts[idx] = webProduct;
+    } else {
+      webProducts.push(webProduct);
+    }
+    setData('webProducts', webProducts);
+
+    var syncResult = await syncWebProductsToServer();
+    if (syncResult && syncResult.success) {
+      showToast('Product published to website!', 'success');
+    } else {
+      showToast('Saved locally. Server sync pending.', 'info');
+    }
+
+    closeModal('publishToWebModal');
     loadProducts();
   }
   </script>
