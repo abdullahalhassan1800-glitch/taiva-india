@@ -17,7 +17,7 @@
     <nav class="sidebar-nav">
       <div class="nav-section">Main</div>
       <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
-      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge" id="orderBadge">0</span></a>
       <div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
       <a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
       <div class="nav-sub open">
@@ -58,6 +58,10 @@
     </header>
 
     <div class="page-content">
+      <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:13px;color:#856404;">
+        <i class="fa-solid fa-circle-info" style="font-size:16px;"></i>
+        Note: Payment gateway not configured. Orders are processed as Cash on Delivery.
+      </div>
       <div class="page-header">
         <div>
           <h1>Products</h1>
@@ -68,6 +72,7 @@
             <button class="active" data-view="grid" title="Grid view"><i class="fa-solid fa-grip"></i></button>
             <button data-view="table" title="Table view"><i class="fa-solid fa-list"></i></button>
           </div>
+          <button class="btn btn-sm viewer-hide" onclick="generateProductPages()" title="Generate static product pages"><i class="fa-solid fa-code"></i> Gen Pages</button>
           <button class="btn btn-accent viewer-hide" onclick="openModal('addProductModal')"><i class="fa-solid fa-plus"></i> Add product</button>
         </div>
       </div>
@@ -87,6 +92,8 @@
           </table>
         </div>
       </div>
+
+      <div id="productsPagination"></div>
     </div>
   </div>
 
@@ -149,22 +156,54 @@
     </div>
   </div>
 
-  <div class="modal" id="publishToWebModal">
+  <div class="modal" id="publishToWebModal" style="max-width:600px;">
     <div class="modal-header"><h2><i class="fa-solid fa-globe"></i> Publish to Website</h2><button class="modal-close" onclick="closeModal('publishToWebModal')">&times;</button></div>
     <div class="modal-body">
       <input type="hidden" id="webProductId">
+      <input type="hidden" id="webProdExistingId">
       <div class="form-group"><label>Product Name</label><input type="text" id="webProdName" placeholder="Product name"></div>
       <div class="form-row">
         <div class="form-group"><label>Selling Price (Rs.)</label><input type="number" id="webProdPrice" placeholder="0"></div>
         <div class="form-group"><label>Original Price (Rs.)</label><input type="number" id="webProdOrigPrice" placeholder="0"></div>
       </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="webProdCategory">
+          <option value="">Select category</option>
+          <option value="Blood Sugar">Blood Sugar</option>
+          <option value="Digestive Health">Digestive Health</option>
+          <option value="Joint Care">Joint Care</option>
+          <option value="Immunity">Immunity</option>
+          <option value="Skin Care">Skin Care</option>
+          <option value="Heart Health">Heart Health</option>
+          <option value="Weight Management">Weight Management</option>
+          <option value="General Wellness">General Wellness</option>
+          <option value="custom">+ Add Custom Category</option>
+        </select>
+      </div>
+      <div class="form-group" id="webProdCustomCatGroup" style="display:none;"><label>Custom Category</label><input type="text" id="webProdCustomCat" placeholder="Enter category name"></div>
       <div class="form-group"><label>Short Tagline</label><input type="text" id="webProdTagline" placeholder="e.g. Natural Blood Sugar Support"></div>
       <div class="form-group"><label>Description</label><textarea id="webProdDesc" rows="3" placeholder="Product description for website..."></textarea></div>
       <div class="form-group"><label>Benefits (one per line)</label><textarea id="webProdBenefits" rows="3" placeholder="Balances Sugar Levels&#10;Reduces Cravings&#10;Improves Heart Health"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Rating (1-5)</label><input type="number" id="webProdRating" min="1" max="5" step="0.1" placeholder="4.8"></div>
+        <div class="form-group"><label>Review Count</label><input type="number" id="webProdReviews" min="0" placeholder="284"></div>
+      </div>
       <div class="form-group">
         <label>Product Images (Gallery)</label>
         <div id="webImageList"></div>
-        <button type="button" class="btn btn-sm" onclick="addWebImageRow('')" style="margin-top:8px;"><i class="fa-solid fa-plus"></i> Add Image URL</button>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button type="button" class="btn btn-sm" onclick="addWebImageRow('')"><i class="fa-solid fa-link"></i> Add URL</button>
+          <button type="button" class="btn btn-sm" onclick="document.getElementById('webImageFileUpload').click()"><i class="fa-solid fa-upload"></i> Upload Image</button>
+          <input type="file" id="webImageFileUpload" accept="image/*" style="display:none" onchange="handleWebImageUpload(this)">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <label class="toggle-label" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" id="webProdActive" checked style="width:18px;height:18px;">
+          <span>Active (visible on website)</span>
+        </label>
       </div>
     </div>
     <div class="modal-footer">
@@ -173,17 +212,6 @@
     </div>
   </div>
 
-  <script>
-    document.getElementById('themeToggle')?.addEventListener('click', function() {
-      var html = document.documentElement;
-      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', theme);
-      localStorage.setItem('taiva_theme', theme);
-      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    });
-    var savedTheme = localStorage.getItem('taiva_theme');
-    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
-  </script>
   <script src="app.js"></script>
   <script>
   function switchImageTab(tab) {
@@ -238,7 +266,7 @@
     document.getElementById('prodImageFile').value = '';
   }
 
-  function initPage() {
+  initPage = function() {
     loadCategoryFilter();
     loadProducts();
     document.getElementById('productSearch').addEventListener('input', loadProducts);
@@ -293,10 +321,14 @@
       if (cat && p.category !== cat) return false;
       return true;
     });
+    var result = paginate(filtered, 'products', 10);
     document.getElementById('productCount').textContent = filtered.length + ' product' + (filtered.length !== 1 ? 's' : '');
-    renderGridView(filtered);
-    renderTableView(filtered);
+    renderGridView(result.items);
+    renderTableView(result.items);
+    renderPagination('productsPagination', 'products', result.totalPages, 'goToProductsPage');
   }
+
+  function goToProductsPage(page) { setPage('products', page); loadProducts(); }
 
   function renderGridView(products) {
     var grid = document.getElementById('productGridView');
@@ -315,7 +347,10 @@
       var isPublished = webProducts.some(function(wp) { return wp.adminProductId === p.id; });
       var publishBadge = isPublished ? '<span class="badge badge-web"><i class="fa-solid fa-globe"></i> Live</span> ' : '';
       var img = p.image || 'https://placehold.co/200x200/e2e8f0/94a3b8?text=No+Image';
-      var actions = isViewer ? '' : '<div class="pcard-actions"><button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')"><i class="fa-solid fa-globe"></i> Add to Web</button><button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i> Edit</button><button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button></div>';
+      var webBtn = isPublished
+        ? '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i> Edit Web</button><button class="btn btn-sm btn-danger" onclick="unpublishFromWeb(\'' + p.id + '\')" title="Remove from website"><i class="fa-solid fa-globe-slash"></i></button>'
+        : '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')"><i class="fa-solid fa-globe"></i> Add to Web</button>';
+      var actions = isViewer ? '' : '<div class="pcard-actions">' + webBtn + '<button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i> Edit</button><button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button></div>';
       return '<div class="product-card-admin"><div class="pcard-img"><img src="' + img + '" alt="' + p.name + '" onerror="this.src=\'https://placehold.co/200x200/e2e8f0/94a3b8?text=No+Image\'"></div><div class="pcard-body"><h4>' + p.name + '</h4><div class="pcard-price">' + formatCurrency(p.price) + '</div><div class="pcard-stock">' + publishBadge + '<span class="badge ' + stockClass + '">' + stockLabel + '</span> &middot; ' + (p.category || 'Uncategorized') + '</div></div>' + actions + '</div>';
     }).join('');
   }
@@ -334,7 +369,11 @@
       if (p.stock <= 0) { stockLabel = 'Out'; stockClass = 'badge-cancelled'; }
       else if (p.stock <= 5) { stockLabel = 'Low'; stockClass = 'badge-low'; }
       var img = p.image || 'https://placehold.co/40x40/e2e8f0/94a3b8?text=N';
-      var actions = isViewer ? '' : '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')"><i class="fa-solid fa-globe"></i></button> <button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>';
+      var isPublishedTable = webProducts.some(function(wp) { return wp.adminProductId === p.id; });
+      var webBtnTable = isPublishedTable
+        ? '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')" title="Edit web listing"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="unpublishFromWeb(\'' + p.id + '\')" title="Remove from web"><i class="fa-solid fa-globe-slash"></i></button>'
+        : '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')" title="Publish to web"><i class="fa-solid fa-globe"></i></button>';
+      var actions = isViewer ? '' : webBtnTable + ' <button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>';
       return '<tr><td><div class="product-cell"><img src="' + img + '" alt="" onerror="this.src=\'https://placehold.co/40x40/e2e8f0/94a3b8?text=N\'"></div></td><td><strong>' + p.name + '</strong></td><td>' + p.sku + '</td><td>' + (p.category || '-') + '</td><td>' + formatCurrency(p.price) + '</td><td>' + p.stock + '</td><td><span class="badge ' + stockClass + '">' + stockLabel + '</span></td><td>' + actions + '</td></tr>';
     }).join('');
   }
@@ -456,20 +495,58 @@
     document.getElementById('webProdTagline').value = '';
     document.getElementById('webProdDesc').value = '';
     document.getElementById('webProdBenefits').value = '';
+    document.getElementById('webProdRating').value = '';
+    document.getElementById('webProdReviews').value = '';
+    document.getElementById('webProdActive').checked = true;
+    document.getElementById('webProdExistingId').value = '';
+
+    // Reset category dropdown
+    var catSel = document.getElementById('webProdCategory');
+    catSel.value = '';
+    document.getElementById('webProdCustomCatGroup').style.display = 'none';
+    document.getElementById('webProdCustomCat').value = '';
 
     var webProducts = getData('webProducts', []);
     var existing = webProducts.find(function(x) { return x.adminProductId === adminProductId; });
     if (existing) {
+      document.getElementById('webProdExistingId').value = existing.id || '';
       document.getElementById('webProdTagline').value = existing.tagline || '';
       document.getElementById('webProdDesc').value = existing.description || '';
       document.getElementById('webProdBenefits').value = (existing.benefits || []).join('\n');
+      document.getElementById('webProdRating').value = existing.rating || '';
+      document.getElementById('webProdReviews').value = existing.reviewCount || '';
+      document.getElementById('webProdActive').checked = existing.active !== false;
+
+      // Set category
+      var catVal = existing.category || '';
+      var catOptions = Array.from(catSel.options).map(function(o) { return o.value; });
+      if (catVal && catOptions.indexOf(catVal) !== -1) {
+        catSel.value = catVal;
+      } else if (catVal) {
+        catSel.value = 'custom';
+        document.getElementById('webProdCustomCatGroup').style.display = '';
+        document.getElementById('webProdCustomCat').value = catVal;
+      }
+
       renderWebImages(existing.images || []);
     } else {
+      // Pre-fill category from admin product
+      var adminCat = p.category || '';
+      var catOptions2 = Array.from(catSel.options).map(function(o) { return o.value; });
+      if (adminCat && catOptions2.indexOf(adminCat) !== -1) {
+        catSel.value = adminCat;
+      }
       renderWebImages(p.image ? [p.image] : []);
     }
 
     openModal('publishToWebModal');
   }
+
+  // Custom category toggle
+  document.getElementById('webProdCategory').addEventListener('change', function() {
+    var group = document.getElementById('webProdCustomCatGroup');
+    group.style.display = this.value === 'custom' ? '' : 'none';
+  });
 
   function renderWebImages(images) {
     var list = document.getElementById('webImageList');
@@ -478,17 +555,67 @@
     if (images.length === 0) addWebImageRow('');
   }
 
-  function addWebImageRow(url) {
+  function addWebImageRow(url, uploading) {
     var list = document.getElementById('webImageList');
     var row = document.createElement('div');
     row.className = 'web-image-row';
     row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:6px;';
-    row.innerHTML = '<input type="text" class="web-img-url" value="' + (url || '') + '" placeholder="https://example.com/image.jpg" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--card-bg);color:var(--text);"><button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>';
+    var preview = url ? '<img src="' + url + '" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display=\'none\'">' : '';
+    var statusIcon = uploading ? '<i class="fa-solid fa-spinner fa-spin" style="color:var(--accent);flex-shrink:0;"></i>' : '';
+    row.innerHTML = preview + '<input type="text" class="web-img-url" value="' + (url || '') + '" placeholder="https://example.com/image.jpg" style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--card-bg);color:var(--text);" oninput="this.previousElementSibling && this.previousElementSibling.tagName===\'IMG\' && (this.previousElementSibling.src=this.value)">' + statusIcon + '<button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>';
     list.appendChild(row);
+    return row;
+  }
+
+  async function handleWebImageUpload(input) {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('Max 5MB allowed', 'error'); return; }
+
+    var row = addWebImageRow('', true);
+    var mc = getMilesConfig();
+    if (!mc || !mc.url || !mc.token) {
+      // Fallback: use base64
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var urlInput = row.querySelector('.web-img-url');
+        if (urlInput) urlInput.value = e.target.result;
+        row.querySelector('.fa-spinner')?.remove();
+      };
+      reader.readAsDataURL(file);
+      input.value = '';
+      return;
+    }
+
+    var formData = new FormData();
+    formData.append('image', file);
+    try {
+      var token = mc.token || 'MilesToken@2026';
+      var uploadUrl = mc.url.replace('api.php', '') + 'api.php?action=upload&token=' + encodeURIComponent(token);
+      var resp = await fetch(uploadUrl, { method: 'POST', body: formData });
+      var data = await resp.json();
+      if (data.success && data.url) {
+        var fullUrl = mc.url.replace('api.php', '') + data.url;
+        var urlInput = row.querySelector('.web-img-url');
+        if (urlInput) urlInput.value = fullUrl;
+        var previewImg = row.querySelector('img');
+        if (previewImg) previewImg.src = fullUrl;
+        row.querySelector('.fa-spinner')?.remove();
+        showToast('Image uploaded!', 'success');
+      } else {
+        row.remove();
+        showToast('Upload failed: ' + (data.error || 'Unknown error'), 'error');
+      }
+    } catch(e) {
+      row.remove();
+      showToast('Upload failed: ' + e.message, 'error');
+    }
+    input.value = '';
   }
 
   async function publishToWeb() {
     var adminId = document.getElementById('webProductId').value;
+    var existingId = document.getElementById('webProdExistingId').value;
     var name = document.getElementById('webProdName').value.trim();
     var price = parseFloat(document.getElementById('webProdPrice').value) || 0;
     var origPrice = parseFloat(document.getElementById('webProdOrigPrice').value) || 0;
@@ -496,6 +623,13 @@
     var description = document.getElementById('webProdDesc').value.trim();
     var benefitsText = document.getElementById('webProdBenefits').value.trim();
     var benefits = benefitsText ? benefitsText.split('\n').filter(function(b) { return b.trim(); }) : [];
+    var rating = parseFloat(document.getElementById('webProdRating').value) || 0;
+    var reviewCount = parseInt(document.getElementById('webProdReviews').value) || 0;
+    var active = document.getElementById('webProdActive').checked;
+
+    // Category
+    var catSel = document.getElementById('webProdCategory');
+    var category = catSel.value === 'custom' ? document.getElementById('webProdCustomCat').value.trim() : catSel.value;
 
     var images = [];
     document.querySelectorAll('.web-img-url').forEach(function(input) {
@@ -505,20 +639,25 @@
     if (!name) { showToast('Product name is required', 'error'); return; }
     if (price <= 0) { showToast('Price must be greater than 0', 'error'); return; }
     if (images.length === 0) { showToast('Add at least one image', 'error'); return; }
+    if (rating < 0 || rating > 5) { showToast('Rating must be between 0 and 5', 'error'); return; }
 
     var slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
     var webProduct = {
-      id: 'WP' + Date.now().toString(36).toUpperCase(),
+      id: existingId || ('WP' + Date.now().toString(36).toUpperCase()),
       adminProductId: adminId,
       name: name,
       slug: slug,
       price: price,
       originalPrice: origPrice,
+      category: category,
       tagline: tagline,
       description: description,
       benefits: benefits,
       images: images,
+      rating: rating || 4.8,
+      reviewCount: reviewCount || 0,
+      active: active,
       publishedAt: new Date().toISOString()
     };
 
@@ -540,6 +679,47 @@
 
     closeModal('publishToWebModal');
     loadProducts();
+  }
+
+  async function unpublishFromWeb(adminProductId) {
+    if (!confirm('Remove this product from the website?')) return;
+    var webProducts = getData('webProducts', []);
+    var wp = webProducts.find(function(x) { return x.adminProductId === adminProductId; });
+    if (!wp) { showToast('Product not published', 'error'); return; }
+
+    // Try server delete
+    var mc = getMilesConfig();
+    if (mc && mc.url && mc.token) {
+      try {
+        var delUrl = mc.url + '?action=deleteWebProduct&id=' + encodeURIComponent(wp.id) + '&token=' + encodeURIComponent(mc.token);
+        await fetch(delUrl);
+      } catch(e) {}
+    }
+
+    // Remove from localStorage
+    webProducts = webProducts.filter(function(x) { return x.adminProductId !== adminProductId; });
+    setData('webProducts', webProducts);
+    await syncWebProductsToServer();
+    showToast('Product removed from website', 'success');
+    loadProducts();
+  }
+
+  async function generateProductPages() {
+    var mc = getMilesConfig();
+    if (!mc || !mc.url || !mc.token) { showToast('Milesweb not configured', 'error'); return; }
+    showToast('Generating pages...', 'info');
+    try {
+      var url = mc.url.replace('api.php', '') + 'generate-pages.php?token=' + encodeURIComponent(mc.token);
+      var resp = await fetch(url, { method: 'GET' });
+      var data = await resp.json();
+      if (data.success) {
+        showToast(data.message || 'Pages generated!', 'success');
+      } else {
+        showToast('Error: ' + (data.error || 'Unknown'), 'error');
+      }
+    } catch(e) {
+      showToast('Failed: ' + e.message, 'error');
+    }
   }
   </script>
 </body>

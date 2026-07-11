@@ -12,14 +12,17 @@ function getData(key, defaults) {
 function setData(key, data) {
   localStorage.setItem('taiva_' + key, JSON.stringify(data));
   // Auto-sync to Milesweb (primary)
+  // Map webProducts -> web_products key to match what api.php reads
   var mc = getMilesConfig();
   if (mc && mc.enabled && mc.url && mc.token && (mc.autoSync !== false)) {
-    milesSave(key, data);
+    var syncKey = key === 'webProducts' ? 'web_products' : key;
+    milesSave(syncKey, data);
   }
   // Auto-sync to Sheets (secondary)
   var dc = getDriveConfig();
   if (dc && dc.enabled && dc.url && dc.token && (dc.autoSync !== false)) {
-    driveSave(key, data);
+    var syncKey2 = key === 'webProducts' ? 'web_products' : key;
+    driveSave(syncKey2, data);
   }
 }
 
@@ -142,7 +145,31 @@ function formatActivityAction(action) {
   return map[action] || action;
 }
 
+// ---- THEME TOGGLE ----
+function initTheme() {
+  var savedTheme = localStorage.getItem('taiva_theme');
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  var themeBtn = document.getElementById('themeToggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function() {
+      var html = document.documentElement;
+      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('taiva_theme', theme);
+      themeBtn.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+    if (savedTheme) themeBtn.innerHTML = savedTheme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+  }
+}
+
 // ---- SIDEBAR ----
+function updateSidebarBadge() {
+  var badge = document.getElementById('orderBadge');
+  if (!badge) return;
+  var orders = getData('orders');
+  badge.textContent = orders.length || '0';
+}
+
 function initSidebar() {
   var toggle = document.getElementById('sidebarToggle');
   var sidebar = document.getElementById('sidebar');
@@ -352,9 +379,9 @@ function seedInitialData() {
   var products = getData('products');
   if (products.length === 0) {
     products = [
-      { id: 'PROD001', name: 'Sugar Pro Max', price: 1090, originalPrice: 1499, image: '../images/sugar-pro-max-1.jpg', category: 'Sugar Control', stock: 50, sku: 'SPM-001', createdAt: new Date().toISOString() },
-      { id: 'PROD002', name: 'Digestive Health', price: 1090, originalPrice: 1399, image: '../images/pachan-pro-main.png', category: 'Digestive', stock: 45, sku: 'DH-001', createdAt: new Date().toISOString() },
-      { id: 'PROD003', name: 'Joint Care', price: 1040, originalPrice: 1140, image: '../images/joint-care-main.png', category: 'Joint Care', stock: 35, sku: 'JC-001', createdAt: new Date().toISOString() }
+      { id: 'PROD001', name: 'Sugar Pro Max', price: 1090, originalPrice: 1499, image: 'https://taiva.in/images/sugar-pro-max-1.jpg', category: 'Sugar Control', stock: 50, sku: 'SPM-001', createdAt: new Date().toISOString() },
+      { id: 'PROD002', name: 'Digestive Health', price: 1090, originalPrice: 1399, image: 'https://taiva.in/images/pachan-pro-main.png', category: 'Digestive', stock: 45, sku: 'DH-001', createdAt: new Date().toISOString() },
+      { id: 'PROD003', name: 'Joint Care', price: 1040, originalPrice: 1140, image: 'https://taiva.in/images/joint-care-main.png', category: 'Joint Care', stock: 35, sku: 'JC-001', createdAt: new Date().toISOString() }
     ];
     setData('products', products);
   }
@@ -368,6 +395,35 @@ function seedInitialData() {
     ];
     setData('orders', orders);
   }
+}
+
+// ---- PAGINATION ----
+var _paginationState = {};
+function paginate(array, pageKey, perPage) {
+  perPage = perPage || 10;
+  var page = _paginationState[pageKey] || 1;
+  var totalPages = Math.ceil(array.length / perPage) || 1;
+  if (page > totalPages) page = totalPages;
+  _paginationState[pageKey] = page;
+  var start = (page - 1) * perPage;
+  var items = array.slice(start, start + perPage);
+  return { items: items, page: page, totalPages: totalPages, total: array.length };
+}
+
+function renderPagination(containerId, pageKey, totalPages, onPageChange) {
+  var el = document.getElementById(containerId);
+  if (!el || totalPages <= 1) { if (el) el.innerHTML = ''; return; }
+  var page = _paginationState[pageKey] || 1;
+  var html = '<div style="display:flex;align-items:center;gap:8px;justify-content:center;padding:12px;font-size:13px;">';
+  html += '<button class="btn btn-sm" ' + (page <= 1 ? 'disabled' : '') + ' onclick="' + onPageChange + '(' + (page - 1) + ')"><i class="fa-solid fa-chevron-left"></i></button>';
+  html += '<span>Page ' + page + ' of ' + totalPages + '</span>';
+  html += '<button class="btn btn-sm" ' + (page >= totalPages ? 'disabled' : '') + ' onclick="' + onPageChange + '(' + (page + 1) + ')"><i class="fa-solid fa-chevron-right"></i></button>';
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function setPage(pageKey, page) {
+  _paginationState[pageKey] = page;
 }
 
 // ---- DRIVE SYNC ----
@@ -435,8 +491,7 @@ function driveLoad(key) {
 function driveBackupAll(progressCb) {
   var dc = getDriveConfig();
   if (!dc || !dc.url || !dc.token) return Promise.resolve({success:false,error:'Not configured'});
-  var keys = ['products','orders','settings','drafts','abandoned','collections','giftCards','purchaseOrders','transfers','segments','users'];
-  // Save each key separately with base64 encoding (smaller URLs)
+  var keys = ['products','orders','settings','drafts','abandoned','collections','giftCards','purchaseOrders','transfers','segments','users','web_products'];
   var results = [];
   var step = function(i) {
     if (i >= keys.length) {
@@ -532,7 +587,7 @@ async function milesLoad(key) {
 async function milesBackupAll(progressCb) {
   var mc = getMilesConfig();
   if (!mc || !mc.url || !mc.token) return {success:false,error:'Not configured'};
-  var keys = ['products','orders','settings','drafts','abandoned','collections','giftCards','purchaseOrders','transfers','segments','users'];
+  var keys = ['products','orders','settings','drafts','abandoned','collections','giftCards','purchaseOrders','transfers','segments','users','web_products'];
   var results = [];
   for (var i = 0; i < keys.length; i++) {
     if (progressCb) progressCb(keys[i], i+1, keys.length);
@@ -547,7 +602,7 @@ async function milesBackupAll(progressCb) {
 async function milesRestoreAll() {
   var mc = getMilesConfig();
   if (!mc || !mc.url || !mc.token) return {success:false,error:'Not configured'};
-  var keys = ['products','orders','settings','drafts','abandoned','collections','giftCards','purchaseOrders','transfers','segments','users'];
+  var keys = ['products','orders','settings','drafts','abandoned','collections','giftCards','purchaseOrders','transfers','segments','users','web_products'];
   var restored = 0;
   for (var i = 0; i < keys.length; i++) {
     var r = await milesLoad(keys[i]);
@@ -778,7 +833,9 @@ document.addEventListener('DOMContentLoaded', function () {
   if (window.location.pathname.indexOf('index.html') === -1 && window.location.pathname !== '/') {
     requireAuth();
   }
+  initTheme();
   initSidebar();
+  updateSidebarBadge();
   applyRoleGate();
   seedInitialData();
   // Restore last sync badge on sidebar if present

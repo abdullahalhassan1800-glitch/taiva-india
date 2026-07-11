@@ -32,7 +32,7 @@
       errorEl.style.display = 'block';
       errorEl.style.color = 'var(--accent)';
       await autoRestoreFromMilesweb();
-      if (login(username, password)) {
+      if (await login(username, password)) {
         window.location.href = 'dashboard.html';
       } else {
         errorEl.style.display = 'block';

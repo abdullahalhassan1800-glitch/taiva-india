@@ -25,7 +25,7 @@
 <nav class="sidebar-nav">
 <div class="nav-section">Main</div>
 <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
-<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+<a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge" id="orderBadge">0</span></a>
 <div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
 <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
 <div class="nav-sub"><a href="products.html" class="nav-item">All products</a><a href="products-collections.html" class="nav-item">Collections</a><a href="products-inventory.html" class="nav-item">Inventory</a><a href="products-purchase-orders.html" class="nav-item">Purchase orders</a><a href="products-transfers.html" class="nav-item">Transfers</a><a href="products-gift-cards.html" class="nav-item">Gift cards</a></div>
@@ -124,27 +124,9 @@ var ruleOperators = [
   { value: '==', label: '=' }
 ];
 
-document.addEventListener('DOMContentLoaded', function () {
-  var tt = document.getElementById('themeToggle');
-  if (tt) {
-    tt.addEventListener('click', function () {
-      var html = document.documentElement;
-      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', theme);
-      localStorage.setItem('taiva_theme', theme);
-      tt.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    });
-    var saved = localStorage.getItem('taiva_theme');
-    if (saved) {
-      document.documentElement.setAttribute('data-theme', saved);
-      tt.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    }
-  }
-});
-
 var ruleIdCounter = 0;
 
-function initPage() {
+initPage = function() {
   renderSegments();
 }
 

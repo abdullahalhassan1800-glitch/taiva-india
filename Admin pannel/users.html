@@ -37,7 +37,7 @@
         <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
         <span class="nav-label">Orders</span>
         <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
-        <span class="nav-badge">31</span>
+        <span class="nav-badge" id="orderBadge">0</span>
       </a>
       <div class="nav-sub">
         <a href="orders.html" class="nav-item">All orders</a>
@@ -246,16 +246,6 @@
 
   <script src="app.js"></script>
   <script>
-    document.getElementById('themeToggle')?.addEventListener('click', function() {
-      var html = document.documentElement;
-      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', theme);
-      localStorage.setItem('taiva_theme', theme);
-      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    });
-    var savedTheme = localStorage.getItem('taiva_theme');
-    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
-
     function renderUsers() {
       var users = getUsers();
       var tbody = document.getElementById('usersBody');
@@ -316,7 +306,7 @@
       openModal('userModal');
     });
 
-    document.getElementById('saveUserBtn').addEventListener('click', function() {
+    document.getElementById('saveUserBtn').addEventListener('click', async function() {
       var id = document.getElementById('editUserId').value;
       var username = document.getElementById('userUsername').value.trim();
       var password = document.getElementById('userPassword').value;
@@ -329,12 +319,12 @@
       if (id) {
         var updates = { username: username, name: name, role: role, status: status };
         if (password) updates.password = password;
-        updateUser(id, updates);
+        await updateUser(id, updates);
         logActivity('user_updated', 'User "' + username + '" updated (role: ' + role + ')');
         showToast('User updated', 'success');
       } else {
         if (!password) { showToast('Password is required for new users', 'error'); return; }
-        addUser({ username: username, password: password, name: name, role: role, status: status });
+        await addUser({ username: username, password: password, name: name, role: role, status: status });
         logActivity('user_created', 'User "' + username + '" created (role: ' + role + ')');
         showToast('User created', 'success');
       }

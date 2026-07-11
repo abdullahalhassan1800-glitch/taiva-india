@@ -37,7 +37,7 @@
 <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
 <span class="nav-label">Orders</span>
 <span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span>
-<span class="nav-badge">31</span>
+<span class="nav-badge" id="orderBadge">0</span>
 </a>
 <div class="nav-sub open">
 <a href="orders.html" class="nav-item active">All orders</a>
@@ -327,16 +327,6 @@
 <script src="data/indian-cities.js"></script>
 <script src="app.js"></script>
 <script>
-document.getElementById('themeToggle')?.addEventListener('click', function() {
-var html = document.documentElement;
-var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-html.setAttribute('data-theme', theme);
-localStorage.setItem('taiva_theme', theme);
-this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-});
-var savedTheme = localStorage.getItem('taiva_theme');
-if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
-
 var currentPage = 1;
 var perPage = 10;
 var filteredOrders = [];

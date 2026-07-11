@@ -30,7 +30,7 @@
         <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
         <span class="nav-label">Orders</span>
         <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
-        <span class="nav-badge">31</span>
+        <span class="nav-badge" id="orderBadge">0</span>
       </a>
       <div class="nav-sub">
         <a href="orders.html" class="nav-item">All orders</a>
@@ -201,16 +201,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="app.js"></script>
   <script>
-    document.getElementById('themeToggle')?.addEventListener('click', function() {
-      var html = document.documentElement;
-      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', theme);
-      localStorage.setItem('taiva_theme', theme);
-      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    });
-    var savedTheme = localStorage.getItem('taiva_theme');
-    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
-
     initPage = function() {
       var orders = getData('orders');
       var products = getData('products');
@@ -267,7 +257,7 @@
         recentTbody.innerHTML = '<tr><td colspan="4" class="text-muted text-center" style="padding:24px;">No orders yet</td></tr>';
       } else {
         recentTbody.innerHTML = recent.map(function(o) {
-          return '<tr><td><a href="#" style="color:var(--accent);text-decoration:none;font-weight:500;">' + o.id + '</a></td><td>' + o.customerName + '</td><td>' + formatCurrency(o.total) + '</td><td><span class="badge badge-' + o.status + '">' + o.status + '</span></td></tr>';
+          return '<tr><td><a href="#" style="color:var(--accent);text-decoration:none;font-weight:500;">' + escapeHtml(o.id) + '</a></td><td>' + escapeHtml(o.customerName) + '</td><td>' + formatCurrency(o.total) + '</td><td><span class="badge badge-' + escapeHtml(o.status) + '">' + escapeHtml(o.status) + '</span></td></tr>';
         }).join('');
       }
 

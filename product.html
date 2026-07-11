@@ -392,6 +392,18 @@
       document.getElementById('pdName').textContent = p.name || 'Product';
       document.getElementById('pdTagline').textContent = p.tagline || '';
 
+      /* Reviews */
+      var rating = p.rating || 4.8;
+      var reviewCount = p.reviewCount || 0;
+      var starsHtml = '';
+      for (var s = 0; s < 5; s++) {
+        starsHtml += s < Math.floor(rating) ? '&#9733;' : '&#9734;';
+      }
+      var metaEl = document.querySelector('.pd-meta');
+      if (metaEl) {
+        metaEl.innerHTML = '<span class="stars">' + starsHtml + '</span> <span class="review-count">' + rating + ' (' + reviewCount + ' reviews)</span>';
+      }
+
       /* Prices */
       var price = p.price || 0;
       var origPrice = p.originalPrice || 0;
@@ -443,18 +455,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
   <script src="app.js"></script>
   <script>
-    /* Sync localStorage cart into app.js globals for checkout */
-    (function() {
-      var cart = getCart();
-      if (cart.length > 0 && typeof cartItems !== 'undefined') {
-        for (var i = 0; i < cart.length; i++) {
-          for (var q = 0; q < (cart[i].qty || 1); q++) {
-            cartItems.push({ name: cart[i].name, price: cart[i].price, image: cart[i].image });
-          }
-        }
-      }
-      renderCartDrawer();
-    })();
+    /* Cart already synced via localStorage - no additional sync needed */
   </script>
 </body>
 </html>

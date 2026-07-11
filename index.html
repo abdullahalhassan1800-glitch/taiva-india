@@ -454,64 +454,110 @@
   <script src="app.js"></script>
   <script>
   // Dynamic product loading from server
+  var allWebProducts = [];
+  var activeCategory = '';
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   async function loadWebProducts() {
     try {
       var resp = await fetch('Admin%20pannel/api.php?action=webProducts');
       var data = await resp.json();
       if (data.success && data.products && data.products.length > 0) {
-        renderWebProducts(data.products);
+        allWebProducts = data.products.filter(function(p) { return p.active !== false; });
+        renderCategoryFilter(allWebProducts);
+        renderWebProducts(allWebProducts);
       }
     } catch(e) {
-      // Fallback cards already in HTML, no action needed
+      // Fallback cards remain in HTML
     }
+  }
+
+  function renderCategoryFilter(products) {
+    var cats = {};
+    products.forEach(function(p) {
+      if (p.category) cats[p.category] = 1;
+    });
+    var catList = Object.keys(cats).sort();
+    if (catList.length <= 1) return; // No filter needed if only 1 category
+
+    var section = document.getElementById('products');
+    if (!section) return;
+    var header = section.querySelector('.section-header');
+    if (!header) return;
+
+    var filterBar = document.createElement('div');
+    filterBar.className = 'category-filter-bar';
+    filterBar.style.cssText = 'display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:32px;';
+    filterBar.innerHTML = '<button class="cat-pill active" data-cat="" onclick="filterByCategory(this, \'\')">All</button>' +
+      catList.map(function(c) {
+        return '<button class="cat-pill" data-cat="' + escapeHtml(c) + '" onclick="filterByCategory(this, \'' + escapeHtml(c).replace(/'/g, "\\'") + '\')">' + escapeHtml(c) + '</button>';
+      }).join('');
+    header.parentNode.insertBefore(filterBar, header.nextSibling);
+  }
+
+  function filterByCategory(btn, cat) {
+    activeCategory = cat;
+    document.querySelectorAll('.cat-pill').forEach(function(p) { p.classList.remove('active'); });
+    btn.classList.add('active');
+    var filtered = cat ? allWebProducts.filter(function(p) { return p.category === cat; }) : allWebProducts;
+    renderWebProducts(filtered);
   }
 
   function renderWebProducts(products) {
     var grid = document.getElementById('productsGrid');
     if (!grid || products.length === 0) return;
+
     grid.innerHTML = products.map(function(p) {
       var discount = p.originalPrice ? Math.round((1 - p.price / p.originalPrice) * 100) : 0;
       var img = (p.images && p.images[0]) || p.image || 'https://placehold.co/400x400/e2e8f0/94a3b8?text=No+Image';
-      var link = 'product.html?id=' + p.id;
+      var link = 'product.html?id=' + encodeURIComponent(p.id);
+      var name = escapeHtml(p.name);
+      var tagline = escapeHtml(p.tagline || p.category || '');
+      var rating = p.rating || 4.8;
+      var reviews = p.reviewCount || 0;
+      var stars = '';
+      for (var s = 0; s < 5; s++) {
+        stars += s < Math.floor(rating) ? '&#9733;' : (s < rating ? '&#9733;' : '&#9734;');
+      }
+
       return '<div class="product-card">' +
         '<div class="card-image product-image">' +
-          '<a href="' + link + '"><img src="' + img + '" alt="' + p.name + '" loading="lazy"></a>' +
+          '<a href="' + link + '"><img src="' + escapeHtml(img) + '" alt="' + name + '" loading="lazy"></a>' +
           (discount ? '<span class="badge-discount">-' + discount + '%</span>' : '') +
         '</div>' +
         '<div class="card-body">' +
-          (p.tagline ? '<span class="category">' + p.tagline + '</span>' : '') +
-          '<h3><a href="' + link + '">' + p.name + '</a></h3>' +
+          (tagline ? '<span class="category">' + tagline + '</span>' : '') +
+          '<h3><a href="' + link + '">' + name + '</a></h3>' +
+          (reviews > 0 ? '<div class="card-rating"><span class="stars">' + stars + '</span> <span>' + rating + ' (' + reviews + ')</span></div>' : '') +
           '<div class="price-row">' +
             '<span class="current current-price">Rs. ' + p.price.toLocaleString('en-IN') + '</span>' +
             (p.originalPrice ? '<span class="original original-price">Rs. ' + p.originalPrice.toLocaleString('en-IN') + '</span>' : '') +
           '</div>' +
-          '<button class="add-btn add-to-cart" onclick="addWebToCart(\'' + p.name.replace(/'/g, "\\'") + '\', ' + p.price + ', \'' + img.replace(/'/g, "\\'") + '\')">Add to Cart</button>' +
+          '<button class="add-btn add-to-cart" onclick="addWebToCart(\'' + name.replace(/'/g, "\\'") + '\', ' + p.price + ', \'' + escapeHtml(img).replace(/'/g, "\\'") + '\')">Add to Cart</button>' +
         '</div>' +
       '</div>';
     }).join('');
-
-    // Re-init add-to-cart buttons for dynamic products
-    grid.querySelectorAll('.add-to-cart').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        if (this.getAttribute('onclick')) return; // Already has onclick handler
-        var card = this.closest('.product-card');
-        var name = card.querySelector('h3')?.textContent?.trim() || 'Product';
-        var priceText = card.querySelector('.current-price')?.textContent?.trim() || '0';
-        var image = card.querySelector('.product-image img')?.src || '';
-        var m = priceText.match(/[\d,]+/);
-        var price = m ? parseInt(m[0].replace(/,/g, '')) : 0;
-        addToCart(name, price, image);
-      });
-    });
   }
 
   function addWebToCart(name, price, image) {
     if (typeof addToCart === 'function') {
       addToCart(name, price, image);
     } else {
-      // Fallback
-      var cart = JSON.parse(localStorage.getItem('taiva_cart')) || [];
-      cart.push({ name: name, price: price, image: image, qty: 1 });
+      // Fallback: save to localStorage directly
+      var cart = JSON.parse(localStorage.getItem('taiva_cart') || '[]');
+      var existing = -1;
+      for (var i = 0; i < cart.length; i++) {
+        if (cart[i].name === name && cart[i].price === price) { existing = i; break; }
+      }
+      if (existing !== -1) {
+        cart[existing].qty = (cart[existing].qty || 1) + 1;
+      } else {
+        cart.push({ name: name, price: price, image: image, qty: 1 });
+      }
       localStorage.setItem('taiva_cart', JSON.stringify(cart));
     }
   }

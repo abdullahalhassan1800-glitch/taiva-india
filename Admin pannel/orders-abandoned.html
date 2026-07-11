@@ -27,7 +27,7 @@
 <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
 <span class="nav-label">Orders</span>
 <span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span>
-<span class="nav-badge">31</span>
+<span class="nav-badge" id="orderBadge">0</span>
 </a>
 <div class="nav-sub open">
 <a href="orders.html" class="nav-item">All orders</a>
@@ -187,16 +187,6 @@
 
 <script src="app.js"></script>
 <script>
-document.getElementById('themeToggle')?.addEventListener('click', function() {
-var html = document.documentElement;
-var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-html.setAttribute('data-theme', theme);
-localStorage.setItem('taiva_theme', theme);
-this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-});
-var savedTheme = localStorage.getItem('taiva_theme');
-if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
-
 function renderAbandoned() {
 var items = getData('abandoned');
 var search = (document.getElementById('searchInput').value || '').toLowerCase();
@@ -216,19 +206,19 @@ if (filtered.length === 0) {
 tbody.innerHTML = '<tr><td colspan="8" class="text-muted text-center" style="padding:24px;">No abandoned checkouts</td></tr>';
 } else {
 tbody.innerHTML = filtered.map(function(a) {
-var itemsHtml = a.items ? a.items.map(function(i) { return i.name + ' x' + i.qty; }).join(', ') : '-';
-var statusBadge = '<span class="badge badge-' + (a.status === 'recovered' ? 'success' : 'pending') + '">' + a.status + '</span>';
-return '<tr><td><div class="customer-cell"><div class="avatar">' + a.customerName.charAt(0) + '</div><div>' + a.customerName + '</div></div></td>' +
-'<td>' + (a.email || '-') + '</td>' +
-'<td>' + (a.phone || '-') + '</td>' +
+var itemsHtml = a.items ? a.items.map(function(i) { return escapeHtml(i.name) + ' x' + i.qty; }).join(', ') : '-';
+var statusBadge = '<span class="badge badge-' + (a.status === 'recovered' ? 'success' : 'pending') + '">' + escapeHtml(a.status) + '</span>';
+return '<tr><td><div class="customer-cell"><div class="avatar">' + escapeHtml(a.customerName.charAt(0)) + '</div><div>' + escapeHtml(a.customerName) + '</div></div></td>' +
+'<td>' + (escapeHtml(a.email || '-')) + '</td>' +
+'<td>' + (escapeHtml(a.phone || '-')) + '</td>' +
 '<td style="font-size:12px;">' + itemsHtml + '</td>' +
 '<td>' + formatCurrency(a.total || 0) + '</td>' +
 '<td>' + formatDateTime(a.createdAt) + '</td>' +
 '<td>' + statusBadge + '</td>' +
 '<td><div class="abandoned-actions">' +
-(a.status !== 'recovered' ? '<button class="btn btn-sm" onclick="sendReminder(\'' + a.id + '\')"><i class="fa-solid fa-envelope"></i> Remind</button>' : '') +
-(a.status !== 'recovered' ? '<button class="btn btn-sm btn-accent" onclick="markRecovered(\'' + a.id + '\')"><i class="fa-solid fa-check"></i> Recovered</button>' : '') +
-'<button class="btn btn-sm btn-danger" onclick="openDeleteAbandonedModal(\'' + a.id + '\')"><i class="fa-solid fa-trash"></i></button>' +
+(a.status !== 'recovered' ? '<button class="btn btn-sm" onclick="sendReminder(\'' + escapeHtml(a.id) + '\')"><i class="fa-solid fa-envelope"></i> Remind</button>' : '') +
+(a.status !== 'recovered' ? '<button class="btn btn-sm btn-accent" onclick="markRecovered(\'' + escapeHtml(a.id) + '\')"><i class="fa-solid fa-check"></i> Recovered</button>' : '') +
+'<button class="btn btn-sm btn-danger" onclick="openDeleteAbandonedModal(\'' + escapeHtml(a.id) + '\')"><i class="fa-solid fa-trash"></i></button>' +
 '</div></td></tr>';
 }).join('');
 }
@@ -238,6 +228,7 @@ function sendReminder(id) {
 var items = getData('abandoned');
 var a = items.find(function(x) { return x.id === id; });
 if (!a) return;
+logActivity('reminder_sent', 'Reminder sent to ' + (a.email || a.customerName));
 showToast('Reminder sent to ' + (a.email || a.customerName), 'success');
 }
 

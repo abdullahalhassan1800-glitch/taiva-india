@@ -31,7 +31,7 @@
 <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
 <span class="nav-label">Orders</span>
 <span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span>
-<span class="nav-badge">31</span>
+<span class="nav-badge" id="orderBadge">0</span>
 </a>
 <div class="nav-sub open">
 <a href="orders.html" class="nav-item">All orders</a>
@@ -254,21 +254,11 @@
 <script src="data/indian-cities.js"></script>
 <script src="app.js"></script>
 <script>
-document.getElementById('themeToggle')?.addEventListener('click', function() {
-var html = document.documentElement;
-var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-html.setAttribute('data-theme', theme);
-localStorage.setItem('taiva_theme', theme);
-this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-});
-var savedTheme = localStorage.getItem('taiva_theme');
-if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
-
 function populateProductDropdown(sel) {
 var products = getData('products');
 sel.innerHTML = '<option value="">Select product</option>';
 products.forEach(function(p) {
-sel.innerHTML += '<option value="' + p.id + '" data-price="' + p.price + '" data-name="' + p.name.replace(/"/g,'&quot;') + '" data-sku="' + (p.sku || 'NA') + '">' + p.name + ' — ' + formatCurrency(p.price) + '</option>';
+sel.innerHTML += '<option value="' + escapeHtml(p.id) + '" data-price="' + p.price + '" data-name="' + escapeHtml(p.name) + '" data-sku="' + escapeHtml(p.sku || 'NA') + '">' + escapeHtml(p.name) + ' — ' + formatCurrency(p.price) + '</option>';
 });
 }
 
@@ -377,12 +367,12 @@ tbody.innerHTML = '<tr><td colspan="6" class="text-muted text-center" style="pad
 } else {
 tbody.innerHTML = filtered.map(function(d) {
 var itemsCount = d.items ? d.items.length : 0;
-return '<tr><td><span style="color:var(--accent);font-weight:500;">' + d.id + '</span></td>' +
-'<td><div class="customer-cell"><div class="avatar">' + d.customerName.charAt(0) + '</div><div>' + d.customerName + '<br><span class="text-muted" style="font-size:11px;">' + d.phone + '</span></div></div></td>' +
+return '<tr><td><span style="color:var(--accent);font-weight:500;">' + escapeHtml(d.id) + '</span></td>' +
+'<td><div class="customer-cell"><div class="avatar">' + escapeHtml(d.customerName.charAt(0)) + '</div><div>' + escapeHtml(d.customerName) + '<br><span class="text-muted" style="font-size:11px;">' + escapeHtml(d.phone) + '</span></div></div></td>' +
 '<td>' + itemsCount + ' item' + (itemsCount !== 1 ? 's' : '') + '</td>' +
 '<td>' + formatCurrency(d.total) + '</td>' +
 '<td>' + formatDate(d.createdAt) + '</td>' +
-'<td><div class="draft-actions"><button class="btn btn-sm btn-accent" onclick="convertDraft(\'' + d.id + '\')"><i class="fa-solid fa-arrow-right"></i> Convert</button><button class="btn btn-sm btn-danger" onclick="openDeleteDraftModal(\'' + d.id + '\')"><i class="fa-solid fa-trash"></i></button></div></td></tr>';
+'<td><div class="draft-actions"><button class="btn btn-sm btn-accent" onclick="convertDraft(\'' + escapeHtml(d.id) + '\')"><i class="fa-solid fa-arrow-right"></i> Convert</button><button class="btn btn-sm btn-danger" onclick="openDeleteDraftModal(\'' + escapeHtml(d.id) + '\')"><i class="fa-solid fa-trash"></i></button></div></td></tr>';
 }).join('');
 }
 }
@@ -435,6 +425,17 @@ if (oi !== -1) { orders[oi] = orderData; setData('orders', orders); }
 showToast('Shiprocket order created! ID: ' + result.shiprocket_order_id, 'success');
 } else {
 showToast('Order saved. Shiprocket: ' + result.error, 'error');
+
+drafts = getData('drafts');
+drafts.splice(idx, 0, draft);
+setData('drafts', drafts);
+
+orders = getData('orders');
+var failedIdx = orders.findIndex(function(o) { return o.id === orderData.id; });
+if (failedIdx !== -1) { orders.splice(failedIdx, 1); setData('orders', orders); }
+
+showToast('Rolled back: draft restored, failed order removed', 'info');
+renderDrafts();
 }
 }
 

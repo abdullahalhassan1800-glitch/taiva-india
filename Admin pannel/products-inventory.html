@@ -21,7 +21,7 @@
     <nav class="sidebar-nav">
       <div class="nav-section">Main</div>
       <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
-      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge">31</span></a>
+      <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-box"></i></span><span class="nav-label">Orders</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span><span class="nav-badge" id="orderBadge">0</span></a>
       <div class="nav-sub"><a href="orders.html" class="nav-item">All orders</a><a href="orders-draft.html" class="nav-item">Drafts</a><a href="orders-abandoned.html" class="nav-item">Abandoned checkouts</a></div>
       <a href="#" class="nav-item has-submenu active"><span class="nav-icon"><i class="fa-solid fa-tag"></i></span><span class="nav-label">Products</span><span class="nav-arrow open"><i class="fa-solid fa-chevron-right"></i></span></a>
       <div class="nav-sub open">
@@ -103,20 +103,9 @@
     </div>
   </div>
 
-  <script>
-    document.getElementById('themeToggle')?.addEventListener('click', function() {
-      var html = document.documentElement;
-      var theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', theme);
-      localStorage.setItem('taiva_theme', theme);
-      this.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    });
-    var savedTheme = localStorage.getItem('taiva_theme');
-    if (savedTheme) { document.documentElement.setAttribute('data-theme', savedTheme); }
-  </script>
   <script src="app.js"></script>
   <script>
-  function initPage() {
+  initPage = function() {
     loadCategoryFilter();
     loadProductSelect();
     loadInventory();
