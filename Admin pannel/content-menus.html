@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Menus — Taiva Admin</title>
+<title>Menus — OMS Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=10">
 <style>
 .menu-item-row { display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:6px; }
 .menu-item-row .drag-handle { cursor:grab; color:var(--text-muted); font-size:14px; }
@@ -20,8 +21,8 @@
 
 <div class="sidebar" id="sidebar">
 <div class="sidebar-header">
-<img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-<span class="logo-text">Taiva</span>
+<img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+<span class="logo-text">OMS</span>
 </div>
 <nav class="sidebar-nav">
 <div class="nav-section">Main</div>
@@ -45,11 +46,14 @@
 <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
 <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
 <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section nav-role-manager">Agents</div>
+<a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
 <div class="nav-section">Settings</div>
-<a href="users.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
+<a href="users.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
 <a href="settings.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
 <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
 </nav>
+<div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
 </div>
 
 <div class="main-content">
@@ -60,7 +64,7 @@
 <div class="topbar-actions">
 <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
 <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-<div class="admin-avatar">A</div>
+<div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
 </div>
 </header>
 
@@ -164,7 +168,7 @@ function renderMenus() {
   }
   tbody.innerHTML = menus.map(function (m) {
     var count = flattenItems(m.items || []).length;
-    return '<tr><td><a href="#" onclick="openMenuEditor(\'' + m.id + '\');return false;" style="font-weight:500;color:var(--accent);">' + m.name + '</a></td><td><span class="badge badge-active">' + m.location + '</span></td><td>' + count + ' item' + (count !== 1 ? 's' : '') + '</td><td>' + formatDate(m.createdAt) + '</td><td><button class="btn btn-sm" onclick="editMenu(\'' + m.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteMenu(\'' + m.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+    return '<tr><td><a href="#" onclick="openMenuEditor(\'' + m.id + '\');return false;" style="font-weight:500;color:var(--accent);">' + m.name + '</a></td><td><span class="badge badge-active">' + m.location + '</span></td><td>' + count + ' item' + (count !== 1 ? 's' : '') + '</td><td>' + formatDate(m.createdAt) + '</td><td><button class="btn btn-sm" onclick="editMenu(\'' + m.id + '\')"><i class="fa-solid fa-pen"></i></button>' + (canDelete() ? ' <button class="btn btn-sm btn-danger" onclick="deleteMenu(\'' + m.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '') + '</td></tr>';
   }).join('');
 }
 
@@ -215,6 +219,7 @@ function editMenu(id) {
 }
 
 function deleteMenu(id) {
+  if (!canDelete()) { showToast('Access denied', 'error'); return; }
   var m = getMenus().find(function (x) { return x.id === id; });
   if (!m) return;
   document.getElementById('deleteMenuId').value = id;
@@ -223,6 +228,7 @@ function deleteMenu(id) {
 }
 
 function confirmDeleteMenu() {
+  if (!canDelete()) { showToast('Access denied', 'error'); return; }
   var id = document.getElementById('deleteMenuId').value;
   saveMenus(getMenus().filter(function (x) { return x.id !== id; }));
   closeModal('deleteMenuModal');
@@ -415,6 +421,6 @@ document.addEventListener('click', function (e) {
   if (e.target.classList.contains('modal-overlay')) closeAllModals();
 });
 </script>
-<script src="app.js"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>

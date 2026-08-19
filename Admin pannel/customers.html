@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>All Customers — Taiva Admin</title>
+<title>All Customers — OMS Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=10">
 <style>
 .customer-orders-list { display: flex; flex-direction: column; gap: 8px; }
 .customer-orders-list .co-item { padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; }
@@ -17,8 +18,8 @@
 
 <div class="sidebar" id="sidebar">
 <div class="sidebar-header">
-<img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-<span class="logo-text">Taiva</span>
+<img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+<span class="logo-text">OMS</span>
 </div>
 <nav class="sidebar-nav">
 <div class="nav-section">Main</div>
@@ -41,11 +42,14 @@
 <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
 <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
 <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section nav-role-manager">Agents</div>
+<a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
 <div class="nav-section">Settings</div>
-<a href="users.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
+<a href="users.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
 <a href="settings.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
 <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
 </nav>
+<div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
 </div>
 
 <div class="main-content">
@@ -56,9 +60,10 @@
 <div class="topbar-actions">
 <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
 <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-<div class="admin-avatar">A</div>
-</div>
-</header>
+<div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
+      <p style="font-size:11px;margin:4px 0;color:var(--text-muted);">Design and Developed by Abdullah Al Hassan</p>
+      </div>
+    </header>
 
 <div class="page-content">
 <div class="page-header">
@@ -111,7 +116,7 @@ initPage = function() {
 }
 
 function getCustomers() {
-  var orders = getData('orders');
+  var orders = getOrders();
   var map = {};
   orders.forEach(function (o) {
     var key = o.phone || 'unknown';
@@ -172,15 +177,16 @@ function showCustomerOrders(phone) {
   } else {
     list.innerHTML = c.orders.map(function (o) {
       var items = (o.items || []).map(function (i) { return i.name + ' x' + (i.qty || 1); }).join(', ');
-      return '<div class="co-item"><div class="co-info"><strong>' + o.id + '</strong>' +
+      return '<div class="co-item" style="cursor:pointer;" onclick="window.location=\'orders-detail.html?id=' + encodeURIComponent(o.id) + '\'"><div class="co-info"><strong>' + escapeHtml(orderDisplayNo(o)) + '</strong>' +
         '<div>' + items + '</div>' +
-        '<div class="text-muted">' + formatDate(o.createdAt) + ' &middot; ' + (o.status || '') + '</div></div>' +
+        '<div class="text-muted">' + formatDate(o.createdAt) + '</div>' +
+        '<div style="margin-top:4px;">' + getOrderBadgesHtml(o) + '</div></div>' +
         '<div style="font-weight:600;">' + formatCurrency(o.total) + '</div></div>';
     }).join('');
   }
   openModal('customerOrdersModal');
 }
 </script>
-<script src="app.js"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>

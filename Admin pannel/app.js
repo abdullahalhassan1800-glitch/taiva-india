@@ -1,5 +1,5 @@
 /* ============================================================
-   Taiva Admin — app.js (Shared Logic)
+   OMS Admin — app.js (Shared Logic)
    ============================================================ */
 
 // ---- DATA HELPERS ----
@@ -13,7 +13,7 @@ function setData(key, data) {
   localStorage.setItem('taiva_' + key, JSON.stringify(data));
   // Auto-sync to Milesweb (primary)
   // Map webProducts -> web_products key to match what api.php reads
-  var mc = getMilesConfig();
+  var mc = ensureMilesConfig();
   if (mc && mc.enabled && mc.url && mc.token && (mc.autoSync !== false)) {
     var syncKey = key === 'webProducts' ? 'web_products' : key;
     milesSave(syncKey, data);
@@ -44,32 +44,140 @@ function requireRole(roles) {
   }
   return true;
 }
+function canDelete() {
+  var u = getCurrentUser();
+  return u && (u.role === 'super_admin' || u.role === 'manager');
+}
 function login(username, password) {
-  var users = getUsers();
-  var defaults = [
-    { id:'USR001', username:'Admin', password:'Taiva@2026FB', name:'Super Admin', role:'super_admin', status:'active', createdAt:new Date().toISOString() },
-    { id:'USR002', username:'Shivam', password:'Admin@123', name:'Shivam', role:'manager', status:'active', createdAt:new Date().toISOString() }
-  ];
-  var needsSave = false;
-  defaults.forEach(function(d) {
-    if (!users.some(function(u) { return u.username === d.username; })) {
-      users.push(d); needsSave = true;
+  return (async function() {
+    await syncUsersFromServer();
+    var users = getUsers();
+    var defaults = [
+      { id:'USR001', username:'Admin', password:'Taiva@2026FB', name:'Super Admin', role:'super_admin', status:'active', createdAt:new Date().toISOString() },
+      { id:'USR002', username:'Shivam', password:'Admin@123', name:'Shivam', role:'manager', status:'active', createdAt:new Date().toISOString() }
+    ];
+    var needsSave = false;
+    defaults.forEach(function(d) {
+      if (!users.some(function(u) { return u.username === d.username; })) {
+        users.push(d); needsSave = true;
+      }
+    });
+    if (needsSave) saveUsers(users);
+    for (var i = 0; i < users.length; i++) {
+      if (users[i].username === username && users[i].password === password && users[i].status === 'active') {
+        var u = users[i];
+        sessionStorage.setItem('taiva_admin', JSON.stringify({ user: u.username, name: u.name, role: u.role, id: u.id }));
+        logActivity('login', 'User ' + u.username + ' logged in');
+        return true;
+      }
     }
-  });
-  if (needsSave) saveUsers(users);
-  for (var i = 0; i < users.length; i++) {
-    if (users[i].username === username && users[i].password === password && users[i].status === 'active') {
-      var u = users[i];
-      sessionStorage.setItem('taiva_admin', JSON.stringify({ user: u.username, name: u.name, role: u.role, id: u.id }));
-      logActivity('login', 'User ' + u.username + ' logged in');
-      return true;
-    }
+    return false;
+  })();
+}
+
+function mergeUsers(a, b) {
+  var map = {};
+  var i;
+  for (i = 0; i < a.length; i++) if (a[i]) map[a[i].id || a[i].username] = a[i];
+  for (i = 0; i < b.length; i++) if (b[i]) map[b[i].id || b[i].username] = b[i];
+  return Object.keys(map).map(function(k) { return map[k]; });
+}
+
+async function syncUsersFromServer() {
+  var mc = getMilesConfig();
+  if (!mc || !mc.url || !mc.token) {
+    mc = { url: 'https://taiva.in/Admin%20pannel/api.php', token: 'MilesToken@2026', enabled: true, autoSync: true };
+    setMilesConfig(mc);
   }
-  return false;
+  if (!mc || !mc.enabled || !mc.url || !mc.token) return false;
+  try {
+    var r = await milesLoad('users');
+    if (!r || !r.success || !r.data) return false;
+    var remote = [];
+    try { remote = JSON.parse(r.data) || []; } catch(e) { remote = []; }
+    if (!Array.isArray(remote) || !remote.length) return false;
+    var local = [];
+    try { local = getUsers(); } catch(e) { local = []; }
+    localStorage.setItem('taiva_users', JSON.stringify(mergeUsers(remote, local)));
+    return true;
+  } catch(e) { return false; }
 }
 function logout() {
   sessionStorage.removeItem('taiva_admin');
   window.location.href = 'index.html';
+}
+
+// ---- PROFILE MENU (topbar avatar) ----
+function profileRoleLabel(r) {
+  var labels = { super_admin: 'Super Admin', manager: 'Manager', agent: 'Agent', viewer: 'Viewer' };
+  return labels[r] || r || '';
+}
+function updateAvatarInitial() {
+  var initial = document.getElementById('avatarInitial');
+  if (!initial) return;
+  var u = getCurrentUser();
+  var letter = 'A';
+  if (u) {
+    letter = ((u.name || u.user || 'A').trim().charAt(0) || 'A').toUpperCase();
+  }
+  if (initial.textContent !== letter) initial.textContent = letter;
+}
+function toggleProfileMenu(e) {
+  if (e) e.stopPropagation();
+  var menu = document.getElementById('profileMenu');
+  if (!menu) { buildProfileMenu(); menu = document.getElementById('profileMenu'); }
+  if (!menu) return;
+  menu.classList.toggle('show');
+  updateAvatarInitial();
+}
+var _profileMenuListenersAdded = false;
+function buildProfileMenu() {
+  var existing = document.getElementById('profileMenu');
+  if (existing) return existing;
+  var menu = document.createElement('div');
+  menu.className = 'profile-menu';
+  menu.id = 'profileMenu';
+  var u = getCurrentUser();
+  var name = u ? (u.name || u.user || '') : '';
+  var uname = u ? (u.user || '') : '';
+  var role = u ? (u.role || '') : '';
+  var initial = ((name || uname || 'A').trim().charAt(0) || 'A').toUpperCase();
+  var email = '';
+  try {
+    var users = getUsers();
+    for (var i = 0; i < users.length; i++) {
+      if (users[i].username === uname && users[i].email) { email = users[i].email; break; }
+    }
+  } catch(e) {}
+  menu.innerHTML =
+    '<div class="profile-menu-header">' +
+      '<div class="profile-avatar">' + escapeHtml(initial) + '</div>' +
+      '<div>' +
+        '<div class="profile-name">' + escapeHtml(name || 'Account') + '</div>' +
+        '<div class="profile-username">@' + escapeHtml(uname) + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="profile-menu-row"><span style="font-size:12px;color:var(--text-muted);">Role</span>' + (role ? '<span class="role-badge role-' + escapeHtml(role) + '">' + escapeHtml(profileRoleLabel(role)) + '</span>' : '') + '</div>' +
+    (email ? '<div class="profile-menu-row"><i class="fa-solid fa-envelope" style="color:var(--text-muted);width:16px;text-align:center;"></i>' + escapeHtml(email) + '</div>' : '') +
+    '<div class="profile-menu-divider"></div>' +
+    '<button type="button" class="profile-menu-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>';
+  document.body.appendChild(menu);
+  if (!_profileMenuListenersAdded) {
+    _profileMenuListenersAdded = true;
+    document.addEventListener('click', function(e) {
+      var m = document.getElementById('profileMenu');
+      var av = document.getElementById('adminAvatar');
+      if (m && m.classList.contains('show') && (!av || !av.contains(e.target))) {
+        m.classList.remove('show');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var m = document.getElementById('profileMenu');
+        if (m) m.classList.remove('show');
+      }
+    });
+  }
 }
 
 // ---- USERS CRUD ----
@@ -90,9 +198,14 @@ function addUser(user) {
 }
 function updateUser(id, updates) {
   var users = getUsers();
+  var allowedKeys = ['username', 'password', 'name', 'email', 'role', 'status', 'rights', 'phone'];
   for (var i = 0; i < users.length; i++) {
     if (users[i].id === id) {
-      for (var k in updates) users[i][k] = updates[k];
+      for (var k in updates) {
+        if (allowedKeys.indexOf(k) !== -1 && updates.hasOwnProperty(k)) {
+          users[i][k] = updates[k];
+        }
+      }
       saveUsers(users);
       return true;
     }
@@ -100,7 +213,17 @@ function updateUser(id, updates) {
   return false;
 }
 function deleteUser(id) {
+  if (!canDelete()) return;
   saveUsers(getUsers().filter(function(u) { return u.id !== id; }));
+}
+
+var ALL_RIGHTS = ['own_orders_only', 'create_orders', 'view_reports', 'draft_access'];
+function hasRight(u, right) {
+  if (!u) return false;
+  if (u.role === 'super_admin' || u.role === 'manager') return true;
+  if (u.role !== 'agent') return false;
+  if (!u.rights || !u.rights.length) return ALL_RIGHTS.indexOf(right) !== -1;
+  return u.rights.indexOf(right) !== -1;
 }
 
 // ---- ACTIVITY LOG ----
@@ -219,19 +342,28 @@ function showToast(msg, type) {
   }
   var t = document.createElement('div');
   t.className = 'toast toast-' + type;
-  t.innerHTML = '<i class="fa-solid ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle') + '"></i> ' + msg;
+  var iconClass = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle';
+  t.textContent = '';
+  var icon = document.createElement('i');
+  icon.className = 'fa-solid ' + iconClass;
+  t.appendChild(icon);
+  t.appendChild(document.createTextNode(' ' + msg));
   container.appendChild(t);
   setTimeout(function () { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(function () { t.remove(); }, 300); }, 3000);
 }
 
 // ---- MODALS ----
 function openModal(id) {
-  document.getElementById('modalOverlay').classList.add('active');
-  document.getElementById(id).classList.add('active');
+  var overlay = document.getElementById('modalOverlay');
+  var modal = document.getElementById(id);
+  if (overlay) overlay.classList.add('active');
+  if (modal) modal.classList.add('active');
 }
 function closeModal(id) {
-  document.getElementById('modalOverlay').classList.remove('active');
-  document.getElementById(id).classList.remove('active');
+  var overlay = document.getElementById('modalOverlay');
+  var modal = document.getElementById(id);
+  if (overlay) overlay.classList.remove('active');
+  if (modal) modal.classList.remove('active');
 }
 function closeAllModals() {
   document.querySelectorAll('.modal').forEach(function (m) { m.classList.remove('active'); });
@@ -244,7 +376,9 @@ document.addEventListener('click', function (e) {
 
 // ---- FORMAT HELPERS ----
 function formatCurrency(n) {
-  return 'Rs. ' + Number(n).toLocaleString('en-IN');
+  var val = Number(n);
+  if (isNaN(val)) val = 0;
+  return 'Rs. ' + val.toLocaleString('en-IN');
 }
 function formatDate(d) {
   if (!d) return '-';
@@ -258,6 +392,27 @@ function formatDateTime(d) {
 }
 function generateId() {
   return 'ORD' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase();
+}
+function orderDisplayNo(o) {
+  if (o && o.orderNumber) return '#' + o.orderNumber;
+  return '#' + (o ? o.id : '');
+}
+function getOrderNumberCounter() {
+  var c = parseInt(localStorage.getItem('taiva_orderCounter'), 10);
+  return isNaN(c) || c < 1000 ? 999 : c;
+}
+function nextOrderNumber() {
+  var maxNum = 999;
+  try {
+    getOrders().forEach(function(o) {
+      var n = parseInt(o.orderNumber, 10);
+      if (!isNaN(n) && n > maxNum) maxNum = n;
+    });
+  } catch(e) {}
+  var c = getOrderNumberCounter();
+  var next = Math.max(maxNum, c) + 1;
+  localStorage.setItem('taiva_orderCounter', next);
+  return next;
 }
 function generateSku() {
   return 'SKU-' + Math.random().toString(36).substr(2, 8).toUpperCase();
@@ -312,6 +467,7 @@ async function authenticateShiprocket() {
   }
 }
 
+var _shiprocketRetryCount = 0;
 async function createShiprocketOrder(orderData) {
   // First ensure we have a token
   if (!shiprocketToken) {
@@ -325,7 +481,7 @@ async function createShiprocketOrder(orderData) {
     pickup_location: 'Primary',
     billing_customer_name: orderData.customerName,
     billing_last_name: '',
-    billing_address: orderData.address,
+    billing_address: (orderData.address || '') + (orderData.landmark ? ', ' + orderData.landmark : ''),
     billing_city: orderData.city,
     billing_pincode: orderData.pincode,
     billing_state: orderData.state || 'Uttar Pradesh',
@@ -361,10 +517,12 @@ async function createShiprocketOrder(orderData) {
     if (!resp.ok) {
       var errText = await resp.text();
       // If token expired, re-auth and retry once
-      if (resp.status === 401) {
+      if (resp.status === 401 && _shiprocketRetryCount < 1) {
         shiprocketToken = null;
+        _shiprocketRetryCount++;
         return await createShiprocketOrder(orderData);
       }
+      _shiprocketRetryCount = 0;
       return { success: false, error: 'Shiprocket order failed: ' + (errText || resp.statusText) };
     }
     var data = await resp.json();
@@ -474,8 +632,15 @@ function driveSave(key, data) {
   var fullKey = 'taiva_' + key;
   var payload = data !== undefined ? data : (function(){ try{return JSON.parse(localStorage.getItem(fullKey));}catch(e){return null;}})();
   if (payload === null || payload === undefined) return Promise.resolve({success:true, skipped:true});
-  var url = dc.url + '?action=save&key=' + encodeURIComponent(fullKey) + '&data=' + encodeURIComponent(JSON.stringify(payload)) + '&token=' + encodeURIComponent(dc.token);
-  return driveGet(url).then(function(r){
+  // Use POST body instead of GET URL to avoid truncation
+  var url = dc.url + '?action=save&key=' + encodeURIComponent(fullKey) + '&token=' + encodeURIComponent(dc.token);
+  return fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({data: JSON.stringify(payload)})
+  }).then(function(r){
+    return r.json();
+  }).then(function(r){
     if (r.success) localStorage.setItem(DRIVE_LAST_SYNC_KEY, new Date().toISOString());
     return r;
   }).catch(function(e){ return {success:false,error:e.message}; });
@@ -549,6 +714,21 @@ function getMilesConfig() {
 }
 function setMilesConfig(cfg) {
   localStorage.setItem('taiva_milesConfig', JSON.stringify(cfg));
+}
+
+function ensureMilesConfig() {
+  var mc = getMilesConfig();
+  var needsFix = false;
+  if (!mc) { mc = {}; needsFix = true; }
+  if (!mc.url || String(mc.url).indexOf(' ') !== -1) {
+    mc.url = 'https://taiva.in/Admin%20pannel/api.php';
+    needsFix = true;
+  }
+  if (!mc.token) { mc.token = 'MilesToken@2026'; needsFix = true; }
+  if (mc.enabled !== true && mc.enabled !== false) { mc.enabled = true; needsFix = true; }
+  if (mc.autoSync !== true && mc.autoSync !== false) { mc.autoSync = true; needsFix = true; }
+  if (needsFix) setMilesConfig(mc);
+  return mc;
 }
 
 function getMilesLastSync() {
@@ -630,6 +810,309 @@ async function autoRestoreFromMilesweb() {
   } catch(e) {}
   return false;
 }
+
+// ---- REALTIME SYNC ----
+var REALTIME_POLL_INTERVAL = 5000;
+var realtimeTimer = null;
+var realtimePolling = false;
+var syncFailCount = 0;
+var newOrderPopupQueue = [];
+var newOrderPopupShown = false;
+
+function canSeeNewOrderPopup() {
+  var u = getCurrentUser();
+  return u && (u.role === 'super_admin' || u.role === 'manager');
+}
+
+function startRealtimeSync() {
+  if (window.location.pathname.indexOf('index.html') !== -1) return;
+  if (realtimeTimer) clearInterval(realtimeTimer);
+  realtimeTimer = setInterval(syncOrdersRealtime, REALTIME_POLL_INTERVAL);
+  setTimeout(syncOrdersRealtime, 2000);
+}
+
+async function syncOrdersRealtime() {
+  if (realtimePolling) return;
+  var mc = ensureMilesConfig();
+  if (!mc || !mc.enabled || !mc.url || !mc.token) return;
+  realtimePolling = true;
+  try {
+    var res = await milesLoad('orders');
+    if (!res || !res.success) {
+      syncFailCount++;
+      if (syncFailCount === 3 || syncFailCount % 30 === 0) {
+        showToast('Sync failed: ' + (res && res.error ? res.error : 'server error'), 'error');
+      }
+      return;
+    }
+    syncFailCount = 0;
+    var remote = [];
+    try { remote = JSON.parse(res.data) || []; } catch(e) { remote = []; }
+    if (!Array.isArray(remote)) remote = [];
+    var local = getOrders();
+    var localMap = {};
+    var i;
+    for (i = 0; i < local.length; i++) localMap[local[i].id] = local[i];
+    var changed = false;
+    var newOrders = [];
+    var now = new Date().toISOString();
+    for (i = 0; i < remote.length; i++) {
+      var r = remote[i];
+      if (!r || !r.id) continue;
+      var l = localMap[r.id];
+      var rTime = r.updatedAt || r.createdAt || '';
+      var lTime = l ? (l.updatedAt || l.createdAt || '') : '';
+      if (!l) {
+        r.updatedAt = r.updatedAt || r.createdAt || now;
+        local.unshift(r);
+        localMap[r.id] = r;
+        changed = true;
+        newOrders.push(r);
+      } else if (rTime > lTime) {
+        localMap[r.id] = r;
+        changed = true;
+      }
+    }
+    if (changed) {
+      _getOrdersSkipSync = true;
+      setData('orders', local);
+      _getOrdersSkipSync = false;
+      if (newOrders.length) {
+        showToast(newOrders.length + ' new order(s) synced', 'success');
+        for (var n = 0; n < newOrders.length; n++) {
+          addNotification({
+            id: newOrders[n].id,
+            title: 'New order ' + orderDisplayNo(newOrders[n]),
+            meta: (newOrders[n].customerName || '-') + (newOrders[n].phone ? ' \u00B7 ' + newOrders[n].phone : ''),
+            total: newOrders[n].total || 0,
+            time: Date.now()
+          });
+        }
+        if (canSeeNewOrderPopup()) {
+          newOrderPopupQueue = newOrderPopupQueue.concat(newOrders);
+          showNextNewOrderPopup();
+        }
+      }
+      try {
+        document.dispatchEvent(new CustomEvent('taiva:sync'));
+      } catch(e) {
+        document.dispatchEvent(new Event('taiva:sync'));
+      }
+    }
+  } catch(e) {}
+  finally { realtimePolling = false; }
+}
+
+// ---- NOTIFICATION BELL (topbar) ----
+var notificationItems = [];
+function notifSeenKey() {
+  var u = getCurrentUser();
+  return 'taiva_notif_seen_' + (u ? (u.user || 'anon') : 'anon');
+}
+function getNotifLastSeen() {
+  try { return parseInt(localStorage.getItem(notifSeenKey()) || '0', 10); } catch (e) { return 0; }
+}
+function setNotifLastSeen(ts) {
+  try { localStorage.setItem(notifSeenKey(), String(ts)); } catch (e) {}
+}
+function addNotification(item) {
+  if (!item) return;
+  notificationItems.unshift(item);
+  if (notificationItems.length > 50) notificationItems.pop();
+  updateNotificationDot();
+}
+function updateNotificationDot() {
+  var lastSeen = getNotifLastSeen();
+  var unread = 0;
+  for (var i = 0; i < notificationItems.length; i++) {
+    if ((notificationItems[i].time || 0) > lastSeen) unread++;
+  }
+  document.querySelectorAll('.notification-dot').forEach(function (d) {
+    if (unread > 0) {
+      d.style.display = 'flex';
+      d.textContent = unread > 9 ? '9+' : unread;
+    } else {
+      d.style.display = 'none';
+      d.textContent = '';
+    }
+  });
+}
+function initNotificationBell() {
+  var bell = document.querySelector('.topbar-actions .fa-bell');
+  if (!bell) return;
+  var btn = bell.closest('button');
+  if (!btn) return;
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    toggleNotifications();
+  });
+  seedNotifications();
+}
+function seedNotifications() {
+  var orders = getOrders();
+  if (!orders || !orders.length) return;
+  var dayMs = 24 * 60 * 60 * 1000;
+  var now = Date.now();
+  for (var i = 0; i < orders.length; i++) {
+    var o = orders[i];
+    var t = Date.parse(o.createdAt || o.updatedAt || '') || 0;
+    if (t && (now - t) <= dayMs) {
+      addNotification({
+        id: o.id,
+        title: 'New order ' + orderDisplayNo(o),
+        meta: (o.customerName || '-') + (o.phone ? ' \u00B7 ' + o.phone : ''),
+        total: o.total || 0,
+        time: t
+      });
+    }
+  }
+  updateNotificationDot();
+}
+function buildNotifPanel() {
+  var panel = document.getElementById('notifPanel');
+  if (panel) return panel;
+  panel = document.createElement('div');
+  panel.id = 'notifPanel';
+  panel.className = 'notif-panel';
+  document.body.appendChild(panel);
+  return panel;
+}
+function closeNotifPanels() {
+  document.querySelectorAll('.notif-panel.show').forEach(function (p) { p.classList.remove('show'); });
+}
+function toggleNotifications() {
+  var panel = buildNotifPanel();
+  var open = panel.classList.contains('show');
+  closeNotifPanels();
+  if (open) return;
+  renderNotifications();
+  panel.classList.add('show');
+  setNotifLastSeen(Date.now());
+  updateNotificationDot();
+}
+function renderNotifications() {
+  var panel = document.getElementById('notifPanel');
+  if (!panel) return;
+  var items = notificationItems.slice(0, 12);
+  var seen = getNotifLastSeen();
+  var rows = '';
+  if (items.length) {
+    rows = items.map(function (n) {
+      return '<div class="notif-item' + ((n.time || 0) > seen ? ' unread' : '') + '" onclick="openOrderFromNotif(\'' + encodeURIComponent(n.id) + '\')">' +
+        '<div class="notif-item-main"><i class="fa-solid fa-cart-shopping notif-item-ic"></i>' +
+        '<div><div class="notif-item-title">' + escapeHtml(n.title) + '</div>' +
+        '<div class="notif-item-meta">' + escapeHtml(n.meta) + ' \u00B7 ' + formatDateTime(new Date(n.time)) + '</div></div></div>' +
+        '<div class="notif-item-total">' + formatCurrency(n.total) + '</div></div>';
+    }).join('');
+  } else {
+    rows = '<div class="notif-empty"><i class="fa-regular fa-bell"></i><div>No new orders yet</div></div>';
+  }
+  panel.innerHTML = '<div class="notif-header"><span><i class="fa-solid fa-bell"></i> Notifications</span>' +
+    (items.length ? '<button class="notif-viewall" onclick="window.location=\'orders.html\'">View all</button>' : '') +
+    '</div>' + rows +
+    '<div class="notif-footer"><button class="notif-clear" onclick="markAllRead()">Mark all as read</button></div>';
+}
+function openOrderFromNotif(id) {
+  closeNotifPanels();
+  window.location.href = 'orders-detail.html?id=' + id;
+}
+function markAllRead() {
+  setNotifLastSeen(Date.now());
+  updateNotificationDot();
+  renderNotifications();
+}
+function initNotifications() {
+  initNotificationBell();
+  document.addEventListener('click', function (e) {
+    var panel = document.getElementById('notifPanel');
+    if (panel && panel.classList.contains('show')) {
+      var btn = document.querySelector('.topbar-actions .fa-bell');
+      if (btn && btn.closest('button') && btn.closest('button').contains(e.target)) return;
+      if (panel.contains(e.target)) return;
+      closeNotifPanels();
+    }
+  });
+}
+
+// ---- NEW ORDER POPUP (manager / super_admin) ----
+function buildNewOrderPopup() {
+  if (document.getElementById('newOrderOverlay')) return;
+  var ov = document.createElement('div');
+  ov.className = 'modal-overlay';
+  ov.id = 'newOrderOverlay';
+  ov.style.display = 'none';
+  ov.addEventListener('click', function(e) {
+    if (e.target === ov) hideNewOrderPopup();
+  });
+  var m = document.createElement('div');
+  m.className = 'modal';
+  m.id = 'newOrderPopup';
+  m.style.display = 'none';
+  ov.appendChild(m);
+  document.body.appendChild(ov);
+}
+
+function showNextNewOrderPopup() {
+  if (newOrderPopupShown) return;
+  if (!newOrderPopupQueue.length) return;
+  newOrderPopupShown = true;
+  var orders = newOrderPopupQueue.slice(0, 5);
+  newOrderPopupQueue = newOrderPopupQueue.slice(orders.length);
+  buildNewOrderPopup();
+  var ov = document.getElementById('newOrderOverlay');
+  var m = document.getElementById('newOrderPopup');
+  var rows = orders.map(function(o) {
+    return '<div class="nop-row" onclick="openOrderFromPopup(\'' + encodeURIComponent(o.id) + '\')">' +
+      '<div><div class="nop-id">' + escapeHtml(orderDisplayNo(o)) + '</div>' +
+      '<div class="nop-meta">' + escapeHtml(o.customerName || '-') + ' &middot; ' + escapeHtml(o.phone || '') + (o.city ? ' &middot; ' + escapeHtml(o.city) : '') + '</div></div>' +
+      '<div class="nop-total">' + formatCurrency(o.total || 0) + '</div></div>';
+  }).join('');
+  m.innerHTML = '<div class="modal-header"><h2><i class="fa-solid fa-bell"></i> New Order' + (orders.length > 1 ? 's' : '') + '</h2><button class="modal-close" onclick="hideNewOrderPopup()">&times;</button></div>' +
+    '<div class="modal-body">' +
+    (orders.length > 1 ? '<p class="nop-note">' + orders.length + ' new orders received from another user.</p>' : '<p class="nop-note">A new order was created by an agent.</p>') +
+    rows +
+    '</div>' +
+    '<div class="modal-footer">' +
+    '<button class="btn" onclick="hideNewOrderPopup()">Close</button>' +
+    '<button class="btn btn-accent" onclick="window.location=\'orders.html\'"><i class="fa-solid fa-list"></i> View All Orders</button>' +
+    '</div>';
+  ov.style.display = 'flex';
+  m.style.display = 'block';
+  playNewOrderBeep();
+}
+
+function hideNewOrderPopup() {
+  newOrderPopupShown = false;
+  var ov = document.getElementById('newOrderOverlay');
+  if (ov) ov.style.display = 'none';
+  showNextNewOrderPopup();
+}
+
+function openOrderFromPopup(id) {
+  var ov = document.getElementById('newOrderOverlay');
+  if (ov) ov.style.display = 'none';
+  newOrderPopupShown = false;
+  newOrderPopupQueue = [];
+  window.location.href = 'orders-detail.html?id=' + id;
+}
+
+function playNewOrderBeep() {
+  try {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    var ctx = new Ctx();
+    var o = ctx.createOscillator();
+    var g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 880;
+    g.gain.value = 0.15;
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start();
+    setTimeout(function() { o.stop(); ctx.close(); }, 300);
+  } catch(e) {}
+}
+
 // ---- CITY AUTOCOMPLETE ----
 function initCityAutocomplete(inputId, stateId, pincodeId) {
   var input = document.getElementById(inputId);
@@ -678,7 +1161,7 @@ function initCityAutocomplete(inputId, stateId, pincodeId) {
     results.forEach(function (item, i) {
       var div = document.createElement('div');
       div.className = 'city-autocomplete-item' + (i === selectedIndex ? ' selected' : '');
-      div.innerHTML = '<span class="city-name">' + item.city + '</span><span class="city-meta">' + item.state + ' - ' + item.pincode + '</span>';
+      div.innerHTML = '<span class="city-name">' + escapeHtml(item.city) + '</span><span class="city-meta">' + escapeHtml(item.state) + ' - ' + escapeHtml(item.pincode) + '</span>';
       div.addEventListener('mousedown', function (e) { e.preventDefault(); selectCity(item); });
       div.addEventListener('mouseenter', function () { selectedIndex = i; renderDropdown(); });
       dropdown.appendChild(div);
@@ -801,11 +1284,40 @@ function lookupPincode(pincode, callback) {
 function applyRoleGate() {
   var u = getCurrentUser();
   if (!u) return;
+  var isSuper = u.role === 'super_admin';
+  var isManager = u.role === 'manager';
+  var isAgent = u.role === 'agent';
   document.querySelectorAll('.nav-role-restricted').forEach(function(el) {
-    if (u.role !== 'super_admin') {
+    if (!isSuper) {
       el.style.display = 'none';
     }
   });
+  document.querySelectorAll('.nav-role-manager').forEach(function(el) {
+    if (!isSuper && !isManager) {
+      el.style.display = 'none';
+    }
+  });
+  document.querySelectorAll('.nav-role-agent').forEach(function(el) {
+    if (!isSuper && !isManager && !isAgent) {
+      el.style.display = 'none';
+    }
+  });
+  if (isAgent) {
+    var agentHidden = ['Products', 'Growth', 'Content', 'Markets'];
+    document.querySelectorAll('.nav-item.has-submenu').forEach(function (item) {
+      var labelEl = item.querySelector('.nav-label');
+      if (labelEl && agentHidden.indexOf(labelEl.textContent) !== -1) {
+        item.style.display = 'none';
+        var sub = item.nextElementSibling;
+        if (sub && sub.classList.contains('nav-sub')) sub.style.display = 'none';
+      }
+    });
+    if (!hasRight(u, 'draft_access')) {
+      document.querySelectorAll('.nav-sub a[href="orders-draft.html"], .nav-sub a[href="orders-abandoned.html"]').forEach(function(el) {
+        el.style.display = 'none';
+      });
+    }
+  }
 }
 
 // ---- WEB PRODUCTS SYNC ----
@@ -827,6 +1339,408 @@ async function syncWebProductsToServer() {
   }
 }
 
+// ---- SHOPIFY-STYLE ORDER DATA LAYER ----
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function getUrlParam(name) {
+  var m = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+  return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : null;
+}
+
+function newEventId() {
+  return 'EVT' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase();
+}
+
+// -- Dual status derivation (legacy-compatible) --
+function getPaymentStatus(o) {
+  if (!o) return 'unpaid';
+  if (o.paymentStatus) return o.paymentStatus;
+  if (o.status === 'delivered') return 'paid';
+  if (o.status === 'cancelled') return 'cancelled';
+  return 'unpaid';
+}
+function getFulfillmentStatus(o) {
+  if (!o) return 'unfulfilled';
+  if (o.fulfillmentStatus) return o.fulfillmentStatus;
+  if (o.status === 'shipped' || o.status === 'delivered') return 'fulfilled';
+  if (o.status === 'cancelled') return 'cancelled';
+  return 'unfulfilled';
+}
+function getPaymentLabel(s) {
+  var map = { unpaid: 'Unpaid', paid: 'Paid', partially_refunded: 'Partially refunded', refunded: 'Refunded', cancelled: 'Cancelled', pending: 'Pending' };
+  return map[s] || s;
+}
+function getFulfillmentLabel(s) {
+  var map = { unfulfilled: 'Unfulfilled', partially_fulfilled: 'Partially fulfilled', fulfilled: 'Fulfilled', cancelled: 'Cancelled', on_hold: 'On hold' };
+  return map[s] || s;
+}
+function paymentBadgeClass(s) {
+  var map = { paid: 'badge-paid', partially_refunded: 'badge-partial-refund', refunded: 'badge-refunded', unpaid: 'badge-unpaid', cancelled: 'badge-cancelled' };
+  return map[s] || 'badge-unpaid';
+}
+function fulfillmentBadgeClass(s) {
+  var map = { fulfilled: 'badge-fulfilled', partially_fulfilled: 'badge-partial', unfulfilled: 'badge-unfulfilled', cancelled: 'badge-cancelled', on_hold: 'badge-hold' };
+  return map[s] || 'badge-unfulfilled';
+}
+function riskBadgeClass(s) {
+  var map = { low: 'badge-ok', medium: 'badge-low', high: 'badge-cancelled' };
+  return map[s] || 'badge-ok';
+}
+function getOrderBadgesHtml(o) {
+  var p = getPaymentStatus(o), f = getFulfillmentStatus(o);
+  if (p === 'cancelled' && f === 'cancelled') {
+    return '<span class="badge badge-cancelled"><i class="fa-solid fa-ban"></i> Cancelled</span>';
+  }
+  var r = '<span class="badge ' + paymentBadgeClass(p) + '" title="Payment status"><i class="fa-solid fa-money-bill-wave"></i> ' + getPaymentLabel(p) + '</span>';
+  r += '<span class="badge ' + fulfillmentBadgeClass(f) + '" title="Fulfillment status"><i class="fa-solid fa-box"></i> ' + getFulfillmentLabel(f) + '</span>';
+  if (o.riskLevel === 'high') r += '<span class="badge badge-cancelled"><i class="fa-solid fa-triangle-exclamation"></i> High risk</span>';
+  else if (o.riskLevel === 'medium') r += '<span class="badge badge-low"><i class="fa-solid fa-triangle-exclamation"></i> Medium risk</span>';
+  if (o.archived) r += '<span class="badge badge-draft"><i class="fa-solid fa-archive"></i> Archived</span>';
+  return r;
+}
+
+// -- Order fetch with migration + persistence --
+var _getOrdersSkipSync = false;
+function getOrders() {
+  var orders = getData('orders', []);
+  var changed = false;
+  for (var i = 0; i < orders.length; i++) {
+    var o = orders[i];
+    if (!o.paymentStatus || !o.fulfillmentStatus) {
+      o.paymentStatus = getPaymentStatus(o);
+      o.fulfillmentStatus = getFulfillmentStatus(o);
+      changed = true;
+    }
+    if (o.status === 'cancelled' && (o.paymentStatus !== 'cancelled' || o.fulfillmentStatus !== 'cancelled')) {
+      o.paymentStatus = 'cancelled';
+      o.fulfillmentStatus = 'cancelled';
+      changed = true;
+    }
+    if (!Array.isArray(o.timeline)) {
+      o.timeline = [{
+        id: newEventId(), action: 'created',
+        details: 'Order ' + o.id + ' created',
+        user: o.createdBy || 'System', timestamp: o.createdAt || new Date().toISOString()
+      }];
+      changed = true;
+    }
+    if (!Array.isArray(o.transactions)) o.transactions = [];
+    if (!Array.isArray(o.fulfillments)) o.fulfillments = [];
+    if (!Array.isArray(o.tags)) o.tags = [];
+    if (!o.riskLevel) o.riskLevel = 'low';
+    if (!o.updatedAt) { o.updatedAt = o.createdAt || new Date().toISOString(); changed = true; }
+  }
+  if (changed && !_getOrdersSkipSync) setData('orders', orders);
+  return orders;
+}
+
+function saveOrders(orders) {
+  var now = new Date().toISOString();
+  for (var i = 0; i < orders.length; i++) {
+    if (orders[i]) orders[i].updatedAt = orders[i].updatedAt || orders[i].createdAt || now;
+  }
+  setData('orders', orders);
+}
+
+function findOrder(id) {
+  var orders = getOrders();
+  for (var i = 0; i < orders.length; i++) if (orders[i].id === id) return orders[i];
+  return null;
+}
+
+// -- Timeline helpers --
+function addTimelineEvent(o, action, details) {
+  if (!Array.isArray(o.timeline)) o.timeline = [];
+  var u = getCurrentUser();
+  o.timeline.unshift({
+    id: newEventId(), action: action, details: details || '',
+    user: u ? u.name : 'System', timestamp: new Date().toISOString()
+  });
+  return o;
+}
+function formatTimelineAction(action) {
+  var map = {
+    created: 'Order created', payment: 'Payment received', payment_marked: 'Payment marked as paid',
+    capture: 'Payment captured', refund: 'Refund issued', cancelled: 'Order cancelled',
+    fulfilled: 'Order fulfilled', shipped: 'Order shipped', delivered: 'Order delivered',
+    note: 'Note added', staff_note: 'Staff note added', edited: 'Order edited',
+    email_sent: 'Email sent', reminder: 'Reminder sent', recovered: 'Checkout recovered',
+    tracking_added: 'Tracking added', duplicate: 'Order duplicated', archived: 'Order archived', restored: 'Order restored'
+  };
+  return map[action] || action;
+}
+
+// -- Transaction helpers --
+function addOrderTransaction(o, type, amount, note) {
+  if (!Array.isArray(o.transactions)) o.transactions = [];
+  var u = getCurrentUser();
+  o.transactions.unshift({
+    id: newEventId(), type: type, amount: amount, note: note || '',
+    user: u ? u.name : 'System', timestamp: new Date().toISOString()
+  });
+  return o;
+}
+function getOrderPaidAmount(o) {
+  var paid = 0;
+  (o.transactions || []).forEach(function (t) {
+    if (t.type === 'payment' || t.type === 'capture') paid += (parseFloat(t.amount) || 0);
+    if (t.type === 'refund') paid -= (parseFloat(t.amount) || 0);
+  });
+  return paid;
+}
+
+// -- Fulfillment helpers --
+function addOrderFulfillment(o, carrier, tracking) {
+  if (!Array.isArray(o.fulfillments)) o.fulfillments = [];
+  o.fulfillments.unshift({
+    id: newEventId(), carrier: carrier || '', tracking: tracking || '',
+    timestamp: new Date().toISOString()
+  });
+  return o;
+}
+
+// -- Tag helpers --
+function addOrderTag(o, tag) {
+  tag = (tag || '').trim().replace(/^#/, '');
+  if (!tag) return o;
+  if (!Array.isArray(o.tags)) o.tags = [];
+  if (o.tags.indexOf(tag) === -1) o.tags.push(tag);
+  return o;
+}
+function removeOrderTag(o, tag) {
+  if (!Array.isArray(o.tags)) return o;
+  o.tags = o.tags.filter(function (t) { return t !== tag; });
+  return o;
+}
+function renderTagsHtml(o, clickable) {
+  var tags = getOrderTags(o);
+  if (!tags.length) return '<span class="text-muted" style="font-size:12px;">No tags</span>';
+  return tags.map(function (t) {
+    return '<span class="order-tag"' + (clickable ? ' onclick="removeOrderTagById(\'' + escapeHtml(o.id) + '\',\'' + escapeHtml(t) + '\');return false;" title="Remove tag"' : '') + '>#' + escapeHtml(t) + '</span>';
+  }).join(' ');
+}
+function getOrderTags(o) { return Array.isArray(o.tags) ? o.tags : []; }
+
+// -- Bulk actions --
+function bulkUpdateOrders(ids, updateFn) {
+  var orders = getOrders();
+  var changed = 0;
+  for (var i = 0; i < orders.length; i++) {
+    if (ids.indexOf(orders[i].id) !== -1) { updateFn(orders[i]); changed++; }
+  }
+  if (changed) saveOrders(orders);
+  return changed;
+}
+function bulkSetStatus(ids, paymentStatus, fulfillmentStatus) {
+  return bulkUpdateOrders(ids, function (o) {
+    if (paymentStatus) { o.paymentStatus = paymentStatus; addTimelineEvent(o, paymentStatus === 'paid' ? 'payment_marked' : 'payment', 'Payment status set to ' + getPaymentLabel(paymentStatus)); }
+    if (fulfillmentStatus) { o.fulfillmentStatus = fulfillmentStatus; addTimelineEvent(o, fulfillmentStatus === 'fulfilled' ? 'fulfilled' : 'shipped', 'Fulfillment status set to ' + getFulfillmentLabel(fulfillmentStatus)); }
+  });
+}
+
+// -- CSV Export --
+function exportOrdersCsv(orders) {
+  var headers = ['Order ID', 'Date', 'Customer', 'Phone', 'Email', 'Items', 'Subtotal', 'Discount', 'Total', 'Payment Method', 'Payment Status', 'Fulfillment Status', 'Tags', 'Address'];
+  var rows = orders.map(function (o) {
+    var items = (o.items || []).map(function (i) { return i.name + ' x' + (i.qty || 1); }).join('; ');
+    return [(o.orderNumber || o.id), o.createdAt, o.customerName, o.phone, o.email || '', items, o.subtotal || 0, o.discount || 0, o.total, o.paymentMethod || '', getPaymentLabel(getPaymentStatus(o)), getFulfillmentLabel(getFulfillmentStatus(o)), getOrderTags(o).join(', '), ((o.address || '') + ', ' + (o.city || '') + (o.landmark ? ', ' + o.landmark : ''))];
+  });
+  var csv = [headers].concat(rows).map(function (r) {
+    return r.map(function (c) { return '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"'; }).join(',');
+  }).join('\r\n');
+  var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'oms-orders-' + new Date().toISOString().split('T')[0] + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// -- Saved views --
+function getSavedOrderViews() {
+  var v = getData('orderViews', []);
+  if (!Array.isArray(v)) v = [];
+  return v;
+}
+function saveOrderView(name, filters) {
+  var views = getSavedOrderViews();
+  views.push({ id: 'VW' + Date.now().toString(36).toUpperCase(), name: name, filters: filters || {}, createdAt: new Date().toISOString() });
+  setData('orderViews', views);
+  return views;
+}
+function deleteOrderView(id) {
+  setData('orderViews', getSavedOrderViews().filter(function (v) { return v.id !== id; }));
+}
+
+// -- Column prefs --
+function getColumnPrefs() {
+  var p = localStorage.getItem('taiva_orderColumns');
+  try { return p ? JSON.parse(p) : null; } catch (e) { return null; }
+}
+function setColumnPrefs(prefs) { localStorage.setItem('taiva_orderColumns', JSON.stringify(prefs)); }
+
+// -- Print --
+function printOrderDoc(orderId, type) {
+  window.open('orders-print.html?id=' + encodeURIComponent(orderId) + '&type=' + type, '_blank');
+}
+
+// -- Email notification (real via api.php sendOrderEmail) --
+async function sendOrderNotification(order, template) {
+  var mc = getMilesConfig();
+  if (!mc || !mc.url) return { success: false, error: 'Milesweb not configured' };
+  var settings = getData('settings', {});
+  try {
+    var url = mc.url + '?action=sendOrderEmail&token=' + encodeURIComponent(mc.token);
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order: order, template: template || 'order_created',
+        fromName: settings.emailFromName || 'OMS', fromEmail: settings.emailFrom || '', siteUrl: settings.siteUrl || ''
+      })
+    });
+    var json = await res.json();
+    if (json.success) {
+      var templateLabels = { order_created: 'Order created', order_paid: 'Payment received', order_fulfilled: 'Order fulfilled', order_refunded: 'Refund issued', order_cancelled: 'Order cancelled', reminder: 'Reminder' };
+      var label = templateLabels[template] || template || 'Order update';
+      addTimelineEvent(order, 'email_sent', label + ' email sent to ' + (order.email || 'customer'));
+    }
+    return json;
+  } catch (e) { return { success: false, error: e.message }; }
+}
+
+// -- Rollout status update for legacy orders on the fly --
+function ensureOrderTimeline(o) {
+  if (!Array.isArray(o.timeline) || o.timeline.length === 0) {
+    o.timeline = [{
+      id: newEventId(), action: 'created', details: 'Order ' + o.id + ' created',
+      user: o.createdBy || 'System', timestamp: o.createdAt || new Date().toISOString()
+    }];
+  }
+  return o;
+}
+
+// ---- GLOBAL SEARCH (topbar #globalSearch) ----
+// Search orders by id/customer/phone/email from any page.
+function initGlobalSearch() {
+  var input = document.getElementById('globalSearch');
+  if (!input) return;
+  var wrap = input.closest('.topbar-search') || input.parentNode;
+  var box = document.createElement('div');
+  box.className = 'search-suggestions';
+  box.id = 'globalSearchBox';
+  wrap.appendChild(box);
+
+  function matches(search) {
+    return getOrders().filter(function (o) {
+      var hay = (o.id + ' ' + (o.orderNumber || '') + ' ' + (o.customerName || '') + ' ' + (o.phone || '') + ' ' + (o.email || '')).toLowerCase();
+      return hay.indexOf(search) !== -1;
+    }).sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+  }
+
+  function renderDropdown() {
+    var search = (input.value || '').replace(/^[#\s]+/, '').toLowerCase();
+    if (!search) { box.classList.remove('open'); box.innerHTML = ''; return; }
+    var list = matches(search).slice(0, 6);
+    var html = '';
+    if (list.length === 0) {
+      html = '<div class="ss-empty">No orders found. Enter dabao to search all orders.</div>';
+    } else {
+      for (var i = 0; i < list.length; i++) {
+        var o = list[i];
+        html += '<div class="ss-item" onclick="window.location=\'orders-detail.html?id=' + encodeURIComponent(o.id) + '\'">' +
+          '<span class="ss-id">' + escapeHtml(orderDisplayNo(o)) + '</span>' +
+          '<span class="ss-meta">' + escapeHtml(o.customerName || '-') + ' &middot; ' + formatCurrency(o.total) + '</span>' +
+          getOrderBadgesHtml(o) + '</div>';
+      }
+    }
+    box.innerHTML = html;
+    box.classList.add('open');
+  }
+
+  function hide() { box.classList.remove('open'); }
+
+  function go() {
+    var search = (input.value || '').replace(/^[#\s]+/, '').trim();
+    if (!search) return;
+    hide();
+    var list = matches(search.toLowerCase());
+    var exact = list.filter(function (o) { return o.id.toLowerCase() === search.toLowerCase(); });
+    if (exact.length === 1) { window.location.href = 'orders-detail.html?id=' + encodeURIComponent(exact[0].id); return; }
+    if (list.length === 1) { window.location.href = 'orders-detail.html?id=' + encodeURIComponent(list[0].id); return; }
+    window.location.href = 'orders.html?search=' + encodeURIComponent(search);
+  }
+
+  input.addEventListener('input', renderDropdown);
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') go();
+    else if (e.key === 'Escape') hide();
+  });
+  document.addEventListener('mousedown', function (e) {
+    if (wrap.contains(e.target)) return;
+    if (box.contains(e.target)) return;
+    hide();
+  });
+}
+
+// ---- MOBILE PUSH (FCM via Capacitor) ----
+function isNativeApp() {
+  try {
+    return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
+  } catch(e) { return false; }
+}
+function setupPushNotifications() {
+  if (!isNativeApp()) return;
+  try {
+    var Push = window.Capacitor.Plugins.PushNotifications;
+    if (!Push) return;
+    Push.addListener('registration', function(data) {
+      if (data && data.value) registerFcmToken(data.value);
+    });
+    Push.addListener('registrationError', function(err) {
+      console.warn('Push registration error', err);
+    });
+    Push.addListener('notification', function(data) {
+      try {
+        if (data && data.notification) {
+          showToast((data.notification.title || 'Notification') + (data.notification.body ? ' — ' + data.notification.body : ''), 'success');
+        }
+      } catch(e) {}
+    });
+    Push.checkPermissions().then(function(status) {
+      if (status.receive === 'granted') {
+        Push.register();
+      } else {
+        Push.requestPermissions().then(function(p) {
+          if (p.receive === 'granted') Push.register();
+        }).catch(function(){});
+      }
+    }).catch(function() {
+      Push.requestPermissions().then(function(p) {
+        if (p.receive === 'granted') Push.register();
+      }).catch(function(){});
+    });
+  } catch(e) {}
+}
+async function registerFcmToken(fcmToken) {
+  try {
+    var mc = ensureMilesConfig();
+    if (!mc || !mc.url || !mc.token || !fcmToken) return;
+    var device = '';
+    try { device = (navigator.userAgent || '').substring(0, 120); } catch(e) {}
+    var url = mc.url + '?action=registerToken&token=' + encodeURIComponent(mc.token) + '&fcmToken=' + encodeURIComponent(fcmToken) + '&device=' + encodeURIComponent(device);
+    var res = await fetch(url);
+    var json = await res.json();
+    if (json && json.success) {
+      localStorage.setItem('taiva_fcmToken', fcmToken);
+    }
+  } catch(e) {}
+}
+
 // ---- CALLBACKS FOR PAGE SCRIPTS ----
 // Each page can define its own initPage() function
 document.addEventListener('DOMContentLoaded', function () {
@@ -838,6 +1752,11 @@ document.addEventListener('DOMContentLoaded', function () {
   updateSidebarBadge();
   applyRoleGate();
   seedInitialData();
+  updateAvatarInitial();
+  setupPushNotifications();
+  initGlobalSearch();
+  initNotifications();
+  startRealtimeSync();
   // Restore last sync badge on sidebar if present
   var lastSync = getDriveLastSync();
   if (lastSync) {

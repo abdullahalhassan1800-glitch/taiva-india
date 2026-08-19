@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shopping Cart - Taiva India</title>
   <meta name="description" content="View and manage your shopping cart at Taiva India.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🌿</text></svg>">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -130,15 +131,28 @@
     function openMobileDrawer() { document.getElementById('mobileDrawer').classList.add('open'); document.getElementById('mobileOverlay').classList.add('active'); }
     function closeMobileDrawer() { document.getElementById('mobileDrawer').classList.remove('open'); document.getElementById('mobileOverlay').classList.remove('active'); }
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
   <script src="app.js"></script>
   <script>
+    function escapeHtml(s) {
+      if (s === null || s === undefined) return '';
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function getCartFromStorage() {
+      try { return JSON.parse(localStorage.getItem('taiva_cart') || '[]'); }
+      catch(e) { return []; }
+    }
+
+    function saveCartToStorage(cart) {
+      localStorage.setItem('taiva_cart', JSON.stringify(cart));
+    }
+
     function renderCartPage() {
       var list = document.getElementById('cartItemsList');
       var empty = document.getElementById('cartEmptyState');
       var subtotalEl = document.getElementById('cartSubtotal');
       var totalEl = document.getElementById('cartTotalPage');
-      var items = typeof cartItems !== 'undefined' ? cartItems : [];
+      var items = getCartFromStorage();
       if (items.length === 0) {
         if (empty) empty.style.display = 'block';
         if (subtotalEl) subtotalEl.textContent = 'Rs. 0';
@@ -149,12 +163,13 @@
       var html = '';
       var total = 0;
       items.forEach(function (item, idx) {
-        total += item.price;
+        var lineTotal = item.price * (item.qty || 1);
+        total += lineTotal;
         html += '<div class="cart-item-card">' +
-          '<img src="' + item.image + '" alt="' + item.name + '" loading="lazy">' +
+          '<img src="' + escapeHtml(item.image || '') + '" alt="' + escapeHtml(item.name || '') + '" loading="lazy">' +
           '<div class="item-info">' +
-            '<h4>' + item.name + '</h4>' +
-            '<div class="item-price">Rs. ' + item.price.toLocaleString('en-IN') + '</div>' +
+            '<h4>' + escapeHtml(item.name || '') + '</h4>' +
+            '<div class="item-price">Rs. ' + lineTotal.toLocaleString('en-IN') + (item.qty > 1 ? ' (x' + item.qty + ')' : '') + '</div>' +
             '<div class="item-actions">' +
               '<button class="remove-btn" onclick="removeFromCart(' + idx + ')"><i class="fa-solid fa-trash-can"></i></button>' +
             '</div>' +
@@ -166,10 +181,10 @@
       if (totalEl) totalEl.textContent = 'Rs. ' + total.toLocaleString('en-IN');
     }
     function removeFromCart(idx) {
-      if (typeof cartItems !== 'undefined') {
-        cartItems.splice(idx, 1);
-        renderCartPage();
-      }
+      var cart = getCartFromStorage();
+      cart.splice(idx, 1);
+      saveCartToStorage(cart);
+      renderCartPage();
     }
     function checkout() {
       if (typeof openCheckout === 'function') {

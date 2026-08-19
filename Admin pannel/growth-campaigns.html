@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Campaigns — Taiva Admin</title>
+<title>Campaigns — OMS Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=10">
 <style>
 .copy-btn { cursor: pointer; background: none; border: none; color: var(--accent); font-size: 14px; padding: 0 4px; }
 .status-toggle { cursor: pointer; }
@@ -15,8 +16,8 @@
 
 <div class="sidebar" id="sidebar">
 <div class="sidebar-header">
-<img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-<span class="logo-text">Taiva</span>
+<img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+<span class="logo-text">OMS</span>
 </div>
 <nav class="sidebar-nav">
 <div class="nav-section">Main</div>
@@ -38,11 +39,14 @@
 <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
 <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
 <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section nav-role-manager">Agents</div>
+<a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
 <div class="nav-section">Settings</div>
-<a href="users.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
+<a href="users.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
 <a href="settings.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
 <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
 </nav>
+<div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
 </div>
 
 <div class="main-content">
@@ -53,7 +57,7 @@
 <div class="topbar-actions">
 <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
 <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-<div class="admin-avatar">A</div>
+<div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
 </div>
 </header>
 
@@ -166,12 +170,12 @@ function renderCampaigns() {
       (c.code ? '<button class="copy-btn" onclick="copyCode(\'' + c.code + '\')" title="Copy code"><i class="fa-regular fa-copy"></i></button>' : '') + '</td>' +
       '<td>' + discountText + '</td>' +
       '<td>' + formatCurrency(c.minAmount || 0) + '</td>' +
-      '<td>' + (c.usedCount || 0) + ' / ' + (c.usageLimit || '∞') + '</td>' +
+      '<td>' + (c.usedCount || 0) + ' / ' + (c.usageLimit || 'âˆž') + '</td>' +
       '<td>' + expiresText + '</td>' +
       '<td><span class="badge ' + statusClass + ' status-toggle" onclick="toggleCampaignStatus(\'' + c.id + '\')">' + c.status + '</span></td>' +
       '<td><div class="order-actions">' +
       '<button class="btn btn-sm" onclick="editCampaign(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
-      '<button class="btn btn-sm btn-danger" onclick="deleteCampaign(\'' + c.id + '\')"><i class="fa-solid fa-trash"></i></button>' +
+      (canDelete() ? '<button class="btn btn-sm btn-danger" onclick="deleteCampaign(\'' + c.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '') +
       '</div></td></tr>';
   }).join('');
 }
@@ -249,11 +253,13 @@ function editCampaign(id) {
 }
 
 function deleteCampaign(id) {
+  if (!canDelete()) { showToast('Access denied', 'error'); return; }
   document.getElementById('deleteCampaignId').value = id;
   openModal('deleteCampaignModal');
 }
 
 function confirmDeleteCampaign() {
+  if (!canDelete()) { showToast('Access denied', 'error'); return; }
   var id = document.getElementById('deleteCampaignId').value;
   saveCampaigns(getCampaigns().filter(function (c) { return c.id !== id; }));
   renderCampaigns();
@@ -286,6 +292,6 @@ function copyCode(code) {
   });
 }
 </script>
-<script src="app.js"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>

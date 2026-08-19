@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings — Taiva Admin</title>
+  <title>Settings — OMS Admin</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-      <span class="logo-text">Taiva</span>
+      <img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+      <span class="logo-text">OMS</span>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Main</div>
@@ -31,10 +32,14 @@
       <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
       <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
       <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+      <div class="nav-section nav-role-manager">Agents</div>
+      <a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
       <div class="nav-section">Settings</div>
-      <a href="settings.html" class="nav-item active"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
+      <a href="users.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
+      <a href="settings.html" class="nav-item nav-role-restricted active"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
       <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
     </nav>
+    <div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
   </div>
 
   <div class="main-content">
@@ -49,7 +54,7 @@
         <span id="driveSyncStatus" style="font-size:12px;color:var(--text-muted);display:none;"></span>
         <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
         <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-        <div class="admin-avatar">A</div>
+        <div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
       </div>
     </header>
 
@@ -66,7 +71,7 @@
         <div class="settings-card">
           <div class="form-group">
             <label>Store Name</label>
-            <input type="text" id="storeName" placeholder="Taiva India">
+            <input type="text" id="storeName" placeholder="OMS">
           </div>
           <div class="form-group">
             <label>Store Email</label>
@@ -106,6 +111,32 @@
             <button class="btn btn-accent" id="saveShipBtn"><i class="fa-solid fa-floppy-disk"></i> Save Credentials</button>
             <button class="btn" id="testShipBtn"><i class="fa-solid fa-plug"></i> Test Connection</button>
           </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3><i class="fa-solid fa-envelope-open-text"></i> Order Email Notifications <span style="font-size:11px;color:var(--accent);font-weight:400;">(via PHP mail)</span></h3>
+        <div class="settings-card">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Sender Name</label>
+              <input type="text" id="emailFromName" placeholder="OMS">
+            </div>
+            <div class="form-group">
+              <label>Sender Email</label>
+              <input type="text" id="emailFrom" placeholder="no-reply@taiva.in">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Website URL</label>
+            <input type="text" id="siteUrl" placeholder="https://taiva.in">
+            <div class="form-hint">Order confirmation, payment received, shipped, refund aur cancellation par customer ko email jaati hai</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-accent" id="saveEmailBtn"><i class="fa-solid fa-floppy-disk"></i> Save Email Settings</button>
+            <button class="btn" id="testEmailBtn"><i class="fa-solid fa-paper-plane"></i> Test Email</button>
+          </div>
+          <div id="emailResult" style="margin-top:8px;font-size:14px;"></div>
         </div>
       </div>
 
@@ -174,7 +205,7 @@
         <div class="settings-card">
           <div style="display:flex;flex-direction:column;gap:8px;">
             <div><span style="font-weight:600;">App Version:</span> 1.0.0</div>
-            <div style="color:var(--text-muted);font-size:14px;">Taiva Admin Panel — Shopify-like management for Taiva India</div>
+            <div style="font-size:11px;color:var(--text-muted);">Design and Developed by Abdullah Al Hassan</div>
           </div>
         </div>
       </div>
@@ -183,11 +214,11 @@
 
   <div class="modal-overlay" id="modalOverlay"></div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=13"></script>
   <script>
     initPage = function() {
       var settings = getData('settings', {});
-      document.getElementById('storeName').value = settings.storeName || 'Taiva India';
+      document.getElementById('storeName').value = settings.storeName || 'OMS';
       document.getElementById('storeEmail').value = settings.storeEmail || 'info@taiva.in';
       document.getElementById('storePhone').value = settings.storePhone || '+91-9582908080';
       document.getElementById('storeCurrency').value = settings.currency || 'INR';
@@ -230,6 +261,44 @@
         }
         this.disabled = false;
         this.innerHTML = '<i class="fa-solid fa-plug"></i> Test Connection';
+      });
+
+      // ---- Email notification settings ----
+      document.getElementById('emailFromName').value = settings.emailFromName || 'OMS';
+      document.getElementById('emailFrom').value = settings.emailFrom || '';
+      document.getElementById('siteUrl').value = settings.siteUrl || 'https://taiva.in';
+
+      document.getElementById('saveEmailBtn').addEventListener('click', function() {
+        var s = getData('settings', {});
+        s.emailFromName = document.getElementById('emailFromName').value.trim();
+        s.emailFrom = document.getElementById('emailFrom').value.trim();
+        s.siteUrl = document.getElementById('siteUrl').value.trim();
+        setData('settings', s);
+        showToast('Email settings saved', 'success');
+        document.getElementById('emailResult').innerHTML = '<span style="color:var(--success);">Saved. Customer orders par email auto-bheji jaayegi.</span>';
+      });
+
+      document.getElementById('testEmailBtn').addEventListener('click', async function() {
+        var s = getData('settings', {});
+        s.emailFromName = document.getElementById('emailFromName').value.trim();
+        s.emailFrom = document.getElementById('emailFrom').value.trim();
+        s.siteUrl = document.getElementById('siteUrl').value.trim();
+        setData('settings', s);
+        var to = settings.storeEmail || document.getElementById('storeEmail').value.trim();
+        if (!to) { showToast('Store email required to test', 'error'); return; }
+        this.disabled = true;
+        this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+        var fake = {
+          id: 'TEST', customerName: 'Test User', email: to, phone: '0000000000',
+          total: 1090, subtotal: 1090, discount: 0, paymentMethod: 'cod',
+          items: [{ name: 'Sugar Pro Max', price: 1090, qty: 1, sku: 'SPM-001' }]
+        };
+        var r = await sendOrderNotification(fake, 'order_created');
+        document.getElementById('emailResult').innerHTML = r.success
+          ? '<span style="color:var(--success);">Test email sent to ' + to + '!</span>'
+          : '<span style="color:var(--danger);">Failed: ' + escapeHtml(r.error || 'Unknown') + '</span>';
+        this.disabled = false;
+        this.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Test Email';
       });
 
       // ---- Milesweb backup init ----

@@ -2,30 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Users — Taiva Admin</title>
+  <title>Users — OMS Admin</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=10">
   <style>
     .role-badge {
       display:inline-flex; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px;
     }
     .role-super_admin { background:#d4edda; color:#155724; }
     .role-manager { background:#cce5ff; color:#004085; }
+    .role-agent { background:#fff3cd; color:#856404; }
     .role-viewer { background:#e2e3e5; color:#383d41; }
     .user-status { font-size:12px; font-weight:500; }
     .user-status.active { color:var(--success); }
     .user-status.inactive { color:var(--danger); }
     [data-theme="dark"] .role-super_admin { background:#00331a; color:#4caf50; }
     [data-theme="dark"] .role-manager { background:#00264d; color:#66b0ff; }
+    [data-theme="dark"] .role-agent { background:#3d2e00; color:#ffd54f; }
     [data-theme="dark"] .role-viewer { background:#333; color:#aaa; }
   </style>
 </head>
 <body>
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-      <span class="logo-text">Taiva</span>
+      <img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+      <span class="logo-text">OMS</span>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Main</div>
@@ -105,8 +108,10 @@
         <a href="analytics-reports.html" class="nav-item">Reports</a>
         <a href="analytics-liveview.html" class="nav-item">Live View</a>
       </div>
+      <div class="nav-section nav-role-manager">Agents</div>
+      <a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
       <div class="nav-section">Settings</div>
-      <a href="users.html" class="nav-item nav-role-restricted active">
+      <a href="users.html" class="nav-item nav-role-manager active">
         <span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span>
         <span class="nav-label">Users</span>
       </a>
@@ -119,6 +124,7 @@
         <span class="nav-label">Logout</span>
       </a>
     </nav>
+    <div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
   </div>
 
   <div class="main-content">
@@ -133,7 +139,8 @@
         <span id="driveSyncStatus" style="font-size:12px;color:var(--text-muted);display:none;"></span>
         <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
         <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-        <div class="admin-avatar">A</div>
+        <div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
+      <p style="font-size:11px;margin:4px 0;color:var(--text-muted);">Design and Developed by Abdullah Al Hassan</p>
       </div>
     </header>
 
@@ -156,6 +163,7 @@
                 <th>Username</th>
                 <th>Name</th>
                 <th>Role</th>
+                <th>Rights</th>
                 <th>Status</th>
                 <th>Created</th>
                 <th>Actions</th>
@@ -212,7 +220,7 @@
         <label>Username</label>
         <input type="text" id="userUsername" placeholder="e.g., manager1">
       </div>
-      <div class="form-group">
+      <div class="form-group" id="passwordGroup">
         <label>Password</label>
         <input type="password" id="userPassword" placeholder="Enter password">
       </div>
@@ -223,9 +231,10 @@
       <div class="form-row">
         <div class="form-group">
           <label>Role</label>
-          <select id="userRole">
+          <select id="userRole" onchange="onRoleChange()">
             <option value="super_admin">Super Admin</option>
             <option value="manager" selected>Manager</option>
+            <option value="agent">Agent</option>
             <option value="viewer">Viewer</option>
           </select>
         </div>
@@ -237,6 +246,15 @@
           </select>
         </div>
       </div>
+      <div class="form-group" id="rightsGroup" style="display:none;border-top:1px solid var(--border);padding-top:12px;">
+        <label>Rights</label>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:500;"><input type="checkbox" id="rightOwnOrders"> Sirf apne orders dekhe</label>
+          <label style="display:flex;align-items:center;gap:8px;font-weight:500;"><input type="checkbox" id="rightCreateOrders"> Order bana sakta hai</label>
+          <label style="display:flex;align-items:center;gap:8px;font-weight:500;"><input type="checkbox" id="rightReports"> Reports / dashboard stats</label>
+          <label style="display:flex;align-items:center;gap:8px;font-weight:500;"><input type="checkbox" id="rightDrafts"> Draft / abandoned access</label>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('userModal')">Cancel</button>
@@ -244,29 +262,43 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=13"></script>
   <script>
     function renderUsers() {
       var users = getUsers();
       var tbody = document.getElementById('usersBody');
+      var cur = getCurrentUser();
+      var isManager = cur && cur.role === 'manager';
       if (users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-muted text-center" style="padding:40px;">No users found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-muted text-center" style="padding:40px;">No users found</td></tr>';
         return;
       }
       tbody.innerHTML = users.map(function(u) {
         var roleClass = 'role-' + u.role;
-        var roleLabel = u.role === 'super_admin' ? 'Super Admin' : u.role === 'manager' ? 'Manager' : 'Viewer';
+        var roleLabel = u.role === 'super_admin' ? 'Super Admin' : u.role === 'manager' ? 'Manager' : u.role === 'agent' ? 'Agent' : 'Viewer';
         var statusClass = u.status === 'active' ? 'active' : 'inactive';
+        var rightsHtml;
+        if (u.role === 'agent') {
+          var r = u.rights || ['own_orders_only', 'create_orders', 'view_reports', 'draft_access'];
+          var labels = { own_orders_only: 'Own orders', create_orders: 'Create', view_reports: 'Reports', draft_access: 'Drafts' };
+          rightsHtml = r.map(function(k) { return labels[k] ? '<span class="badge badge-info" style="font-size:10px;margin-right:4px;">' + labels[k] + '</span>' : ''; }).join('') || '<span class="text-muted">none</span>';
+        } else {
+          rightsHtml = '<span class="text-muted" style="font-size:11px;">All</span>';
+        }
+        var canManage = !isManager || u.role !== 'super_admin';
+        var actions = '<span class="text-muted" style="font-size:12px;">&mdash;</span>';
+        if (canManage) {
+          actions = '<button class="btn btn-sm" onclick="editUser(\'' + u.id + '\')"><i class="fa-solid fa-pen"></i></button> ' +
+            (u.username !== 'Admin' ? '<button class="btn btn-sm btn-danger" onclick="deleteUserConfirm(\'' + u.id + '\',\'' + u.username + '\')"><i class="fa-solid fa-trash"></i></button>' : '');
+        }
         return '<tr>' +
           '<td><span class="font-medium">' + u.username + '</span></td>' +
           '<td>' + u.name + '</td>' +
           '<td><span class="role-badge ' + roleClass + '">' + roleLabel + '</span></td>' +
+          '<td style="max-width:220px;">' + rightsHtml + '</td>' +
           '<td><span class="user-status ' + statusClass + '">' + u.status + '</span></td>' +
           '<td>' + formatDate(u.createdAt) + '</td>' +
-          '<td>' +
-            '<button class="btn btn-sm" onclick="editUser(\'' + u.id + '\')"><i class="fa-solid fa-pen"></i></button> ' +
-            (u.username !== 'Admin' ? '<button class="btn btn-sm btn-danger" onclick="deleteUserConfirm(\'' + u.id + '\',\'' + u.username + '\')"><i class="fa-solid fa-trash"></i></button>' : '') +
-          '</td>' +
+          '<td>' + actions + '</td>' +
         '</tr>';
       }).join('');
     }
@@ -276,13 +308,20 @@
       var u = null;
       for (var i = 0; i < users.length; i++) { if (users[i].id === id) { u = users[i]; break; } }
       if (!u) return;
+      var cur = getCurrentUser();
+      if (cur && cur.role === 'manager' && u.role === 'super_admin') {
+        showToast('Managers cannot edit Super Admin users', 'error');
+        return;
+      }
       document.getElementById('editUserId').value = u.id;
       document.getElementById('userUsername').value = u.username;
       document.getElementById('userPassword').value = '';
       document.getElementById('userName').value = u.name;
       document.getElementById('userRole').value = u.role;
       document.getElementById('userStatus').value = u.status;
+      setRightsCheckboxes(u.rights || ['own_orders_only', 'create_orders', 'view_reports', 'draft_access']);
       document.getElementById('userModalTitle').textContent = 'Edit User';
+      onRoleChange();
       openModal('userModal');
     }
 
@@ -302,9 +341,38 @@
       document.getElementById('userName').value = '';
       document.getElementById('userRole').value = 'manager';
       document.getElementById('userStatus').value = 'active';
+      setRightsCheckboxes(['own_orders_only', 'create_orders', 'view_reports', 'draft_access']);
       document.getElementById('userModalTitle').textContent = 'Add User';
+      onRoleChange();
       openModal('userModal');
     });
+
+    function onRoleChange() {
+      var g = document.getElementById('rightsGroup');
+      var role = document.getElementById('userRole').value;
+      var isAgent = role === 'agent';
+      g.style.display = isAgent ? 'block' : 'none';
+      var cur = getCurrentUser();
+      var isManager = cur && cur.role === 'manager';
+      var superOpt = document.querySelector('#userRole option[value="super_admin"]');
+      if (superOpt) superOpt.disabled = isManager;
+    }
+
+    function setRightsCheckboxes(rights) {
+      document.getElementById('rightOwnOrders').checked = rights.indexOf('own_orders_only') !== -1;
+      document.getElementById('rightCreateOrders').checked = rights.indexOf('create_orders') !== -1;
+      document.getElementById('rightReports').checked = rights.indexOf('view_reports') !== -1;
+      document.getElementById('rightDrafts').checked = rights.indexOf('draft_access') !== -1;
+    }
+
+    function getRightsFromForm() {
+      var r = [];
+      if (document.getElementById('rightOwnOrders').checked) r.push('own_orders_only');
+      if (document.getElementById('rightCreateOrders').checked) r.push('create_orders');
+      if (document.getElementById('rightReports').checked) r.push('view_reports');
+      if (document.getElementById('rightDrafts').checked) r.push('draft_access');
+      return r;
+    }
 
     document.getElementById('saveUserBtn').addEventListener('click', async function() {
       var id = document.getElementById('editUserId').value;
@@ -316,15 +384,24 @@
 
       if (!username || !name) { showToast('Username and name are required', 'error'); return; }
 
+      var cur = getCurrentUser();
+      if (cur && cur.role === 'manager' && role === 'super_admin') {
+        showToast('Managers cannot create Super Admin users', 'error');
+        return;
+      }
+
       if (id) {
         var updates = { username: username, name: name, role: role, status: status };
+        if (role === 'agent') updates.rights = getRightsFromForm(); else updates.rights = null;
         if (password) updates.password = password;
         await updateUser(id, updates);
         logActivity('user_updated', 'User "' + username + '" updated (role: ' + role + ')');
         showToast('User updated', 'success');
       } else {
         if (!password) { showToast('Password is required for new users', 'error'); return; }
-        await addUser({ username: username, password: password, name: name, role: role, status: status });
+        var newUser = { username: username, password: password, name: name, role: role, status: status };
+        if (role === 'agent') newUser.rights = getRightsFromForm();
+        await addUser(newUser);
         logActivity('user_created', 'User "' + username + '" created (role: ' + role + ')');
         showToast('User created', 'success');
       }
@@ -355,7 +432,7 @@
     document.getElementById('activityFilter').addEventListener('change', renderActivity);
 
     initPage = function() {
-      requireRole(['super_admin']);
+      requireRole(['super_admin', 'manager']);
       renderUsers();
       renderActivity();
     };

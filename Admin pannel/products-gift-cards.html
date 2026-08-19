@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gift Cards — Taiva Admin</title>
+  <title>Gift Cards — OMS Admin</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-      <span class="logo-text">Taiva</span>
+      <img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+      <span class="logo-text">OMS</span>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Main</div>
@@ -38,11 +39,14 @@
       <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
       <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
       <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+      <div class="nav-section nav-role-manager">Agents</div>
+      <a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
       <div class="nav-section">Settings</div>
-      <a href="users.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
+      <a href="users.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
       <a href="settings.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
       <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
     </nav>
+    <div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
   </div>
 
   <div class="main-content">
@@ -53,7 +57,7 @@
       <div class="topbar-actions">
         <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
         <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-        <div class="admin-avatar">A</div>
+        <div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
       </div>
     </header>
 
@@ -108,7 +112,7 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=13"></script>
   <script>
   initPage = function() {
     loadGiftCards();
@@ -151,7 +155,7 @@
         }
       }
       var statusBadge = 'badge-' + (status === 'active' ? 'ok' : status === 'expired' ? 'expired' : status === 'used' ? 'processing' : 'draft');
-      return '<tr><td><code style="font-size:13px;background:var(--page-bg);padding:2px 8px;border-radius:4px;">' + gc.code + '</code></td><td>' + formatCurrency(gc.amount) + '</td><td>' + formatCurrency(gc.balance) + '</td><td>' + (gc.customer || '-') + '</td><td>' + (gc.expiry ? formatDate(gc.expiry) : '-') + '</td><td><span class="badge ' + statusBadge + '">' + status + '</span></td><td><button class="btn btn-sm btn-danger" onclick="deleteGiftCard(\'' + gc.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+      return '<tr><td><code style="font-size:13px;background:var(--page-bg);padding:2px 8px;border-radius:4px;">' + gc.code + '</code></td><td>' + formatCurrency(gc.amount) + '</td><td>' + formatCurrency(gc.balance) + '</td><td>' + (gc.customer || '-') + '</td><td>' + (gc.expiry ? formatDate(gc.expiry) : '-') + '</td><td><span class="badge ' + statusBadge + '">' + status + '</span></td><td>' + (canDelete() ? '<button class="btn btn-sm btn-danger" onclick="deleteGiftCard(\'' + gc.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '') + '</td></tr>';
     }).join('');
   }
 
@@ -204,6 +208,7 @@
   };
 
   function deleteGiftCard(id) {
+    if (!canDelete()) { showToast('Access denied', 'error'); return; }
     var cards = getData('giftCards');
     var gc = cards.find(function(x) { return x.id === id; });
     if (!gc) return;
@@ -213,6 +218,7 @@
   }
 
   function confirmDeleteGiftCard() {
+    if (!canDelete()) { showToast('Access denied', 'error'); return; }
     var id = document.getElementById('deleteGcId').value;
     var cards = getData('giftCards');
     var idx = cards.findIndex(function(gc) { return gc.id === id; });

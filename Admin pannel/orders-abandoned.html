@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Abandoned Checkouts — Taiva Admin</title>
+<title>Abandoned Checkouts — OMS Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=10">
 <style>
 .abandoned-actions { display: flex; gap: 4px; }
 </style>
@@ -14,8 +15,8 @@
 
 <div class="sidebar" id="sidebar">
 <div class="sidebar-header">
-<img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-<span class="logo-text">Taiva</span>
+<img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+<span class="logo-text">OMS</span>
 </div>
 <nav class="sidebar-nav">
 <div class="nav-section">Main</div>
@@ -95,8 +96,10 @@
 <a href="analytics-reports.html" class="nav-item">Reports</a>
 <a href="analytics-liveview.html" class="nav-item">Live View</a>
 </div>
+<div class="nav-section nav-role-manager">Agents</div>
+<a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
 <div class="nav-section">Settings</div>
-<a href="users.html" class="nav-item nav-role-restricted">
+<a href="users.html" class="nav-item nav-role-manager">
 <span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span>
 <span class="nav-label">Users</span>
 </a>
@@ -109,6 +112,7 @@
 <span class="nav-label">Logout</span>
 </a>
 </nav>
+<div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
 </div>
 
 <div class="main-content">
@@ -122,9 +126,10 @@
 <div class="topbar-actions">
 <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
 <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-<div class="admin-avatar">A</div>
-</div>
-</header>
+<div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
+      <p style="font-size:11px;margin:4px 0;color:var(--text-muted);">Design and Developed by Abdullah Al Hassan</p>
+      </div>
+    </header>
 
 <div class="page-content">
 <div class="page-header">
@@ -185,7 +190,7 @@
 
 <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
-<script src="app.js"></script>
+<script src="app.js?v=13"></script>
 <script>
 function renderAbandoned() {
 var items = getData('abandoned');
@@ -207,7 +212,7 @@ tbody.innerHTML = '<tr><td colspan="8" class="text-muted text-center" style="pad
 } else {
 tbody.innerHTML = filtered.map(function(a) {
 var itemsHtml = a.items ? a.items.map(function(i) { return escapeHtml(i.name) + ' x' + i.qty; }).join(', ') : '-';
-var statusBadge = '<span class="badge badge-' + (a.status === 'recovered' ? 'success' : 'pending') + '">' + escapeHtml(a.status) + '</span>';
+var statusBadge = '<span class="badge badge-' + (a.status === 'recovered' ? 'ok' : 'unpaid') + '">' + escapeHtml(a.status) + '</span>';
 return '<tr><td><div class="customer-cell"><div class="avatar">' + escapeHtml(a.customerName.charAt(0)) + '</div><div>' + escapeHtml(a.customerName) + '</div></div></td>' +
 '<td>' + (escapeHtml(a.email || '-')) + '</td>' +
 '<td>' + (escapeHtml(a.phone || '-')) + '</td>' +
@@ -218,7 +223,7 @@ return '<tr><td><div class="customer-cell"><div class="avatar">' + escapeHtml(a.
 '<td><div class="abandoned-actions">' +
 (a.status !== 'recovered' ? '<button class="btn btn-sm" onclick="sendReminder(\'' + escapeHtml(a.id) + '\')"><i class="fa-solid fa-envelope"></i> Remind</button>' : '') +
 (a.status !== 'recovered' ? '<button class="btn btn-sm btn-accent" onclick="markRecovered(\'' + escapeHtml(a.id) + '\')"><i class="fa-solid fa-check"></i> Recovered</button>' : '') +
-'<button class="btn btn-sm btn-danger" onclick="openDeleteAbandonedModal(\'' + escapeHtml(a.id) + '\')"><i class="fa-solid fa-trash"></i></button>' +
+(canDelete() ? '<button class="btn btn-sm btn-danger" onclick="openDeleteAbandonedModal(\'' + escapeHtml(a.id) + '\')"><i class="fa-solid fa-trash"></i></button>' : '') +
 '</div></td></tr>';
 }).join('');
 }
@@ -228,8 +233,17 @@ function sendReminder(id) {
 var items = getData('abandoned');
 var a = items.find(function(x) { return x.id === id; });
 if (!a) return;
+if (a.email) {
+  var mc = getMilesConfig();
+  if (mc && mc.url) {
+    sendOrderNotification({ id: a.id, customerName: a.customerName, email: a.email, items: a.items, total: a.total, paymentMethod: a.paymentMethod }, 'reminder').then(function(r) {
+      showToast(r.success ? 'Reminder email sent' : 'Reminder logged', r.success ? 'success' : 'info');
+    });
+  } else {
+    showToast('Reminder logged (email not configured)', 'info');
+  }
+}
 logActivity('reminder_sent', 'Reminder sent to ' + (a.email || a.customerName));
-showToast('Reminder sent to ' + (a.email || a.customerName), 'success');
 }
 
 function markRecovered(id) {
@@ -237,17 +251,21 @@ var items = getData('abandoned');
 var a = items.find(function(x) { return x.id === id; });
 if (!a) return;
 a.status = 'recovered';
+a.recoveredAt = new Date().toISOString();
 setData('abandoned', items);
+logActivity('recovered', 'Abandoned checkout ' + a.id + ' recovered');
 showToast('Marked as recovered', 'success');
 renderAbandoned();
 }
 
 function openDeleteAbandonedModal(id) {
+if (!canDelete()) { showToast('Access denied', 'error'); return; }
 document.getElementById('deleteAbandonedTargetId').value = id;
 openModal('deleteAbandonedModal');
 }
 
 function confirmDeleteAbandoned() {
+if (!canDelete()) { showToast('Access denied', 'error'); return; }
 var id = document.getElementById('deleteAbandonedTargetId').value;
 var items = getData('abandoned');
 var idx = items.findIndex(function(a) { return a.id === id; });
@@ -258,6 +276,16 @@ renderAbandoned();
 }
 
 initPage = function() {
+var cur = getCurrentUser();
+if (cur && cur.role === 'agent' && !hasRight(cur, 'draft_access')) {
+var root = document.querySelector('.page-content');
+if (root) root.innerHTML = '<div class="card" style="padding:60px;text-align:center;">' +
+'<i class="fa-solid fa-lock" style="font-size:44px;color:var(--text-muted);opacity:0.4;"></i>' +
+'<h3 style="margin:12px 0 4px;">Access denied</h3>' +
+'<p class="text-muted">You do not have permission to view abandoned checkouts.</p>' +
+'<a class="btn btn-accent mt-16" href="orders.html"><i class="fa-solid fa-arrow-left"></i> Back to Orders</a></div>';
+return;
+}
 document.getElementById('searchInput').addEventListener('input', function() { renderAbandoned(); });
 document.getElementById('statusFilter').addEventListener('change', function() { renderAbandoned(); });
 renderAbandoned();

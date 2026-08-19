@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — Taiva Admin</title>
+  <title>Login — OMS Admin</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body class="login-page">
   <div class="login-box">
-    <h1>Taiva Admin</h1>
+    <h1>OMS Admin</h1>
     <p>Sign in to your account</p>
     <div class="form-group">
       <label for="username">Username</label>
-      <input type="text" id="username" value="Admin" autocomplete="username">
+      <input type="text" id="username" value="" placeholder="Enter username" autocomplete="username">
     </div>
     <div class="form-group">
       <label for="password">Password</label>
@@ -21,18 +22,30 @@
     </div>
     <button class="login-btn" onclick="handleLogin()">Sign in</button>
     <div class="login-error" id="loginError"></div>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
+      <p style="margin:0 0 8px 0;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);text-align:center;">Quick Login</p>
+      <button type="button" onclick="quickLogin('manager')" style="width:100%;padding:9px;margin-bottom:8px;font-size:13px;font-weight:600;background:#cce5ff;color:#004085;border:1px solid #b8daff;border-radius:8px;cursor:pointer;">Login as Manager</button>
+      <button type="button" onclick="quickLogin('agent')" style="width:100%;padding:9px;font-size:13px;font-weight:600;background:#fff3cd;color:#856404;border:1px solid #ffeeba;border-radius:8px;cursor:pointer;">Login as Agent</button>
+    </div>
+    <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+      <p style="margin:0;font-size:12px;color:var(--text-muted);">
+        <i class="fa-solid fa-user-pen" style="color:var(--primary);margin-right:8px;font-size:1.1em;"></i>Design and Developed by <strong>Abdullah Al Hassan</strong>
+      </p>
+    </div>
   </div>
-  <script src="app.js"></script>
+  <script src="app.js?v=13"></script>
   <script>
     async function handleLogin() {
       var username = document.getElementById('username').value;
       var password = document.getElementById('password').value;
       var errorEl = document.getElementById('loginError');
-      errorEl.textContent = 'Syncing data...';
+      errorEl.textContent = 'Signing in...';
       errorEl.style.display = 'block';
       errorEl.style.color = 'var(--accent)';
-      await autoRestoreFromMilesweb();
+
       if (await login(username, password)) {
+        errorEl.textContent = 'Syncing data...';
+        try { await autoRestoreFromMilesweb(); } catch(e) {}
         window.location.href = 'dashboard.html';
       } else {
         errorEl.style.display = 'block';
@@ -42,6 +55,31 @@
     document.getElementById('password').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') handleLogin();
     });
+    function ensureAgentUser() {
+      try {
+        var users = getUsers();
+        if (!users.some(function(u) { return u.username === 'Agent'; })) {
+          users.push({
+            id: 'USR' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase(),
+            username: 'Agent', password: 'Agent@123', name: 'Agent', role: 'agent',
+            status: 'active', createdAt: new Date().toISOString()
+          });
+          saveUsers(users);
+        }
+      } catch(e) {}
+    }
+    function quickLogin(role) {
+      ensureAgentUser();
+      var creds = {
+        manager: { u: 'Shivam' },
+        agent: { u: 'Agent' }
+      };
+      var c = creds[role];
+      if (!c) return;
+      document.getElementById('username').value = c.u;
+      document.getElementById('password').value = '';
+      document.getElementById('password').focus();
+    }
   </script>
 </body>
 </html>

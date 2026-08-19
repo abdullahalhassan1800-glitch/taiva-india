@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catalogs — Taiva Admin</title>
+<title>Catalogs — OMS Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
 <div class="sidebar" id="sidebar">
 <div class="sidebar-header">
-<img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-<span class="logo-text">Taiva</span>
+<img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+<span class="logo-text">OMS</span>
 </div>
 <nav class="sidebar-nav">
 <div class="nav-section">Main</div>
@@ -34,11 +35,14 @@
 </div>
 <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
 <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+<div class="nav-section nav-role-manager">Agents</div>
+<a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
 <div class="nav-section">Settings</div>
-<a href="users.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
+<a href="users.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
 <a href="settings.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
 <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
 </nav>
+<div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
 </div>
 
 <div class="main-content">
@@ -49,7 +53,7 @@
 <div class="topbar-actions">
 <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
 <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-<div class="admin-avatar">A</div>
+<div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
 </div>
 </header>
 
@@ -125,7 +129,7 @@ function renderCatalogs() {
   tbody.innerHTML = catalogs.map(function (c) {
     var count = (c.products || []).length;
     var statusClass = c.status === 'active' ? 'badge-active' : 'badge-draft';
-    return '<tr><td><strong>' + c.name + '</strong></td><td><span class="badge badge-active">' + c.market + '</span></td><td>' + count + ' product' + (count !== 1 ? 's' : '') + '</td><td><span class="badge ' + statusClass + '">' + c.status + '</span></td><td>' + formatDate(c.createdAt) + '</td><td><button class="btn btn-sm" onclick="editCatalog(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteCatalog(\'' + c.id + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+    return '<tr><td><strong>' + c.name + '</strong></td><td><span class="badge badge-active">' + c.market + '</span></td><td>' + count + ' product' + (count !== 1 ? 's' : '') + '</td><td><span class="badge ' + statusClass + '">' + c.status + '</span></td><td>' + formatDate(c.createdAt) + '</td><td><button class="btn btn-sm" onclick="editCatalog(\'' + c.id + '\')"><i class="fa-solid fa-pen"></i></button>' + (canDelete() ? ' <button class="btn btn-sm btn-danger" onclick="deleteCatalog(\'' + c.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '') + '</td></tr>';
   }).join('');
 }
 
@@ -200,6 +204,7 @@ function editCatalog(id) {
 }
 
 function deleteCatalog(id) {
+  if (!canDelete()) { showToast('Access denied', 'error'); return; }
   var c = getCatalogs().find(function (x) { return x.id === id; });
   if (!c) return;
   document.getElementById('deleteCatId').value = id;
@@ -208,6 +213,7 @@ function deleteCatalog(id) {
 }
 
 function confirmDeleteCatalog() {
+  if (!canDelete()) { showToast('Access denied', 'error'); return; }
   var id = document.getElementById('deleteCatId').value;
   saveCatalogs(getCatalogs().filter(function (c) { return c.id !== id; }));
   closeModal('deleteCatalogModal');
@@ -219,6 +225,6 @@ document.addEventListener('click', function (e) {
   if (e.target.classList.contains('modal-overlay')) closeAllModals();
 });
 </script>
-<script src="app.js"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>

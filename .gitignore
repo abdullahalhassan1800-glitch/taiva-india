@@ -8,3 +8,24 @@ desktop.ini
 
 # Large video
 images/11.mp4
+
+# Sensitive files - NEVER commit
+*-firebase-adminsdk-*.json
+google-services.json
+taiva_users.json
+taiva_orders.json
+taiva_activity.json
+fcm_tokens.json
+fcm_server_key.txt
+fcm_service_account.json
+
+# Build artifacts
+TaivaAdminApp/node_modules/
+TaivaAdminApp/android/build/
+TaivaAdminApp/android/app/build/
+TaivaAdminApp/android/.gradle/
+TaivaAdminApp/www/
+
+# FTP deployment copies (keep in git for reference)
+# TAIVA FTP/
+# TAIVA FINAL/

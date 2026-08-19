@@ -29,7 +29,13 @@ const PRODUCT_CATALOG = [
 ];
 
 // Cart State (Persisted in LocalStorage)
-let cart = JSON.parse(localStorage.getItem('taiva_cart')) || [];
+let cart = [];
+try { cart = JSON.parse(localStorage.getItem('taiva_cart')) || []; } catch(e) { cart = []; }
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   initHeaderScroll();
@@ -79,7 +85,8 @@ function initMobileMenu() {
   
   const closeMenu = () => {
     drawer.classList.remove('open');
-    if (!document.querySelector('.cart-drawer').classList.contains('open')) {
+    var cartDrawer = document.querySelector('.cart-drawer');
+    if (!cartDrawer || !cartDrawer.classList.contains('open')) {
       overlay.classList.remove('open');
     }
   };
@@ -101,13 +108,15 @@ function initSearch() {
   searchBtn.addEventListener('click', () => {
     searchOverlay.classList.add('open');
     overlay.classList.add('open');
-    setTimeout(() => searchInput.focus(), 200);
+    if (searchInput) setTimeout(() => searchInput.focus(), 200);
   });
   
   const closeSearch = () => {
     searchOverlay.classList.remove('open');
-    if (!document.querySelector('.mobile-nav-drawer').classList.contains('open') && 
-        !document.querySelector('.cart-drawer').classList.contains('open')) {
+    var mobDrawer = document.querySelector('.mobile-nav-drawer');
+    var cartDr = document.querySelector('.cart-drawer');
+    if ((!mobDrawer || !mobDrawer.classList.contains('open')) && 
+        (!cartDr || !cartDr.classList.contains('open'))) {
       overlay.classList.remove('open');
     }
   };
@@ -144,7 +153,8 @@ function initCartDrawer() {
   
   const closeCart = () => {
     cartDrawer.classList.remove('open');
-    if (!document.querySelector('.mobile-nav-drawer').classList.contains('open')) {
+    var mobDrawer = document.querySelector('.mobile-nav-drawer');
+    if (!mobDrawer || !mobDrawer.classList.contains('open')) {
       overlay.classList.remove('open');
     }
   };
@@ -197,10 +207,7 @@ function updateCartQty(productId, delta) {
   if (cart[index].qty <= 0) {
     cart.splice(index, 1);
   } else {
-    const product = PRODUCT_CATALOG.find(p => p.id === productId);
-    if (product) {
-      cart[index].price = cart[index].qty >= 2 ? 980 : product.price;
-    }
+    // Keep original price, don't override
   }
   
   saveCart();
@@ -262,18 +269,18 @@ function renderCartItems() {
     html += `
       <div class="cart-item">
         <div class="cart-item-img">
-          <img src="${item.image}" alt="${item.name}">
+          <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}">
         </div>
         <div class="cart-item-details">
-          <h4 class="cart-item-title">${item.name}</h4>
+          <h4 class="cart-item-title">${escapeHtml(item.name)}</h4>
           <div class="cart-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}.00</div>
           <div class="cart-item-controls">
             <div class="qty-selector">
-              <button class="qty-btn" onclick="updateCartQty('${item.id}', -1)"><i class="fa-solid fa-minus"></i></button>
+              <button class="qty-btn" onclick="updateCartQty('${escapeHtml(item.id)}', -1)"><i class="fa-solid fa-minus"></i></button>
               <span class="qty-val">${item.qty}</span>
-              <button class="qty-btn" onclick="updateCartQty('${item.id}', 1)"><i class="fa-solid fa-plus"></i></button>
+              <button class="qty-btn" onclick="updateCartQty('${escapeHtml(item.id)}', 1)"><i class="fa-solid fa-plus"></i></button>
             </div>
-            <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">
+            <button class="cart-item-remove" onclick="removeFromCart('${escapeHtml(item.id)}')">
               <i class="fa-regular fa-trash-can"></i>
             </button>
           </div>
@@ -322,21 +329,23 @@ function initHeroSlider() {
   
   // Touch / swipe support
   const slider = document.querySelector('.hero-slider');
-  slider.addEventListener('touchstart', (e) => {
-    startX = e.touches[0].clientX;
-    isDragging = true;
-  }, { passive: true });
-  
-  slider.addEventListener('touchend', (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    const endX = e.changedTouches[0].clientX;
-    const diff = startX - endX;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) updateSlider(currentIdx + 1);
-      else updateSlider(currentIdx - 1);
-    }
-  }, { passive: true });
+  if (slider) {
+    slider.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    }, { passive: true });
+    
+    slider.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const endX = e.changedTouches[0].clientX;
+      const diff = startX - endX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) updateSlider(currentIdx + 1);
+        else updateSlider(currentIdx - 1);
+      }
+    }, { passive: true });
+  }
   
   // Auto slide change
   setInterval(() => {
@@ -491,7 +500,8 @@ function initQuantityControls() {
   const addBtn = document.querySelector('.add-to-cart-action');
   if (addBtn) {
     addBtn.addEventListener('click', (e) => {
-      const pid = e.target.dataset.productId;
+      var btn = e.currentTarget;
+      const pid = btn.dataset.productId;
       const count = parseInt(val.textContent);
       const usePrice = count >= 2 ? 980 : undefined;
       addToCart(pid, count, usePrice);
@@ -536,8 +546,8 @@ function initSearchPage() {
       <div class="product-card">
         <span class="product-tag">${discount}% OFF</span>
         <div class="product-image-container">
-          <a href="${p.link}">
-            <img src="${p.image}" alt="${p.name}">
+          <a href="${escapeHtml(p.link)}">
+            <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">
           </a>
         </div>
         <div class="product-info">
@@ -549,13 +559,13 @@ function initSearchPage() {
             <i class="fa-solid fa-star"></i>
             <span>(4.9)</span>
           </div>
-          <h3 class="product-title"><a href="${p.link}">${p.name}</a></h3>
+          <h3 class="product-title"><a href="${escapeHtml(p.link)}">${escapeHtml(p.name)}</a></h3>
           <div class="product-price">
             <span class="price-current">${p.price.toLocaleString('en-IN')}.00</span>
             <span class="price-original">${p.originalPrice.toLocaleString('en-IN')}.00</span>
           </div>
           <div class="product-action">
-            <button class="btn btn-full" onclick="addToCart('${p.id}')">Add to Cart</button>
+            <button class="btn btn-full" onclick="addToCart('${escapeHtml(p.id)}')">Add to Cart</button>
           </div>
         </div>
       </div>
@@ -598,18 +608,18 @@ function renderCartPageItems() {
     html += `
       <div class="cart-item" style="border-bottom: 1px solid var(--border-color); padding: 20px 0; gap: 24px;">
         <div class="cart-item-img" style="width: 100px; height: 100px;">
-          <img src="${item.image}" alt="${item.name}">
+          <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}">
         </div>
         <div class="cart-item-details">
-          <h4 class="cart-item-title" style="font-size: 1.05rem; margin-bottom: 8px;"><a href="${item.link}">${item.name}</a></h4>
+          <h4 class="cart-item-title" style="font-size: 1.05rem; margin-bottom: 8px;"><a href="${escapeHtml(item.link)}">${escapeHtml(item.name)}</a></h4>
           <div class="cart-item-price" style="font-size: 1rem; margin-bottom: 12px;">₹${(item.price * item.qty).toLocaleString('en-IN')}.00</div>
           <div class="cart-item-controls">
             <div class="qty-selector">
-              <button class="qty-btn" onclick="updateCartQty('${item.id}', -1)"><i class="fa-solid fa-minus"></i></button>
+              <button class="qty-btn" onclick="updateCartQty('${escapeHtml(item.id)}', -1)"><i class="fa-solid fa-minus"></i></button>
               <span class="qty-val">${item.qty}</span>
-              <button class="qty-btn" onclick="updateCartQty('${item.id}', 1)"><i class="fa-solid fa-plus"></i></button>
+              <button class="qty-btn" onclick="updateCartQty('${escapeHtml(item.id)}', 1)"><i class="fa-solid fa-plus"></i></button>
             </div>
-            <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">
+            <button class="cart-item-remove" onclick="removeFromCart('${escapeHtml(item.id)}')">
               <i class="fa-regular fa-trash-can" style="margin-right: 6px;"></i> Remove
             </button>
           </div>

@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Analytics Reports — Taiva Admin</title>
+  <title>Analytics Reports — OMS Admin</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=10">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-      <span class="logo-text">Taiva</span>
+      <img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+      <span class="logo-text">OMS</span>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Main</div>
@@ -35,11 +36,14 @@
         <a href="analytics-reports.html" class="nav-item active">Reports</a>
         <a href="analytics-liveview.html" class="nav-item">Live View</a>
       </div>
+      <div class="nav-section nav-role-manager">Agents</div>
+      <a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
       <div class="nav-section">Settings</div>
-      <a href="users.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
+      <a href="users.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
       <a href="settings.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
       <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
     </nav>
+    <div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
   </div>
 
   <div class="main-content">
@@ -53,11 +57,12 @@
       <div class="topbar-actions">
         <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
         <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-        <div class="admin-avatar">A</div>
+        <div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
+      <p style="font-size:11px;margin:4px 0;color:var(--text-muted);">Design and Developed by Abdullah Al Hassan</p>
       </div>
     </header>
 
-    <div class="page-content">
+    <div class="page-content" id="reportsRoot">
       <div class="page-header">
         <div>
           <h1>Reports</h1>
@@ -70,6 +75,7 @@
             <label style="font-size:13px;color:var(--text-muted);">To:</label>
             <input type="date" id="filterTo" style="padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--card-bg);color:var(--text);">
             <button class="btn btn-accent btn-sm" id="applyFilter">Apply</button>
+            <button class="btn btn-sm" id="exportBtn"><i class="fa-solid fa-download"></i> Download</button>
           </div>
         </div>
       </div>
@@ -102,6 +108,8 @@
               <div style="display:flex;flex-direction:column;gap:12px;">
                 <div><div style="font-size:12px;color:var(--text-muted);">Total Revenue</div><div style="font-size:24px;font-weight:700;" id="summaryRevenue">Rs. 0</div></div>
                 <div><div style="font-size:12px;color:var(--text-muted);">Total Orders</div><div style="font-size:24px;font-weight:700;" id="summaryOrders">0</div></div>
+                <div><div style="font-size:12px;color:var(--text-muted);">Total Cancelled</div><div style="font-size:24px;font-weight:700;color:var(--danger);" id="summaryCancelled">0</div></div>
+                <div><div style="font-size:12px;color:var(--text-muted);">Cancelled Value</div><div style="font-size:24px;font-weight:700;" id="summaryCancelledValue">Rs. 0</div></div>
                 <div><div style="font-size:12px;color:var(--text-muted);">Avg Order Value</div><div style="font-size:24px;font-weight:700;" id="summaryAvg">Rs. 0</div></div>
                 <div><div style="font-size:12px;color:var(--text-muted);">Total Products Sold</div><div style="font-size:24px;font-weight:700;" id="summarySold">0</div></div>
               </div>
@@ -120,7 +128,8 @@
 
   <div class="modal-overlay" id="modalOverlay"></div>
 
-  <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="app.js?v=13"></script>
   <script>
     var salesChartInstance, productsChartInstance, ordersChartInstance, paymentChartInstance;
 
@@ -142,8 +151,12 @@
       completed.forEach(function(o) {
         if (o.items) o.items.forEach(function(i) { totalSold += i.qty || 1; });
       });
+      var cancelled = filtered.filter(function(o) { return o.status === 'cancelled'; });
+      var cancelledValue = cancelled.reduce(function(s, o) { return s + (o.total || 0); }, 0);
       document.getElementById('summaryRevenue').textContent = formatCurrency(totalRevenue);
       document.getElementById('summaryOrders').textContent = totalOrders;
+      document.getElementById('summaryCancelled').textContent = cancelled.length;
+      document.getElementById('summaryCancelledValue').textContent = formatCurrency(cancelledValue);
       document.getElementById('summaryAvg').textContent = formatCurrency(avgOrder);
       document.getElementById('summarySold').textContent = totalSold;
 
@@ -308,13 +321,116 @@
       }
     }
 
+    function getFilteredOrders() {
+      var orders = getData('orders');
+      var fromDate = document.getElementById('filterFrom').value;
+      var toDate = document.getElementById('filterTo').value;
+      if (fromDate) orders = orders.filter(function(o) { return o.createdAt && o.createdAt.split('T')[0] >= fromDate; });
+      if (toDate) orders = orders.filter(function(o) { return o.createdAt && o.createdAt.split('T')[0] <= toDate; });
+      return orders;
+    }
+
+    function exportReports() {
+      var orders = getFilteredOrders();
+      var completed = orders.filter(function(o) { return o.status !== 'cancelled'; });
+      var totalRevenue = completed.reduce(function(s, o) { return s + o.total; }, 0);
+      var totalOrders = orders.length;
+      var avgOrder = completed.length > 0 ? totalRevenue / completed.length : 0;
+      var totalSold = 0;
+      completed.forEach(function(o) {
+        if (o.items) o.items.forEach(function(i) { totalSold += i.qty || 1; });
+      });
+      var cancelled = orders.filter(function(o) { return o.status === 'cancelled'; });
+      var cancelledValue = cancelled.reduce(function(s, o) { return s + (o.total || 0); }, 0);
+
+      var summaryData = [
+        ['Metric', 'Value'],
+        ['Total Revenue', totalRevenue],
+        ['Total Orders', totalOrders],
+        ['Total Cancelled', cancelled.length],
+        ['Cancelled Value', cancelledValue],
+        ['Avg Order Value', avgOrder],
+        ['Total Products Sold', totalSold]
+      ];
+
+      var today = new Date();
+      var dailyData = [['Date', 'Sales (Rs.)', 'Orders']];
+      var productSales = {};
+      var productRevenue = {};
+      var cod = 0, upi = 0, card = 0;
+      for (var i = 29; i >= 0; i--) {
+        var d = new Date(today.getTime() - i * 86400000);
+        var ds = d.toISOString().split('T')[0];
+        var dayTotal = 0, dayOrders = 0;
+        completed.forEach(function(o) {
+          var od = o.createdAt ? o.createdAt.split('T')[0] : '';
+          if (od === ds) { dayTotal += o.total; dayOrders++; }
+        });
+        dailyData.push([ds, dayTotal, dayOrders]);
+      }
+      completed.forEach(function(o) {
+        if (o.items) o.items.forEach(function(li) {
+          var name = li.name || 'Unknown';
+          productSales[name] = (productSales[name] || 0) + (li.qty || 1);
+          productRevenue[name] = (productRevenue[name] || 0) + ((li.price || 0) * (li.qty || 1));
+        });
+        var pm = (o.paymentMethod || '').toLowerCase();
+        if (pm === 'cod' || pm === 'cash_on_delivery') cod += o.total;
+        else if (pm === 'upi' || pm === 'phonepe' || pm === 'gpay') upi += o.total;
+        else card += o.total;
+      });
+      var productsData = [['Product', 'Qty Sold', 'Revenue (Rs.)']];
+      Object.keys(productSales).forEach(function(name) {
+        productsData.push([name, productSales[name], productRevenue[name]]);
+      });
+      var paymentData = [['Method', 'Amount (Rs.)'], ['COD', cod], ['UPI', upi], ['Card', card]];
+
+      if (typeof XLSX !== 'undefined') {
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryData), 'Summary');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dailyData), 'Daily Sales');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(productsData), 'Top Products');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(paymentData), 'Payment Methods');
+        XLSX.writeFile(wb, 'oms-reports-' + new Date().toISOString().split('T')[0] + '.xlsx');
+        showToast('Report downloaded', 'success');
+      } else {
+        var csv = '\uFEFF' + [
+          'Metric,Value',
+          'Total Revenue,' + totalRevenue,
+          'Total Orders,' + totalOrders,
+          'Total Cancelled,' + cancelled.length,
+          'Cancelled Value,' + cancelledValue,
+          'Avg Order Value,' + avgOrder,
+          'Total Products Sold,' + totalSold
+        ].join('\n');
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'oms-reports-' + new Date().toISOString().split('T')[0] + '.csv';
+        a.click();
+        showToast('Report downloaded', 'success');
+      }
+    }
+
     initPage = function() {
+      var cur = getCurrentUser();
+      if (cur && cur.role === 'agent' && !hasRight(cur, 'view_reports')) {
+        var root = document.getElementById('reportsRoot');
+        root.innerHTML =
+          '<div class="card" style="padding:60px;text-align:center;">' +
+          '<i class="fa-solid fa-lock" style="font-size:44px;color:var(--text-muted);opacity:0.4;"></i>' +
+          '<h3 style="margin:12px 0 4px;">Access denied</h3>' +
+          '<p class="text-muted">You do not have permission to view reports.</p>' +
+          '<a class="btn btn-accent mt-16" href="dashboard.html"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a></div>';
+        return;
+      }
       var d = new Date();
       var fromDefault = new Date(d.getTime() - 30 * 86400000);
       document.getElementById('filterFrom').value = fromDefault.toISOString().split('T')[0];
       document.getElementById('filterTo').value = d.toISOString().split('T')[0];
       buildCharts();
       document.getElementById('applyFilter').addEventListener('click', buildCharts);
+      document.getElementById('exportBtn').addEventListener('click', exportReports);
       window.addEventListener('pageshow', function(e) { if (e.persisted) buildCharts(); });
     };
   </script>

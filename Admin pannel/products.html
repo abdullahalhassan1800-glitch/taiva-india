@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All Products — Taiva Admin</title>
+  <title>All Products — OMS Admin</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <img src="assets/logo.png" alt="Taiva" style="height:32px;width:auto;flex-shrink:0;">
-      <span class="logo-text">Taiva</span>
+      <img src="assets/logo.png?v=2" alt="OMS" style="height:32px;width:auto;flex-shrink:0;">
+      <span class="logo-text">OMS</span>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Main</div>
@@ -38,11 +39,14 @@
       <div class="nav-sub"><a href="markets-catalogs.html" class="nav-item">Catalogs</a><a href="markets-rollouts.html" class="nav-item">Rollouts</a></div>
       <a href="#" class="nav-item has-submenu"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span><span class="nav-label">Analytics</span><span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span></a>
       <div class="nav-sub"><a href="analytics-reports.html" class="nav-item">Reports</a><a href="analytics-liveview.html" class="nav-item">Live View</a></div>
+      <div class="nav-section nav-role-manager">Agents</div>
+      <a href="agents-activity.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span><span class="nav-label">Agent Activity</span></a>
       <div class="nav-section">Settings</div>
-      <a href="users.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
+      <a href="users.html" class="nav-item nav-role-manager"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span class="nav-label">Users</span></a>
       <a href="settings.html" class="nav-item nav-role-restricted"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span class="nav-label">Settings</span></a>
       <a href="#" class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="nav-label">Logout</span></a>
     </nav>
+    <div class="sidebar-footer">Dev By Abdullah Al Hassan</div>
   </div>
 
   <div class="main-content">
@@ -53,7 +57,8 @@
       <div class="topbar-actions">
         <button id="themeToggle"><i class="fa-solid fa-moon"></i></button>
         <button><i class="fa-regular fa-bell"></i><span class="notification-dot"></span></button>
-        <div class="admin-avatar">A</div>
+        <div class="admin-avatar" id="adminAvatar" onclick="toggleProfileMenu(event)"><span id="avatarInitial">A</span></div>
+      <p style="font-size:11px;margin:4px 0;color:var(--text-muted);">Design and Developed by Abdullah Al Hassan</p>
       </div>
     </header>
 
@@ -212,7 +217,7 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=13"></script>
   <script>
   function switchImageTab(tab) {
     document.querySelectorAll('.image-tab').forEach(function(t) { t.classList.remove('active'); });
@@ -350,7 +355,7 @@
       var webBtn = isPublished
         ? '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i> Edit Web</button><button class="btn btn-sm btn-danger" onclick="unpublishFromWeb(\'' + p.id + '\')" title="Remove from website"><i class="fa-solid fa-globe-slash"></i></button>'
         : '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')"><i class="fa-solid fa-globe"></i> Add to Web</button>';
-      var actions = isViewer ? '' : '<div class="pcard-actions">' + webBtn + '<button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i> Edit</button><button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button></div>';
+      var actions = isViewer ? '' : '<div class="pcard-actions">' + webBtn + '<button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i> Edit</button>' + (canDelete() ? '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '') + '</div>';
       return '<div class="product-card-admin"><div class="pcard-img"><img src="' + img + '" alt="' + p.name + '" onerror="this.src=\'https://placehold.co/200x200/e2e8f0/94a3b8?text=No+Image\'"></div><div class="pcard-body"><h4>' + p.name + '</h4><div class="pcard-price">' + formatCurrency(p.price) + '</div><div class="pcard-stock">' + publishBadge + '<span class="badge ' + stockClass + '">' + stockLabel + '</span> &middot; ' + (p.category || 'Uncategorized') + '</div></div>' + actions + '</div>';
     }).join('');
   }
@@ -373,7 +378,7 @@
       var webBtnTable = isPublishedTable
         ? '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')" title="Edit web listing"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="unpublishFromWeb(\'' + p.id + '\')" title="Remove from web"><i class="fa-solid fa-globe-slash"></i></button>'
         : '<button class="btn btn-sm btn-web" onclick="openPublishModal(\'' + p.id + '\')" title="Publish to web"><i class="fa-solid fa-globe"></i></button>';
-      var actions = isViewer ? '' : webBtnTable + ' <button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>';
+      var actions = isViewer ? '' : webBtnTable + ' <button class="btn btn-sm" onclick="editProduct(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button> ' + (canDelete() ? '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '');
       return '<tr><td><div class="product-cell"><img src="' + img + '" alt="" onerror="this.src=\'https://placehold.co/40x40/e2e8f0/94a3b8?text=N\'"></div></td><td><strong>' + p.name + '</strong></td><td>' + p.sku + '</td><td>' + (p.category || '-') + '</td><td>' + formatCurrency(p.price) + '</td><td>' + p.stock + '</td><td><span class="badge ' + stockClass + '">' + stockLabel + '</span></td><td>' + actions + '</td></tr>';
     }).join('');
   }
@@ -460,6 +465,7 @@
   };
 
   function deleteProduct(id) {
+    if (!canDelete()) { showToast('Access denied', 'error'); return; }
     var products = getData('products');
     var p = products.find(function(x) { return x.id === id; });
     if (!p) return;
@@ -469,6 +475,7 @@
   }
 
   function confirmDeleteProduct() {
+    if (!canDelete()) { showToast('Access denied', 'error'); return; }
     var id = document.getElementById('deleteProdId').value;
     var products = getData('products');
     var p = products.find(function(x) { return x.id === id; });

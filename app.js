@@ -1,4 +1,8 @@
 /* ===== UNIFIED CART (localStorage-based) ===== */
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 function getCart() {
   try { return JSON.parse(localStorage.getItem('taiva_cart') || '[]'); }
   catch(e) { return []; }
@@ -64,15 +68,18 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ===== HERO VIDEO SOUND TOGGLE ===== */
-  document.querySelector('.hero-section').addEventListener('click', function (e) {
-    const btn = e.target.closest('.hero-sound-toggle');
-    if (!btn) return;
-    const slide = btn.closest('.hero-slide');
-    const video = slide && slide.querySelector('video');
-    if (!video) return;
-    video.muted = !video.muted;
-    btn.innerHTML = video.muted ? '&#128263;' : '&#128266;';
-  });
+  var heroSection = document.querySelector('.hero-section');
+  if (heroSection) {
+    heroSection.addEventListener('click', function (e) {
+      const btn = e.target.closest('.hero-sound-toggle');
+      if (!btn) return;
+      const slide = btn.closest('.hero-slide');
+      const video = slide && slide.querySelector('video');
+      if (!video) return;
+      video.muted = !video.muted;
+      btn.innerHTML = video.muted ? '&#128263;' : '&#128266;';
+    });
+  }
 
   /* ===== HERO VIDEO PAUSE ON SWIPE ===== */
   heroSwiper.on('slideChangeTransitionStart', function () {
@@ -141,9 +148,9 @@ document.addEventListener('DOMContentLoaded', function () {
     cart.forEach(function (item, idx) {
       var lineTotal = item.price * (item.qty || 1);
       html += '<div class="cart-item" data-index="' + idx + '">' +
-        '<img src="' + (item.image || '') + '" alt="' + (item.name || '') + '" loading="lazy">' +
+        '<img src="' + escapeHtml(item.image || '') + '" alt="' + escapeHtml(item.name || '') + '" loading="lazy">' +
         '<div class="cart-item-info">' +
-          '<span class="ci-name">' + (item.name || '') + '</span>' +
+          '<span class="ci-name">' + escapeHtml(item.name || '') + '</span>' +
           '<span class="ci-price">Rs. ' + lineTotal.toLocaleString('en-IN') + (item.qty > 1 ? ' (x' + item.qty + ')' : '') + '</span>' +
         '</div>' +
         '<button class="cart-item-remove" data-index="' + idx + '"><i class="fa-solid fa-trash-can"></i></button>' +
