@@ -41,6 +41,12 @@
     <changefreq>weekly</changefreq>
   </url>
   <url>
+    <loc>https://taiva.in/sea-buckthorn.html</loc>
+    <lastmod>2026-10-01</lastmod>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
     <loc>https://taiva.in/privacy-policy.html</loc>
     <priority>0.3</priority>
     <changefreq>yearly</changefreq>

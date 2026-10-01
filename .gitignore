@@ -26,6 +26,41 @@ TaivaAdminApp/android/app/build/
 TaivaAdminApp/android/.gradle/
 TaivaAdminApp/www/
 
-# FTP deployment copies (keep in git for reference)
-# TAIVA FTP/
-# TAIVA FINAL/
+# FTP deployment copies - huge (2.3GB incl. ~2GB of videos) and already
+# deployed to the server via FTP. Keeping these out of git avoids the
+# GitHub 100MB per-file limit and duplicate history.
+TAIVA FTP/
+TAIVA FINAL/
+
+# Secrets & credentials - NEVER commit
+# ftp_root.txt contains a plaintext FTP password.
+ftp_root.txt
+ftp_script.txt
+ftp_script2.txt
+ftp_session.txt
+ftp_session2.txt
+ftp_ascii.txt
+ftp_check_path.txt
+ftp_list.txt
+ftp_list2.txt
+ftp_upload.bat
+ftp_upload2.txt
+ftp_landing_upload.bat
+ftp_reupload*.bat
+ftp_reupload*.txt
+ftpscript.txt
+ftpscript2.txt
+*.env
+.env.*
+live*.txt
+dummy.txt
+check_credit.ps1
+verify.ps1
+verify2.ps1
+
+# Local tooling / editor cruft
+.opencode/
+.vscode/
+*.code-workspace
+node_modules/
+__pycache__/
